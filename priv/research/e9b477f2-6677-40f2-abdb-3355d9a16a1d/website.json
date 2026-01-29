@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "Error, página no encontrada",
+    "title": "pyme10 - Error, p&aacute;gina no encontrada",
+    "languages_detected": []
+  },
+  "pages": [
+    {
+      "description": "Error, página no encontrada",
+      "title": "pyme10 - Error, p&aacute;gina no encontrada",
+      "url": "http://www.cirugiaveterinaria.es/",
+      "language": null,
+      "content": "pyme10 - Error, p&aacute;gina no encontrada La página que está tratando de abrir no existe en el sistema PYME10 Por favor agrege este dominio al cliente desde la administración del sistema pyme10 para solucionar este error. Una vez agregado el dominio refresque la página para visualizar la web.",
+      "headings": [
+        "La página que está tratando de abrir  no existe en el sistema PYME10"
+      ],
+      "content_length": 295
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 295,
+  "crawled_at": "2026-01-28T15:58:21.454304Z"
+}

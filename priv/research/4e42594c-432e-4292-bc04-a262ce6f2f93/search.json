@@ -1,0 +1,99 @@
+{
+  "failed": 0,
+  "queries": [
+    {
+      "query": "\"Freire.eiti\" Santiago de Compostela reviews opinions",
+      "results": [
+        {
+          "title": "A TAFONA BY LUCIA FREITAS, Santiago de Compostela - Tripadvisor",
+          "url": "https://www.tripadvisor.com/Restaurant_Review-g187508-d2399814-Reviews-A_Tafona_by_Lucia_Freitas-Santiago_de_Compostela_Province_of_A_Coruna_Galicia.html",
+          "content": "The staff very polite, unpretentious, smiling and helpful. The food was quite disappointing to the point of being bland with one or two notable exceptions.",
+          "score": 0.99187535
+        },
+        {
+          "title": "Free Tour Compostela (2026) - All You Need to Know BEFORE You ...",
+          "url": "https://www.tripadvisor.com/Attraction_Review-g187508-d8367989-Reviews-Free_Tour_Compostela-Santiago_de_Compostela_Province_of_A_Coruna_Galicia.html",
+          "content": "A free tour rich in information and very educational. This free ride was one of the best I've ever done. The guide gave us a lot of information and in a very",
+          "score": 0.9730365
+        },
+        {
+          "title": "Santiago de Compostela Tourist Train (2026) - Tripadvisor",
+          "url": "https://www.tripadvisor.com/Attraction_Review-g187508-d2292821-Reviews-Santiago_de_Compostela_Tourist_Train-Santiago_de_Compostela_Province_of_A_Coruna_.html",
+          "content": "The ride was noisy and bumpy, with poor and very limited, hard-to-hear commentary, and was really just a circle around the zona vieja and the Alameda park.",
+          "score": 0.9167081
+        },
+        {
+          "title": "Santiago Freetours (2026) - All You Need to Know BEFORE You Go ...",
+          "url": "https://www.tripadvisor.com/Attraction_Review-g187508-d8376975-Reviews-Santiago_Freetours-Santiago_de_Compostela_Province_of_A_Coruna_Galicia.html",
+          "content": "I really enjoyed the guided tour through Santiago. Our guide was not only full of knowledge, but really interested in sharing this knowledge with us.",
+          "score": 0.6791787
+        },
+        {
+          "title": "FREE TOUR COMPOSTELA (2026 Guide) All You ... - Tripadvisor",
+          "url": "https://www.tripadvisor.ie/Attraction_Review-g187508-d8367989-Reviews-or25-Free_Tour_Compostela-Santiago_de_Compostela_Province_of_A_Coruna_Galicia.html",
+          "content": "Sandra's visit was great, for two hours we toured the surroundings of the Plaza del Obradoiro and she explained to us in a very pleasant way the main locations",
+          "score": 0.4054487
+        }
+      ]
+    },
+    {
+      "query": "\"Freire.eiti\" Plumbers specialist expertise",
+      "results": [
+        {
+          "title": "Freire Plumbing - 4330 Gus Thomasson Rd, Mesquite, Texas - Yelp",
+          "url": "https://www.yelp.com/biz/freire-plumbing-mesquite",
+          "content": "Trusted Plumbing Repair Experts Serving Mesquite, Texas · Trusted Toilet Installation in Mesquite, Texas · Trusted Water Purification Services Near Mesquite",
+          "score": 0.9974491
+        },
+        {
+          "title": "Eire Plumbing - Updated January 2026 - 11 Reviews - Yelp",
+          "url": "https://www.yelp.com/biz/eire-plumbing-rockville",
+          "content": "Services - Eire Plumbing: Drain Cleaning, Faucet Repair, Garbage Disposal Repair, 1 More Service. Eire Plumbing Photos.",
+          "score": 0.8688268
+        }
+      ]
+    },
+    {
+      "query": "\"Freire.eiti\" Santiago de Compostela news",
+      "results": [
+        {
+          "title": "Forest fires affecting Camino Frances route in Spain?",
+          "url": "https://www.facebook.com/groups/869651420073723/posts/2475164046189111/",
+          "content": "ℹ️ The French Way is currently fire-free throughout Galicia, from Pedrafita to Santiago de Compostela. It is recommended that you regularly check",
+          "score": 0.23108497
+        },
+        {
+          "title": "'Very high to extreme' wildfire warning for Ireland after ' ...",
+          "url": "https://www.irishmirror.ie/news/irish-news/camino-de-santiago-damage-pilgrims-35772545",
+          "content": "There has been “a huge amount of damage” caused to the Camino De Santiago by fires as a wildfire warning has also been issued to Ireland.",
+          "score": 0.17562322
+        },
+        {
+          "title": "Forest fires threaten pilgrims on the Way of St. James",
+          "url": "https://www.bluewin.ch/en/news/forest-fires-threaten-pilgrims-on-the-way-of-st-james-2834750.html",
+          "content": "Due to the ongoing forest fires, the northern Spanish authorities are warning against traveling on the Camino de Santiago. On social media,",
+          "score": 0.17401722
+        },
+        {
+          "title": "Camino de Santiago pilgrims voice shock as wildfires force ...",
+          "url": "https://www.standard.co.uk/news/world/camino-de-santiago-wildfires-route-closure-spain-b1243444.html",
+          "content": "Camino de Santiago pilgrims voice shock as devastating Spanish wildfires force route closure. 'This is a fire situation we haven't experienced",
+          "score": 0.17192177
+        },
+        {
+          "title": "Record Spanish wildfires close part of Camino de Santiago ...",
+          "url": "https://www.yahoo.com/news/videos/record-spanish-wildfires-close-part-200956942.html",
+          "content": "STORY: Spanish authorities on Monday closed part of the popular Camino de Santiago pilgrimage route as the country faces its worst wave of",
+          "score": 0.15104061
+        }
+      ]
+    },
+    {
+      "query": "\"Freire.eiti\" site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net",
+      "results": []
+    }
+  ],
+  "successful": 4,
+  "total_queries": 4,
+  "searched_at": "2026-01-28T16:02:42.528235Z"
+}

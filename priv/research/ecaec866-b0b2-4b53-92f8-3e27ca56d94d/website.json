@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "description": "Conuco Coffee Roasters is a Roastery and Specialty Coffee Shop based in Coruña.",
+    "title": "Specialty Coffee Roasted in Coruña",
+    "languages_detected": [
+      "en-US"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Conuco Coffee Roasters is a Roastery and Specialty Coffee Shop based in Coruña.",
+      "title": "Specialty Coffee Roasted in Coruña",
+      "url": "https://conucocoffee.com/",
+      "language": "en-US",
+      "content": "Specialty Coffee Roasted in Coruña Skip to content SPECIALTY COFFEE CORUÑA We are in  Rua Orzán 178 In the center of Coruña, just by the beach! Find us! FOLLOW US! Follow us on Instagram for news and hot promos! Follow Us! HOLA! We are a Coffee Roaster based in A Coruña. We come from London and Madrid. We love bikes, sourdough bread, beers and great coffee. We serve great coffee, roasted with love and carefully selected. Our menu includes toasties and bakery. It is reduced as we believe that less is better, so our selection will be changing based on seasonality and your tastes too. We aim to pick together the perfect match for your coffee. Scroll to Top",
+      "headings": [
+        "SPECIALTY COFFEE CORUÑA",
+        "We are in  Rua Orzán 178",
+        "FOLLOW US!",
+        "HOLA!"
+      ],
+      "content_length": 661
+    },
+    {
+      "description": null,
+      "title": "Cookie Policy (EU) | Conuco Coffee Roasters | Specialty Coffee Coruña",
+      "url": "https://conucocoffee.com/cookie-policy-eu",
+      "language": "en-US",
+      "content": "Cookie Policy (EU) | Conuco Coffee Roasters | Specialty Coffee Coruña Skip to content Scroll to Top",
+      "headings": [],
+      "content_length": 99
+    }
+  ],
+  "pages_crawled": 2,
+  "has_english_version": true,
+  "total_content_length": 760,
+  "crawled_at": "2026-01-28T15:55:19.584744Z"
+}

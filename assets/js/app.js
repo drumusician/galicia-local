@@ -25,11 +25,116 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/galicia_local"
 import topbar from "../vendor/topbar"
 
+// Leaflet Map Hook
+const LeafletMap = {
+  mounted() {
+    const lat = parseFloat(this.el.dataset.lat)
+    const lng = parseFloat(this.el.dataset.lng)
+    const name = this.el.dataset.name
+
+    if (isNaN(lat) || isNaN(lng)) return
+
+    // Clear loading message
+    this.el.innerHTML = ""
+
+    // Load Leaflet CSS dynamically
+    if (!document.querySelector('link[href*="leaflet"]')) {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+      document.head.appendChild(link)
+    }
+
+    // Load Leaflet JS dynamically
+    if (!window.L) {
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+      script.onload = () => this.initMap(lat, lng, name)
+      document.head.appendChild(script)
+    } else {
+      this.initMap(lat, lng, name)
+    }
+  },
+
+  initMap(lat, lng, name) {
+    const map = L.map(this.el).setView([lat, lng], 15)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map)
+
+    L.marker([lat, lng])
+      .addTo(map)
+      .bindPopup(name)
+      .openPopup()
+  }
+}
+
+// Cities Map Hook - multiple markers with clickable popups
+const CitiesMap = {
+  mounted() {
+    const cities = JSON.parse(this.el.dataset.cities)
+    if (!cities || cities.length === 0) return
+
+    this.el.innerHTML = ""
+
+    // Load Leaflet CSS
+    if (!document.querySelector('link[href*="leaflet"]')) {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+      document.head.appendChild(link)
+    }
+
+    // Load Leaflet JS
+    if (!window.L) {
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+      script.onload = () => this.initMap(cities)
+      document.head.appendChild(script)
+    } else {
+      this.initMap(cities)
+    }
+  },
+
+  initMap(cities) {
+    const map = L.map(this.el).setView([42.6, -8.0], 8)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map)
+
+    const bounds = []
+    const hook = this
+
+    cities.forEach(city => {
+      if (!city.lat || !city.lng) return
+      const pos = [city.lat, city.lng]
+      bounds.push(pos)
+
+      const popup = L.popup().setContent(
+        `<div style="text-align:center;min-width:120px">` +
+        `<strong style="font-size:14px">${city.name}</strong><br>` +
+        `<span style="color:#666">${city.province}</span><br>` +
+        `<span style="color:#888;font-size:12px">${city.business_count} listings</span><br>` +
+        `<a href="/cities/${city.slug}" style="color:#6419e6;font-weight:600;font-size:13px">Explore →</a>` +
+        `</div>`
+      )
+
+      L.marker(pos).addTo(map).bindPopup(popup)
+    })
+
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [30, 30] })
+    }
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, LeafletMap, CitiesMap},
 })
 
 // Show progress bar on live navigation and form submits

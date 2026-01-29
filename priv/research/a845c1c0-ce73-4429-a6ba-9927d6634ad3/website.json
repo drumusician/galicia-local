@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "Los supermercados GADIS, presentes en Galicia y Castilla y León, destacan por su proximidad y variedad de surtido, apostando por el producto fresco y local.",
+    "title": "Gadis || Tu supermercado de cercanía.",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Los supermercados GADIS, presentes en Galicia y Castilla y León, destacan por su proximidad y variedad de surtido, apostando por el producto fresco y local.",
+      "title": "Gadis || Tu supermercado de cercanía.",
+      "url": "http://www.gadis.es/",
+      "language": "es",
+      "content": "Gadis || Tu supermercado de cercanía.",
+      "headings": [],
+      "content_length": 37
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 37,
+  "crawled_at": "2026-01-28T14:32:13.559432Z"
+}

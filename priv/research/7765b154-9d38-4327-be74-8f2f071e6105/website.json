@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "description": "Tapas, carne a la parrilla y guisos de pescado. La cocina tradicional gallega de siempre con toques modernos en un mesón de estilo rústico.",
+    "title": "Mesón42 - Cocina tradicional gallega.",
+    "languages_detected": [
+      "es-ES"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Tapas, carne a la parrilla y guisos de pescado. La cocina tradicional gallega de siempre con toques modernos en un mesón de estilo rústico.",
+      "title": "Mesón42 - Cocina tradicional gallega.",
+      "url": "http://www.meson42.com/index.php",
+      "language": "es-ES",
+      "content": "Mesón42 - Cocina tradicional gallega. Ir al contenido RESERVA NUESTRA CARTA En plena Rúa do Franco (muy cerca de la Catedral de Santiago de Compostela) se encuentra tu restaurante de siempre adaptado a los tiempos actuales. El Mesón 42 es tu local de confianza para tomar unos vinos, unas cañas o sentarte a disfrutar de la cocina tradicional gallega preparada con mucho cariño. SOMOS mesón42 Nuestros menús: CARTA COMPLETA PARA GRUPOS ¿Necesitas algo más? Contacto Facebook Instagram Tripadvisor Google Gestionar el consentimiento de las cookies Para ofrecer las mejores experiencias, utilizamos tecnologías como las cookies para almacenar y/o acceder a la información del dispositivo. El consentimiento de estas tecnologías nos permitirá procesar datos como el comportamiento de navegación o las identificaciones únicas en este sitio. No consentir o retirar el consentimiento, puede afectar negativamente a ciertas características y funciones. Funcional Funcional Siempre activo El almacenamiento o acceso técnico es estrictamente necesario para el propósito legítimo de permitir el uso de un servicio específico explícitamente solicitado por el abonado o usuario, o con el único propósito de llevar a cabo la transmisión de una comunicación a través de una red de comunicaciones electrónicas. Preferencias Preferencias El almacenamiento o acceso técnico es necesario para la finalidad legítima de almacenar preferencias no solicitadas por el abonado o usuario. Estadísticas Estadísticas El almacenamiento o acceso técnico que es utilizado exclusivamente con fines estadísticos. El almacenamiento o acceso técnico que se utiliza exclusivamente con fines estadísticos anónimos. Sin un requerimiento, el cumplimiento voluntario por parte de tu proveedor de servicios de Internet, o los registros adicionales de un tercero, la información almacenada o recuperada sólo para este propósito no se puede utilizar para identificarte. Marketing Marketing El almacenamiento o acceso técnico es necesario para crear perfiles de usuario para enviar publicidad, o para rastrear al usuario en una web o en varias web con fines de marketing similares. Administrar opciones Gestionar los servicios Gestionar {vendor_count} proveedores Leer más sobre estos propósitos Aceptar Denegar Ver preferencias Guardar preferencias Ver preferencias {title} {title} {title} Gestionar consentimiento Facebook Instagram Tripadvisor Google CARTA SOMOS 42 RESERVA CONTACTO TRABAJA CON NOSOTROS",
+      "headings": [
+        "Nuestros menús:",
+        "¿Necesitas algo más?",
+        "CARTA",
+        "SOMOS 42",
+        "RESERVA",
+        "CONTACTO",
+        "TRABAJA CON NOSOTROS"
+      ],
+      "content_length": 2463
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 2463,
+  "crawled_at": "2026-01-28T14:58:40.421642Z"
+}

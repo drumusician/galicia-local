@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "description": null,
+    "title": "Inicio",
+    "languages_detected": [
+      "en"
+    ]
+  },
+  "pages": [
+    {
+      "description": null,
+      "title": "Inicio",
+      "url": "http://www.profitasesores.es/",
+      "language": "en",
+      "content": "Inicio Skip to main content Skip to navigation ¿Quiénes somos? Protif Asesores cuenta con una dilatada experiencia en el ámbito de la asesoría integral, basados en la calidad en el trabajo, una metodología desarrollada y una atención particularizada. Nuestros clientes reciben un servicio eficaz  a través de un análisis pormenorizado y soluciones alternativas, en busca de un mejor funcionamiento y progreso de la empresa. ¿Qué Hacemos? Fiscal y Contable Prestamos los servicios fiscales y contables que dan cumplimiento a las obligaciones formales con las Administraciónes del Estado. También realizamos revisiones contables, consolidación fiscal y contable, así como valoración de empresas. Laboral Nuestros servicios  laborales abarcan Empresas, PYMES y autónomos.  Acompañamos a nuestros clientes en su relación con los trabajadores. Mercantil Constitución, adquisición, fusión y escisión de sociedades. Estructuras societarias adecuadas a cada situación. Redacción de Estatutos y trasmisión de acciones Transferencia de vehiculos Realizamos todas las gestiones relacionadas con vehículos ante la DGT.",
+      "headings": [
+        "¿Quiénes somos?",
+        "¿Qué Hacemos?",
+        "Fiscal y Contable",
+        "Laboral",
+        "Mercantil",
+        "Transferencia de vehiculos"
+      ],
+      "content_length": 1106
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": true,
+  "total_content_length": 1106,
+  "crawled_at": "2026-01-28T15:05:00.701677Z"
+}

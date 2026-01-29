@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": null,
+    "title": "Web Server's Default Page",
+    "languages_detected": [
+      "en"
+    ]
+  },
+  "pages": [
+    {
+      "description": null,
+      "title": "Web Server's Default Page",
+      "url": "http://www.distribucionesgonzalezseijas.com/",
+      "language": "en",
+      "content": "Web Server's Default Page You see this page because there is no Web site at this address.",
+      "headings": [],
+      "content_length": 89
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": true,
+  "total_content_length": 89,
+  "crawled_at": "2026-01-28T15:21:11.800902Z"
+}

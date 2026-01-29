@@ -1,0 +1,148 @@
+{
+  "failed": 0,
+  "queries": [
+    {
+      "query": "\"Vitae Compostela\" Santiago de Compostela reviews opinions",
+      "results": [
+        {
+          "title": "Vitae Compostela Inmobiliaria | Santiago de Compostela - Facebook",
+          "url": "https://www.facebook.com/vitaecompostela/",
+          "content": "Otro inmueble alquilado con éxito gracias a un trabajo basado en la: ✓ Responsabilidad ✓ Efectividad ✓ Confianza ✓ Seguridad Si estás pensando en alquilar,",
+          "score": 0.9999385
+        },
+        {
+          "title": "Vita Homes by Upper Luxury Housing, Santiago de Compostela",
+          "url": "https://www.hotels.com/ho3812927232/",
+          "content": "9.6 out of 10, Exceptional, 39 reviews. 9.6. Exceptional. 39 reviews. Apartamentos Nova Compostela · Compare similar properties. Mod logo. Earn",
+          "score": 0.99968743
+        },
+        {
+          "title": "Vita Homes by Upper Luxury Housing",
+          "url": "https://www.booking.com/hotel/es/vita-homes-by-upper-luxury-housing-santiago-de-compostela.html",
+          "content": "Vita Homes by Upper Luxury Housing, Santiago de Compostela (updated prices 2026) ... Reviews. Scored 9. 9.0. Rated wonderful. Wonderful · 5 reviews. Location.",
+          "score": 0.99694854
+        },
+        {
+          "title": "The 10 best luxury hotels in Santiago de Compostela, Spain",
+          "url": "https://www.booking.com/luxury/city/es/santiago-de-compostela.html",
+          "content": "The hotel was amazing they were very helpful with everything even though I don't speak Spanish the English with everyone I encountered with was amazing.",
+          "score": 0.18832396
+        },
+        {
+          "title": "TOP 10 Hotels in Santiago de Compostela (from $48) - Expedia",
+          "url": "https://www.expedia.com/Santiago-De-Compostela-Hotels.d3099.Travel-Guide-Hotels",
+          "content": "\"Great location, our room was clean and very comfortable. The staff was amazing. They went over and beyond to help make our stay enjoyable.",
+          "score": 0.061875984
+        }
+      ]
+    },
+    {
+      "query": "\"Vitae Compostela\" Real Estate Agents specialist expertise",
+      "results": [
+        {
+          "title": "Vitae Compostela Inmobiliaria | Santiago de ...",
+          "url": "https://www.facebook.com/vitaecompostela/",
+          "content": "✨ Hogares luminosos, eficientes y con un diseño actual. Vitae Compostela – Obra nueva en Culleredo, A Coruña. Teléfono: 676 19 91 28 Te acompañamos durante",
+          "score": 0.9998822
+        },
+        {
+          "title": "Real Estate Agent Santiago de Compostela",
+          "url": "https://www.engelvoelkers.com/es/en/real-estate-agent/galicia/santiago-de-compostela",
+          "content": "We specialise in real estate brokerage, offering a wide range of properties for both sale and rent. We are proud to have a highly qualified professional team",
+          "score": 0.99977654
+        },
+        {
+          "title": "Real Estate Agent Municipality of Santiago de Compostela",
+          "url": "https://www.engelvoelkers.com/es/en/real-estate-agent/galicia/municipality-of-santiago-de-compostela",
+          "content": "We specialise in real estate brokerage, offering a wide range of properties for both sale and rent. We are proud to have a highly qualified professional team",
+          "score": 0.9997658
+        },
+        {
+          "title": "Estate agents in Santiago De Compostela",
+          "url": "https://www.kyero.com/en/spain/estate-agents/santiago-de-compostela-l19868",
+          "content": "Specialists in buying and selling rural properties in Galicia and the rest of Spain. We represent rustic houses, buildings with land, unique buildings, rural",
+          "score": 0.9996259
+        },
+        {
+          "title": "VITAE VIS - Real estate agent on Properstar",
+          "url": "https://www.properstar.mu/real-estate-agent/vitae-vis?p=6",
+          "content": "Median selling price. MUR 7,823,811. Listings for sale. 176. Spoken languages. English. Agency. VITAE VIS IMMOBILIARIA. 868927581. AVDA. EUROPA, 23.",
+          "score": 0.99949265
+        }
+      ]
+    },
+    {
+      "query": "\"Vitae Compostela\" Santiago de Compostela news",
+      "results": [
+        {
+          "title": "Vitae Compostela Inmobiliaria | Santiago de Compostela - Facebook",
+          "url": "https://www.facebook.com/vitaecompostela/",
+          "content": "Nueva firma de arras de este terreno en Briáns de Abaixo (A Estivada) En Vitae Compostela seguimos acompañando a quienes confían en nosotros para dar pasos",
+          "score": 0.65252984
+        },
+        {
+          "title": "VITAE COMPOSTELA: 9 casas y pisos en venta - Idealista",
+          "url": "https://www.idealista.com/pro/vitae-compostela/",
+          "content": "Posee un entorno ideal a 6.7 km del centro de Santiago de Compostela, urbanización con más de 60000 m2 de zona verde, parque infantil, línea. Contactar",
+          "score": 0.5565207
+        },
+        {
+          "title": "Santiago de Compostela - latest news, breaking stories and comment",
+          "url": "https://www.the-independent.com/topic/santiago-de-compostela",
+          "content": "News, Camino pilgrims help rural Spain's emptying villages survive, News, Pilgrims return to Spain's 'El Camino' paths after pandemic.",
+          "score": 0.51105833
+        },
+        {
+          "title": "VITAE COMPOSTELA - Pza Quintana 3 ,, SANTIAGO DE ...",
+          "url": "https://www.inmobiliariavitae.es/",
+          "content": "Visita VITAE COMPOSTELA y conoce nuestra oferta de inmuebles en venta y alquiler al mejor precio del mercado, estamos en Pza Quintana 3 ,, SANTIAGO DE",
+          "score": 0.45159313
+        },
+        {
+          "title": "News - Grupo SANJOSE",
+          "url": "https://gruposanjose.biz/english/noticias.php?pagina=2&",
+          "content": "> SANJOSE will build an industrial warehouse for Arroupa in Santiago de Compostela 27/10/2025. > SANJOSE will build Phase III of the Los Enebros Residential",
+          "score": 0.3169086
+        }
+      ]
+    },
+    {
+      "query": "\"Vitae Compostela\" site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net",
+      "results": [
+        {
+          "title": "125 anos con Brañas",
+          "url": "https://www.lavozdegalicia.es/noticia/opinion/2025/02/21/125-anos-branas/0003_202502G21P14993.htm",
+          "content": "Tal día como hoxe, un 21 de febreiro de hai 125 anos, falecía en Compostela Alfredo Brañas, á temperá idade de 41 anos.",
+          "score": 0.29931557
+        },
+        {
+          "title": "A chegada a Santiago de Compostela",
+          "url": "https://www.lavozdegalicia.es/noticia/opinion/2017/09/30/span-langgl-chegada-santiago-compostelaspan/0003_201709G30P13992.htm",
+          "content": "Santiago de Compostela é, quizais, a única cidade do mundo occidental á que se vén andando. A chegada ao Obradoiro e os variados rituais fronte",
+          "score": 0.26249477
+        },
+        {
+          "title": "¿Qué hacer hoy en las comarcas?",
+          "url": "https://www.farodevigo.es/visado/agenda/2024/08/29/hoy-comarcas-107478289.html",
+          "content": "Hoy se celebra en Santiago de Compostela la última etapa del Camino de Santiago que realizan los 80 participantes de la segunda edición del",
+          "score": 0.26215103
+        },
+        {
+          "title": "Media Markt prepara su llegada y Bricomart ultima ...",
+          "url": "https://www.lavozdegalicia.es/noticia/santiago/2015/03/10/media-markt-prepara-llegada-bricomart-ultima-apertura/0003_201503S10C19911.htm",
+          "content": "La multinacional Media Markt tiene la intención de radicarse en Compostela. La firma germana, dedicada a electrodomésticos, informática y",
+          "score": 0.22066174
+        },
+        {
+          "title": "El creador de la «Divina Comedia», en Compostela",
+          "url": "https://www.lavozdegalicia.es/noticia/cultura/2021/11/08/creador-divina-comedia-compostela/0003_202111G8P26993.htm",
+          "content": "Dante fue a París a principios del siglo XIII, el maestro Mateo se supone que estuvo antes. Las gárgolas son el ímpetu demoníaco y rebelde del",
+          "score": 0.2084692
+        }
+      ]
+    }
+  ],
+  "successful": 4,
+  "total_queries": 4,
+  "searched_at": "2026-01-28T16:00:28.129337Z"
+}

@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "",
+    "title": "La Flor",
+    "languages_detected": [
+      "en"
+    ]
+  },
+  "pages": [
+    {
+      "description": "",
+      "title": "La Flor",
+      "url": "https://www.laflorcafebar.com/",
+      "language": "en",
+      "content": "La Flor",
+      "headings": [],
+      "content_length": 7
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": true,
+  "total_content_length": 7,
+  "crawled_at": "2026-01-28T15:01:54.607187Z"
+}

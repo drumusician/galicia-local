@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "Empieza tu compra online en Mercadona, encuentra nuestros supermercados más cercanos o descubre cómo trabajar con nosotros",
+    "title": "Mercadona",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Empieza tu compra online en Mercadona, encuentra nuestros supermercados más cercanos o descubre cómo trabajar con nosotros",
+      "title": "Mercadona",
+      "url": "https://www.mercadona.es/",
+      "language": "es",
+      "content": "Mercadona",
+      "headings": [],
+      "content_length": 9
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 9,
+  "crawled_at": "2026-01-28T15:48:41.189806Z"
+}

@@ -1,0 +1,148 @@
+{
+  "failed": 0,
+  "queries": [
+    {
+      "query": "\"Supermercados Froiz\" Ourense reviews opinions",
+      "results": [
+        {
+          "title": "Opiniones sobre Grupo Froiz",
+          "url": "https://es.trustpilot.com/review/froiz.com",
+          "content": "El FROIZ del Posío, Ourense, espectacular.Personal muy amable. En especial, destacar a Ana, Patricia, Chus, Raúl y Rafa. Atención al cliente excepcional y",
+          "score": 0.8742601
+        },
+        {
+          "title": "Supermercados Froiz - Ourense Restaurants",
+          "url": "https://www.tripadvisor.com/Restaurant_Review-g644337-d27210232-Reviews-Supermercados_Froiz-Ourense_Province_of_Ourense_Galicia.html",
+          "content": "Supermercados Froiz, Ourense: See unbiased reviews of Supermercados Froiz, rated 1.0 of 5 on Tripadvisor and ranked #285 of 312 restaurants",
+          "score": 0.8488849
+        },
+        {
+          "title": "Supermercados Froiz, Ourense, Spain - Reviews, Ratings ...",
+          "url": "https://wanderlog.com/place/details/3278405/supermercados-froiz",
+          "content": "The supermarket is described as large, spacious, and easy to navigate, with highlights including a stationery area and good meat selection. Review score. 4.3.",
+          "score": 0.82391036
+        },
+        {
+          "title": "THE BEST 10 GROCERY in VERÍN, OURENSE, SPAIN",
+          "url": "https://www.yelp.com/search?cflt=grocery&find_loc=Ver%C3%ADn%2C+Ourense",
+          "content": "Supermercados Froiz - Grocery near me - Verín, Ourense. 8. Supermercados ... Supermercados Froiz. 4.5 (2 reviews). 67.3 mi. Calle Jose Antonio 12, 36740 Tomiño",
+          "score": 0.82288796
+        },
+        {
+          "title": "THE BEST 10 GROCERY in A LIMIA, OURENSE, SPAIN",
+          "url": "https://www.yelp.com/search?cflt=grocery&find_loc=A+Limia%2C+Ourense",
+          "content": "Supermercados Froiz (4.5/5). What are some grocery with a large number of reviews in A Limia, OR? These are some grocery with a large number of reviews in A",
+          "score": 0.77873385
+        }
+      ]
+    },
+    {
+      "query": "\"Supermercados Froiz\" Supermarkets specialist expertise",
+      "results": [
+        {
+          "title": "Supermercados Froiz. El súper de casa.",
+          "url": "https://froiz.es/",
+          "content": "La cadena de supermercados Froiz es especialista en frescos, bodega y droguería buscando la mejor calidad a los mejores precios.",
+          "score": 0.82895297
+        },
+        {
+          "title": "Supermercados Froiz. O super de casa.",
+          "url": "https://www.froiz.pt/",
+          "content": "A cadeia de supermercados Froiz é especializada em produtos frescos, de mercearia e de drogaria, procurando a melhor qualidade aos melhores preços.",
+          "score": 0.76554126
+        },
+        {
+          "title": "Froiz - Grokipedia",
+          "url": "https://grokipedia.com/page/froiz",
+          "content": "Distribuciones Froiz, S.A., commonly known as Froiz, is a Spanish supermarket chain specializing in fresh produce, groceries, wine, and household goods,",
+          "score": 0.75616
+        },
+        {
+          "title": "Supermercados Froiz - Reviews, Photos & Phone Number ...",
+          "url": "https://supermercados-froiz.wheree.com/",
+          "content": "Supermercados Froiz is a well-known supermarket located in Salceda de Caselas, Spain, offering a wide range of products to its customers.",
+          "score": 0.61668247
+        },
+        {
+          "title": "Froiz - Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Froiz",
+          "content": "Distribuciones Froiz, S.A. is a Spanish supermarket chain based in Poio, Galicia. It operates in the Spanish regions of Galicia, Castile and León,",
+          "score": 0.598524
+        }
+      ]
+    },
+    {
+      "query": "\"Supermercados Froiz\" Ourense news",
+      "results": [
+        {
+          "title": "Actualidad y noticias de Supermercados Froiz",
+          "url": "https://froiz.es/noticias/page/2/",
+          "content": "Apertura de una nueva tienda franquiciada MercaExpress en la localidad de Gustei (Ourense). La empresa Froiz acaba de inaugurar una nueva tienda franquiciada",
+          "score": 0.8679453
+        },
+        {
+          "title": "Actualidad y noticias de Supermercados Froiz",
+          "url": "https://froiz.es/noticias/page/16/",
+          "content": "Reapertura del supermercado Froiz de Lagunas, Ourense. El supermercado Froiz de calle Alfonso Rodríguez Castelao, Las Lagunas, en Ourense abre hoy sus puertas …",
+          "score": 0.86331123
+        },
+        {
+          "title": "Actualidad y noticias de Supermercados Froiz",
+          "url": "https://froiz.es/noticias/",
+          "content": "En nuestra sección de noticias podrás enterarte de toda la actualidad de Froiz, ofertas, eventos y mucho más ¡Entra ahora!",
+          "score": 0.7548612
+        },
+        {
+          "title": "Froiz, últimas noticias - Economía Digital",
+          "url": "https://www.economiadigital.es/temas/froiz",
+          "content": "Noticias de Froiz en Economía Digital. Última hora de la cadena supermercados gallega y sus resultados. Lea las declaraciones de su presidente, Magín Froiz.",
+          "score": 0.7311551
+        },
+        {
+          "title": "Últimas noticias sobre Froiz. La Voz de Galicia",
+          "url": "https://www.lavozdegalicia.es/temas/froiz/69",
+          "content": "Un ladrón hiere al hombre que evitó un robo en un supermercado. El caco logró fugarse del establecimiento, situado en la calle Alcalde Marchesi Los vecinos",
+          "score": 0.6698534
+        }
+      ]
+    },
+    {
+      "query": "\"Supermercados Froiz\" site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net",
+      "results": [
+        {
+          "title": "Noticias de supermercados. Toda la actualidad en Atlántico",
+          "url": "https://www.atlantico.net/temas/supermercados/",
+          "content": "Froiz tiene su centro de distribución para Castilla y León, Madrid y Castilla La Mancha. 29 ago 2025. Froiz compra los súper de León de Masymas a Hijos de Luis",
+          "score": 0.99974877
+        },
+        {
+          "title": "Froiz se interesa por los supermercados Supersol que ...",
+          "url": "https://www.lavozdegalicia.es/noticia/economia/2007/01/19/froiz-interesa-supermercados-supersol-quiere-poner-venta-dinosol/0003_5469360.htm",
+          "content": "Froiz es la segunda empresa de distribución y venta de alimentos de Galicia. Desde su fundación, en 1968, ha ido creciendo a través de una",
+          "score": 0.99971753
+        },
+        {
+          "title": "Últimas noticias sobre Froiz. La Voz de Galicia",
+          "url": "https://www.lavozdegalicia.es/temas/froiz/",
+          "content": "Froiz desembarca en A Pobra con un supermercado Mercamás. Abrirá sus puertas dentro de cinco meses en un bajo ubicado al final de calle Gasset, y contará con",
+          "score": 0.99971086
+        },
+        {
+          "title": "Noticias de Supermercados Froiz",
+          "url": "https://www.farodevigo.es/tags/supermercados-froiz/pagina-2/",
+          "content": "Actualidad y últimas noticias de Supermercados Froiz con Faro de Vigo.",
+          "score": 0.9996699
+        },
+        {
+          "title": "Froiz compra los súper de León de Masymas a Hijos ...",
+          "url": "https://www.atlantico.net/economia/froiz-compra-super-leon-masymas_1_20250829-3962520.html",
+          "content": "Froiz alcanzó una facturación de 940 millones de euros el año pasado, un 3% más, y emplea a 6.750 trabajadores, 180 más que un año antes. A",
+          "score": 0.999608
+        }
+      ]
+    }
+  ],
+  "successful": 4,
+  "total_queries": 4,
+  "searched_at": "2026-01-28T14:32:57.549498Z"
+}

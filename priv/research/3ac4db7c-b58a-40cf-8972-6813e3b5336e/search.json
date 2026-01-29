@@ -1,0 +1,183 @@
+{
+  "failed": 0,
+  "queries": [
+    {
+      "query": "\"Hospital HM Rosaleda\" Santiago de Compostela reviews opinions",
+      "results": [
+        {
+          "title": "Top 10 Best Hospitals Near Santiago de Compostela, A Coruña - Yelp",
+          "url": "https://www.yelp.com/search?cflt=hospitals&find_loc=Santiago+de+Compostela%2C+A+Coru%C3%B1a",
+          "content": "These are some hospitals with a large number of reviews in Santiago de Compostela, C: Hospital Universitario A Coruña (3 reviews). Hospital Materno Infantil",
+          "score": 0.9993881
+        },
+        {
+          "title": "Nano-Based Approved Pharmaceuticals for Cancer Treatment",
+          "url": "https://search.ebscohost.com/login.aspx?direct=true&profile=ehost&scope=site&authtype=crawler&jrnl=2218273X&AN=157661596&h=BLOQUDhT6a5qJz9z0v1fTdg5UMHbFGqXgMSj0VOZpp82S5t%2FfuEGUqLBKZaa4%2BNM9kUVdw5M8Drx7QFVtI%2F5GA%3D%3D&crl=c",
+          "content": "In this review, we provide an overview ... 2Servicio de Cirugía General y del Aparato Digestivo, Hospital HM Rosaleda, 15701 Santiago de Compostela, Spain",
+          "score": 0.9993228
+        },
+        {
+          "title": "Doctors in Santiago | Camino de Santiago Forum",
+          "url": "https://www.caminodesantiago.me/community/threads/doctors-in-santiago.77221/",
+          "content": "I always use Hospital HM Rosaleda. They have a robust international department, and near everyone speaks English. Here is their contact",
+          "score": 0.9973061
+        },
+        {
+          "title": "Where to find a doctor in Santiago without going to the hospital?",
+          "url": "https://www.facebook.com/groups/544764125895308/posts/2464751957229839/",
+          "content": "Concurring with John. I have had to use urgent care and various doctors at Rosaleda and found them to provide excellent healthcare.",
+          "score": 0.5525397
+        },
+        {
+          "title": "HM Hospitales Reviews 135 - Trustpilot",
+          "url": "https://www.trustpilot.com/review/www.hmhospitales.com",
+          "content": "TrustScore 1.5 out of 5. 135 reviews. 5-star. 4-star. 3-star. 2-star. 1-star. How is the TrustScore calculated? How this company uses Trustpilot.",
+          "score": 0.4016878
+        }
+      ]
+    },
+    {
+      "query": "\"Hospital HM Rosaleda\" Doctors specialist expertise",
+      "results": [
+        {
+          "title": "HM Rosaleda - Explore Health Care",
+          "url": "https://explorehealth.com.np/hospital/hm-rosaleda/",
+          "content": "Medical Specialties · Digestive system · Allergology · Children's Allergology · Anesthesiology and Resuscitation · Angiology and Vascular Surgery · Dermatology",
+          "score": 0.99964297
+        },
+        {
+          "title": "Hospital Hm Rosaleda - A Coruna, Spain - Dr. Galen",
+          "url": "https://drgalen.org/emergency-service/hospital-hm-rosaleda-4798",
+          "content": "Hospital Hm Rosaleda has gained a prominent reputation for its outstanding Trauma services in A Coruna, Spain. Esteemed for its superior medical care,",
+          "score": 0.99940693
+        },
+        {
+          "title": "HM Rosaleda - Medi Tour Europe",
+          "url": "https://meditoureurope.com/hospital/hm-rosaleda/",
+          "content": "Medical specialties · Digestive system · Cardiology · Children's Cardiology · General and Digestive System Surgery · Plastic and Reconstructive Surgery · Allergology",
+          "score": 0.99938333
+        },
+        {
+          "title": "Vithas La Rosaleda Medical Centre",
+          "url": "https://vithas.es/en/center/vithas-la-rosaleda-medical-centre/",
+          "content": "Our services · Allergology · Cardiology · Cardiovascular surgery · Clinical neurophysiology · Clinical psychology · Digestive system · Endocrinology and nutrition.",
+          "score": 0.9930962
+        },
+        {
+          "title": "[PDF] HM Hospitales - IHR MEETING",
+          "url": "https://ihrmeeting.com/wp-content/uploads/2024/07/PRESENTACION-HM-HOSPITALES-INTERNATIONAL.pdf",
+          "content": "HM Hospitales has 4 highly specialized monographic centers in Oncology,. Cardiology and Neuroscience and a center specialized in Fertility. Our",
+          "score": 0.9801293
+        }
+      ]
+    },
+    {
+      "query": "\"Hospital HM Rosaleda\" Santiago de Compostela news",
+      "results": [
+        {
+          "title": "Hospital HM Rosaleda (Santiago de Compostela)",
+          "url": "https://www.sehh.es/en/services-for-members/careers/125986-hospital-hm-rosaleda-santiago-de-compostela",
+          "content": "The SEHH is news · Press releases · Newsletter of the SEHH · White Paper on Hematology and Hemotherapy in Spain · Contact · News. Accreditations",
+          "score": 0.76152116
+        },
+        {
+          "title": "2022: Covid / Camino, news and rolling updates",
+          "url": "https://santiagoinlove.com/en/2022-covid-camino-news-information-rolling-updates/",
+          "content": "News and developments about Covid; health measures; impact on the ... HOSPITAL HM ROSALEDA. Rúa de Santiago León de Caracas, 1 - 15701 Santiago de Compostela",
+          "score": 0.75464433
+        },
+        {
+          "title": "Introducing the HM Hospitales International Patient network | ITIJ",
+          "url": "https://www.itij.com/latest/long-read/introducing-hm-hospitales-international-patient-network",
+          "content": "In 2025, HM Hospitales has consolidated its position as one of the most relevant private hospital groups in Spain and Europe. With a healthcare model based on",
+          "score": 0.47154015
+        },
+        {
+          "title": "Molecular Signatures of Aeroallergen Sensitization in ...",
+          "url": "https://www.mdpi.com/1422-0067/26/7/2963",
+          "content": "by A Martínez-Cañavate · 2025 — The results revealed different sensitization trends across patients from the eight cities analyzed (Barcelona, Granada, Lugo, Sagunto, Santiago de Compostela,",
+          "score": 0.11183174
+        },
+        {
+          "title": "How to get back home from Santiago?",
+          "url": "https://www.facebook.com/groups/544764125895308/posts/2607731899598510/",
+          "content": "Santiago de Compostela Telephone: 0034 981 562 462 E-mail: info@laboratorioclinicocompostela.es LABORATORIO J. DE SOTO Web: https://www",
+          "score": 0.101189256
+        }
+      ]
+    },
+    {
+      "query": "\"Hospital HM Rosaleda\" Santiago de Compostela site:linkedin.com",
+      "results": [
+        {
+          "title": "El Hospital HM Rosaleda de Santiago de Compostela ...",
+          "url": "https://es.linkedin.com/posts/hm-hospitales_el-hospital-hm-rosaleda-de-santiago-de-compostela-activity-6726910898797113344-vidt",
+          "content": "- El Hospital HM Rosaleda es el único centro que realiza cirugías endoscópicas de cuello para intervenciones de tiroides, paratiroides y",
+          "score": 0.8700796
+        },
+        {
+          "title": "El Hospital HM Rosaleda es el de los pocos ...",
+          "url": "https://es.linkedin.com/posts/hm-hospitales_el-hospital-hm-rosaleda-es-el-de-los-pocos-activity-6490597283594326016-ql23",
+          "content": "El Hospital HM Rosaleda es el de los pocos de España que utiliza cirugía endoscópica de tiroides, paratiroides y glándula submaxilar",
+          "score": 0.8145405
+        },
+        {
+          "title": "Miguel A. Freiría E. - Hospital HM Rosaleda",
+          "url": "https://es.linkedin.com/in/miguel-a-freir%C3%ADa-e-84116513a",
+          "content": "Experiencia: Hospital HM Rosaleda · Ubicación: Compostela · Más de 500 contactos en LinkedIn. Ver el perfil de Miguel A. Freiría E. en LinkedIn,",
+          "score": 0.81133276
+        },
+        {
+          "title": "HM Rosaleda (Santiago de Compostela, A Coruña, Galicia)",
+          "url": "https://es.linkedin.com/jobs/view/auxiliar-administrativo-a-consultas-hm-rosaleda-santiago-de-compostela-a-coru%C3%B1a-galicia-at-hm-hospitales-4360966662",
+          "content": "Desde el grupo HM Hospitales buscamos incorporar un/a Auxiliar Administrativo/a para el área de Consultas Externas en nuestro Hospital HM",
+          "score": 0.7999589
+        },
+        {
+          "title": "Hospital Policlínico la Rosaleda",
+          "url": "https://il.linkedin.com/company/hospital-policl%C3%A3%C2%ADnico-la-rosaleda",
+          "content": "מיקומים. C/ Santiago LeÃ³n de Caracas, 1. Santiago de Compostela, 15701. ... Admisión de Urgencias en HM Rosaleda… לחיצה כאן כדי להציג את הפרופיל של ‏Sergio",
+          "score": 0.78214747
+        }
+      ]
+    },
+    {
+      "query": "\"Hospital HM Rosaleda\" site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net",
+      "results": [
+        {
+          "title": "HM Rosaleda se convierte en el primer hospital privado ...",
+          "url": "https://www.lavozdegalicia.es/noticia/santiago/2025/01/23/hm-hospitales-primer-centro-privado-usa-robot-mako/0003_202501S23C4993.htm",
+          "content": "El sistema dispone de una plataforma de planificación en 3D y navegación en tiempo real que facilita la personalización de la cirugía.",
+          "score": 0.99973875
+        },
+        {
+          "title": "Los hospitales de HM en Santiago inician la recuperación ...",
+          "url": "https://www.lavozdegalicia.es/noticia/santiago/2022/03/23/hospitales-hm-inician-recuperacion-incremento-pruebas-diagnosticas/0003_202203S23C4993.htm",
+          "content": "HM Rosaleda y HM La Esperanza crecieron en 2021 en todos sus indicadores asistenciales, destacando especialmente estudios de laboratorio, con un",
+          "score": 0.99964297
+        },
+        {
+          "title": "HM Rosaleda, destacado como o hospital privado con ...",
+          "url": "https://galego.lavozdegalicia.es/noticia/coruna/coruna/2026/01/21/hm-rosaleda-destacado-hospital-privado-mejor-reputacion-sanitaria-galicia/0003_202601S21C4992.htm",
+          "content": "O Hospital HM Rosaleda foi elixido como o centro privado mellor valorado de Galicia. Así o reflicte o ránking Merco Saúde, feito público esta",
+          "score": 0.99963164
+        },
+        {
+          "title": "HM Rosaleda promueve una campaña de prevención ...",
+          "url": "https://www.lavozdegalicia.es/noticia/santiago/2022/05/21/hm-rosaleda-promueve-campana-prevencion-dolencias-cardiovasculares/0003_202205S21C2995.htm",
+          "content": "Especialistas del hospital HM Rosaleda promueven una campaña de prevención de las dolencias cardiovasculares, tras los dos últimos años en",
+          "score": 0.99957615
+        },
+        {
+          "title": "HM Rosaleda, destacado como el hospital privado con ...",
+          "url": "https://www.lavozdegalicia.es/noticia/coruna/coruna/2026/01/21/hm-rosaleda-destacado-hospital-privado-mejor-reputacion-sanitaria-galicia/0003_202601S21C4992.htm",
+          "content": "El Hospital HM Rosaleda ha sido elegido como el centro privado mejor valorado de Galicia. Así lo refleja el ránking Merco Salud, hecho",
+          "score": 0.9995627
+        }
+      ]
+    }
+  ],
+  "successful": 5,
+  "total_queries": 5,
+  "searched_at": "2026-01-28T15:34:33.953435Z"
+}

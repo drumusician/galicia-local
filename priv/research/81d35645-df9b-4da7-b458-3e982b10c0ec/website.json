@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "Desayunos, meriendas, pizzas y burger en Cambados. Cafetería. Pizzería.",
+    "title": "NUDI CAMBADOS",
+    "languages_detected": [
+      "es-ES"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Desayunos, meriendas, pizzas y burger en Cambados. Cafetería. Pizzería.",
+      "title": "NUDI CAMBADOS",
+      "url": "http://www.nudicambados.com/",
+      "language": "es-ES",
+      "content": "NUDI CAMBADOS 0",
+      "headings": [],
+      "content_length": 15
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 15,
+  "crawled_at": "2026-01-28T18:11:24.118802Z"
+}

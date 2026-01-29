@@ -35,3 +35,7 @@ galicia_local-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Environment secrets
+.envrc
+dets_simple_storage
+

@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "description": null,
+    "title": "Google Search",
+    "languages_detected": [
+      "es-NL"
+    ]
+  },
+  "pages": [
+    {
+      "description": null,
+      "title": "Google Search",
+      "url": "https://www.google.com/search?q=paz&ie=UTF-8&oe=UTF-8&hl=es-es&client=safari",
+      "language": "es-NL",
+      "content": "Google Search If you're having trouble accessing Google Search, please  click here , or send  feedback .",
+      "headings": [],
+      "content_length": 104
+    },
+    {
+      "description": null,
+      "title": "Zet JavaScript aan om te zoeken",
+      "url": "https://www.google.com/httpservice/retry/enablejs?sei=piN6abLSDuGDi-gPxuymiQc",
+      "language": null,
+      "content": "Zet JavaScript aan om te zoeken Zet JavaScript aan om door te gaan met zoeken JavaScript staat uit in de browser die je gebruikt. Zet dit aan om door te gaan met zoeken. Meer informatie over hoe je dit doet in Google Chrome Klik op en dan op Instellingen . Klik op Privacy en beveiliging . Klik op Site-instellingen . Klik op JavaScript . Selecteer Sites kunnen JavaScript gebruiken . (Je kunt JavaScript ook alleen aanzetten voor google.com.) Meer informatie over hoe je dit doet in Microsoft Edge Klik op het menu Meer en dan op Instellingen . Selecteer Cookies en siterechten . Selecteer JavaScript . Selecteer Toegestaan (aanbevolen) . Meer informatie over hoe je dit doet in Mozilla Firefox Typ about:config in de adresbalk en druk op Return. Klik op 'Het risico aanvaarden en doorgaan' om door te gaan. Zoek de voorkeur javascript.enabled . Klik op de schakel- of resetknoppen om de instelling in te stellen op true (waar). Meer informatie over hoe je dit doet in Apple Safari Ga naar Safari > Voorkeuren . Selecteer Beveiliging . Vink het selectievakje Activeer JavaScript aan. Meer informatie over hoe je dit doet in Opera Ga naar Instellingen . Klik in de linkerzijbalk op Geavanceerd en klik op Privacy en beveiliging . Klik op Site-instellingen . Klik op JavaScript . Zet bovenaan Toegestaan aan.",
+      "headings": [
+        "Zet JavaScript aan om door te gaan met zoeken"
+      ],
+      "content_length": 1307
+    },
+    {
+      "description": null,
+      "title": "Google Search",
+      "url": "https://www.google.com/search?q=paz&client=safari&sca_esv=09b1523b2d059e4c&hl=es-es&ucbcb=1&emsg=SG_REL&sei=piN6abLSDuGDi-gPxuymiQc",
+      "language": "es-NL",
+      "content": "Google Search If you're having trouble accessing Google Search, please  click here , or send  feedback .",
+      "headings": [],
+      "content_length": 104
+    }
+  ],
+  "pages_crawled": 3,
+  "has_english_version": false,
+  "total_content_length": 1515,
+  "crawled_at": "2026-01-28T14:56:39.380103Z"
+}

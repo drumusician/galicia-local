@@ -1,4 +1,5 @@
 import Config
+config :ash, policies: [show_policy_breakdowns?: true]
 
 # Configure your database
 config :galicia_local, GaliciaLocal.Repo,
@@ -68,7 +69,7 @@ config :galicia_local, GaliciaLocalWeb.Endpoint,
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :galicia_local, dev_routes: true
+config :galicia_local, dev_routes: true, token_signing_secret: "Jjz1EPG9u5CVPk+GHzYNTMS+e7i+BTac"
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

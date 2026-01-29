@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "description": null,
+    "title": "Panadería Amodia | Artesanos del pan. Especialidad en mini bollería. Empanadas. Cambados. Pontevedra.",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": null,
+      "title": "Panadería Amodia | Artesanos del pan. Especialidad en mini bollería. Empanadas. Cambados. Pontevedra.",
+      "url": "https://panaderiaamodia.com/",
+      "language": "es",
+      "content": "Panadería Amodia | Artesanos del pan. Especialidad en mini bollería. Empanadas. Cambados. Pontevedra. PANADERIA A MODIA Bienvenidos a nuestra página web ; En Panadería A Modia ejercemos el trabajo desde hace más 100 años, pasando de generación en generación, avanzando con los tiempos y acercándonos a las necesidades de la gente. Hemos ido modernizándonos en pan y maquinaria, hasta estar a la última. En cuestiones sanitarias cumplimos todos los requisitos de higiene alimentaria exigidos por Sanidad y la Xunta de Galicia. Formamos parte de la Asociación de Panaderos de la provincia de Pontevedra. Usamos materia prima de primera calidad en nuestros productos, y sobre todo, procurando siempre que sean lo más artesano posible en todo su proceso de fabricación. Los hornos, a pesar de ser modernos, trabajan a leña, lo que da un sabor especial a todos nuestros productos. Todo nuestro personal está preparado para hacer cualquier tipo de producto que el cliente desee. Disponemos de reparto a domicilio en zonas cercanas: Cambados, Villanueva de Arosa, Barrantes… Nuestras especialidades son el pan artesano, roscas, bizcochos, empanadas, etc.",
+      "headings": [
+        "PANADERIA A MODIA"
+      ],
+      "content_length": 1147
+    },
+    {
+      "description": null,
+      "title": "Productos | Panadería Amodia",
+      "url": "https://panaderiaamodia.com/productos",
+      "language": "es",
+      "content": "Productos | Panadería Amodia Disponemos de una gran variedad de productos PAN Normal Artesano Integral Sin sal Centeno Hogazas Chapatas Baguette Bollitos gramados Bollitos preñados Medias noches   BOLLERÍA Croissants Napolitanas Bollos de leche Cristinas Pretzel Donuts Palmeras Tartaletas de manzana Larpeiras Roscas Bizcochos Bizcochos especiales Brazos de gitano Tartas EMPANADAS Mejillones Marisco Pulpo Hojaldre jamón y queso Manzana Tartaletas de manzana Larpeiras Roscas Bizcochos Bizcochos especiales Brazos de gitano Tartas",
+      "headings": [],
+      "content_length": 532
+    },
+    {
+      "description": null,
+      "title": "Instalaciones | Panadería Amodia",
+      "url": "https://panaderiaamodia.com/instalaciones",
+      "language": "es",
+      "content": "Instalaciones | Panadería Amodia",
+      "headings": [],
+      "content_length": 32
+    },
+    {
+      "description": null,
+      "title": "Contacto | Panadería Amodia",
+      "url": "https://panaderiaamodia.com/contacto",
+      "language": "es",
+      "content": "Contacto | Panadería Amodia Nombre Dirección de correo electrónico Teléfono Mensaje 3 + 1 = Enviar Datos de contacto  Teléfono 986 54 22 33  Dirección Aldea Modia, 77, 36633 – Cambados Pontevedra",
+      "headings": [
+        "Datos de contacto"
+      ],
+      "content_length": 197
+    }
+  ],
+  "pages_crawled": 4,
+  "has_english_version": false,
+  "total_content_length": 1908,
+  "crawled_at": "2026-01-28T18:08:14.894956Z"
+}

@@ -1,0 +1,38 @@
+# fly.toml app configuration file generated for galicia-local on 2026-01-28T23:59:21+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'galicia-local'
+primary_region = 'ams'
+kill_signal = 'SIGTERM'
+
+[build]
+  dockerfile = "Dockerfile"
+  ignorefile = ".dockerignore"
+
+[deploy]
+  release_command = '/app/bin/migrate'
+
+[env]
+  PHX_HOST = 'galicia-local.fly.dev'
+  PORT = '8080'
+  PHX_SERVER = 'true'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [http_service.concurrency]
+    type = 'connections'
+    hard_limit = 1000
+    soft_limit = 1000
+
+[[vm]]
+  memory = '1gb'
+  cpus = 2
+  memory_mb = 1024

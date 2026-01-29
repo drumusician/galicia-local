@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": null,
+    "title": "Facebook",
+    "languages_detected": [
+      "nl"
+    ]
+  },
+  "pages": [
+    {
+      "description": null,
+      "title": "Facebook",
+      "url": "https://www.facebook.com/prazadeabastosdecambados/",
+      "language": "nl",
+      "content": "Facebook",
+      "headings": [],
+      "content_length": 8
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 8,
+  "crawled_at": "2026-01-28T18:06:31.007795Z"
+}

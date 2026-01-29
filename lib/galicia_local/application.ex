@@ -11,11 +11,17 @@ defmodule GaliciaLocal.Application do
       GaliciaLocalWeb.Telemetry,
       GaliciaLocal.Repo,
       {DNSCluster, query: Application.get_env(:galicia_local, :dns_cluster_query) || :ignore},
+      {Oban,
+       AshOban.config(
+         Application.fetch_env!(:galicia_local, :ash_domains),
+         Application.fetch_env!(:galicia_local, Oban)
+       )},
       {Phoenix.PubSub, name: GaliciaLocal.PubSub},
       # Start a worker by calling: GaliciaLocal.Worker.start_link(arg)
       # {GaliciaLocal.Worker, arg},
       # Start to serve requests, typically the last entry
-      GaliciaLocalWeb.Endpoint
+      GaliciaLocalWeb.Endpoint,
+      {AshAuthentication.Supervisor, [otp_app: :galicia_local]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

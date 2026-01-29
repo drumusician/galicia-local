@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "Create an account or log in to Instagram - Share what you're into with the people who get you.",
+    "title": "Instagram",
+    "languages_detected": [
+      "en"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Create an account or log in to Instagram - Share what you're into with the people who get you.",
+      "title": "Instagram",
+      "url": "https://www.instagram.com/invites/contact/?utm_source=ig_contact_invite&utm_medium=copy_link&utm_content=ybw255f",
+      "language": "en",
+      "content": "Instagram",
+      "headings": [],
+      "content_length": 9
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": true,
+  "total_content_length": 9,
+  "crawled_at": "2026-01-28T15:33:20.322806Z"
+}

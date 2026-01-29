@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "Carta y pedidos gestionados a través de la plataforma de PlaceIn.",
+    "title": "",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Carta y pedidos gestionados a través de la plataforma de PlaceIn.",
+      "title": "",
+      "url": "https://placein.app/booking-widget/382c43f1890248c1ae0b4d00e723ce31/configure/",
+      "language": "es",
+      "content": "2.8.7.2 20260127155654",
+      "headings": [],
+      "content_length": 22
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 22,
+  "crawled_at": "2026-01-28T14:57:44.833615Z"
+}

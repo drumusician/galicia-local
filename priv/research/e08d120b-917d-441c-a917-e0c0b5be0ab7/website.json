@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "description": "Carta cafetería",
+    "title": "RAÍCES GALEGAS",
+    "languages_detected": []
+  },
+  "pages": [
+    {
+      "description": "Carta cafetería",
+      "title": "RAÍCES GALEGAS",
+      "url": "http://raicesgalegas.gal/",
+      "language": null,
+      "content": "RAÍCES GALEGAS Carta de bebidas Carta de comidas Horario de cociña: 10:00 a 16:00 e 18:00 a 23:30. Drinks price list Menu Meal times: 10:00 to 16:00 and 18:00 to 23:30.",
+      "headings": [
+        "Carta de bebidas",
+        "Carta de comidas",
+        "Horario de cociña: 10:00 a 16:00 e 18:00 a 23:30.",
+        "Drinks price list",
+        "Menu",
+        "Meal times: 10:00 to 16:00 and 18:00 to 23:30."
+      ],
+      "content_length": 168
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 168,
+  "crawled_at": "2026-01-28T14:58:43.043317Z"
+}

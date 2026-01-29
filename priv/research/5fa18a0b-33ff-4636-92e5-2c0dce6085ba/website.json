@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "",
+    "title": "Delicatesen Martínez | Vigo",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": "",
+      "title": "Delicatesen Martínez | Vigo",
+      "url": "https://martinezdelicatessen.com/",
+      "language": "es",
+      "content": "Delicatesen Martínez | Vigo",
+      "headings": [],
+      "content_length": 27
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 27,
+  "crawled_at": "2026-01-28T15:17:39.985608Z"
+}

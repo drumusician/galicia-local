@@ -1,0 +1,117 @@
+{
+  "failed": 0,
+  "queries": [
+    {
+      "query": "\"Mamá Sofía Cafeterías Panaderías Pastelerías\" Pontevedra reviews opinions",
+      "results": []
+    },
+    {
+      "query": "\"Mamá Sofía Cafeterías Panaderías Pastelerías\" Bakeries specialist expertise",
+      "results": [
+        {
+          "title": "Mamá Sofía Cafeterías Panaderías Pastelerías",
+          "url": "https://revolutionrockbar.es/bar/mama-sofia-cafeterias-panaderias-pastelerias/",
+          "content": "Mamá Sofía se presenta en la Rúa San Antoniño de Pontevedra como un establecimiento multifacético que busca fusionar el concepto de panadería tradicional",
+          "score": 0.61834323
+        },
+        {
+          "title": "Mamá Sofía Panadería Degustación",
+          "url": "https://www.facebook.com/mamasofiapanaderia/",
+          "content": "Estamos ubicados en la Calle San Antoniño, 83 en Pontevedra. Somos una panadería, pastelería y cafetería en el que puedes disfrutar de desayunos especiales,",
+          "score": 0.5501488
+        },
+        {
+          "title": "Mamá Sofía Panadería Degustación",
+          "url": "https://www.facebook.com/mamasofiapanaderia/photos/",
+          "content": "Estamos ubicados en la Calle San Antoniño, 83 en Pontevedra. Somos una panadería, pastelería y cafetería en el que puedes disfrutar de",
+          "score": 0.51530343
+        },
+        {
+          "title": "Mamá Sofía Panadería Degustación",
+          "url": "https://www.facebook.com/111569491353005/",
+          "content": "Estamos ubicados en la Calle San Antoniño, 83 en Pontevedra. Somos una panadería, pastelería y cafetería en el que puedes disfrutar de desayunos especiales,",
+          "score": 0.51076555
+        },
+        {
+          "title": "Mama Sofía Panadería, Cafetería, Degustación",
+          "url": "https://www.mamasofiapontevedra.com/",
+          "content": "Estamos ubicados en la calle San Antoniño, 83, en Pontevedra. Ven a disfrutar de nuestro acogedor local, con una decoración pensada para tu desconexión, para",
+          "score": 0.4549328
+        }
+      ]
+    },
+    {
+      "query": "\"Mamá Sofía Cafeterías Panaderías Pastelerías\" Pontevedra news",
+      "results": [
+        {
+          "title": "Mamá Sofía Panadería Degustación (@mamasofiapanaderia)",
+          "url": "https://www.facebook.com/111569491353005/",
+          "content": "Estamos ubicados en la Calle San Antoniño, 83 en Pontevedra. Somos una panadería, pastelería y cafetería en el que puedes disfrutar de desayunos especiales,",
+          "score": 0.9999833
+        },
+        {
+          "title": "Mamá Sofía Panadería Degustación (@mamasofiapanaderia)",
+          "url": "https://www.facebook.com/mamasofiapanaderia/?locale=es_LA",
+          "content": "Estamos ubicados en la Calle San Antoniño, 83 en Pontevedra. Somos una panadería, pastelería y cafetería en el que puedes disfrutar de desayunos especiales, de",
+          "score": 0.99997306
+        },
+        {
+          "title": "Mama Sofía Panadería, Cafetería, Degustación: Mamá Sofía ...",
+          "url": "https://www.mamasofiapontevedra.com/",
+          "content": "Estamos ubicados en la calle San Antoniño, 83, en Pontevedra. Ven a disfrutar de nuestro acogedor local, con una decoración pensada para tu desconexión, para",
+          "score": 0.99996805
+        },
+        {
+          "title": "Mamá Sofía: el hogar artesano de los desayunos, panes y dulces en ...",
+          "url": "https://www.elespanol.com/treintayseis/vivir/gastropontevedra/20230603/mama-sofia-hogar-artesano-desayunos-panes-dulces-pontevedra/768673287_0.html",
+          "content": "Mamá Sofía: el hogar artesano de los desayunos, panes y dulces en Pontevedra. Sandra Reboredo es el alma de esta moderna cafetería-panadería",
+          "score": 0.99996114
+        },
+        {
+          "title": "Mamá Sofía Cafeterías Panaderías Pastelerías - Bar en Pontevedra",
+          "url": "https://revolutionrockbar.es/bar/mama-sofia-cafeterias-panaderias-pastelerias/",
+          "content": "Mamá Sofía se presenta en la Rúa San Antoniño de Pontevedra como un establecimiento multifacético que busca fusionar el concepto de panadería tradicional",
+          "score": 0.99995244
+        }
+      ]
+    },
+    {
+      "query": "\"Mamá Sofía Cafeterías Panaderías Pastelerías\" site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net",
+      "results": [
+        {
+          "title": "Otros negocios con café a un euro - La Voz de Galicia",
+          "url": "https://www.lavozdegalicia.es/noticia/coruna/vivir-coruna/2023/06/02/abre-tercer-amasarte-cuatro-caminos-coruna-equivocamos-poner-cafe-euro/00031685706717130365573.htm",
+          "content": "Abre en Cuatro Caminos el tercer Amasarte de A Coruña: «No nos equivocamos al poner el café a un euro» La cadena de panaderías ha inaugurado un nuevo establecimiento en el céntrico barrio La Fábrica de Tabacos es una de las zonas de moda en A Coruña. Edificios de obra nueva, una gran plaza con parque infantil y varias aperturas de locales de hostelería son las claves de este área, que es el nuevo corazón de Cuatro Caminos. El último en apuntarse ha sido Amasarte, que ha abierto una nueva panadería en la calle Concepción Arenal, 19. Con esta nueva apertura, la cadena ya suma tres establecimientos en la ciudad. El primero vio la luz en la avenida de Oza, donde tiene el obrador. Y el segundo Amasarte subió la persiana en la avenida Finisterre, 183. La propuesta de esta referencia es elaborar pan de masa madre, respetar los procesos y recuperar la tradición. El establecimiento, además, ofrece una interesante selección de bizcochería, con unas deliciosas napolitanas de chocolate, y de tartas. Y ofrece el café para llevar a un euro. Otros negocios con café a un euro Esta apuesta por el café a un euro no es nueva y la practican otros negocios del área. Un ejemplo paradigmático es el de Dorsal 94 (Pastoriza, Arteixo), que servía esta bebida por 1,20 euros pero la bajaron 20 céntimos. «Lo hicimos para arrimar el hombro con nuestros clientes y ahora servimos un 30 % más de café que antes», cuentan desde el local. Otros establecimientos que manejan los mismos precios son: Bar Coco (Avenida Hércules, 5).Golden 2 (Calle Barcelona, 10).La Cepa (Travesía Gaiteira, 2).Bendito Café (Calle Barcelona, 64).Os Codillos (Rafael Alberti, 27).Cafetería del Rectorado (Maestranza, 9). Un año para perfilar el nuevo borde litoral de A Coruña La gestora de Galivivienda se aviene a bajar las cuotas de Xuxán y el ICO pide concreción © Copyright LA VOZ DE GALICIA S.A. Todos los derechos reservados. Polígono de Sabón, Arteixo, A CORUÑA (ESPAÑA) Inscrita en el Registro Mercantil de A Coruña en el Tomo 2438 del Archivo, Sección General, a los folios 91 y siguientes, hoja C-2141.",
+          "score": 0.2757502
+        },
+        {
+          "title": "MEJOR CAFÉ ESPECIALIDAD VIGO | Dos cafeterías de Vigo se cuelan entre las mejores de España: logran la «excelencia» por su local, su ambiente y su café",
+          "url": "https://www.farodevigo.es/visado/gastronomia/2025/05/26/cafeterias-especialidad-vigo-cuelan-mejores-espana-dv-117827945.html",
+          "content": "# Dos cafeterías de Vigo se cuelan entre las mejores de España: logran la «excelencia» por su local, su ambiente y su café ## El jurado de 'The Best Coffee Shops' se ha basado en varios criterios para otorgar la distinción El **café** es un imprescindible en nuestra hostelería. Según el último informe de la AECafé, **de cada 100 tazas de café que se consumen en España, 39 son en bares y cafeterías**. En los últimos años se ha popularizado el **café de especialidad**, obtenido a partir de granos de café seleccionados, procesados y **tostados de manera experta.** El número de adeptos es tal que ya existe una asociación especializada, la Specialty Coffee Association, y también un **ranking a nivel nacional** que premia las mejores cafeterías que sirven esta variedad. La nueva cafetería de Vigo para amantes de las meriendas y el brunch con «café XXL y galletas llenas de sabor» El listado se denomina **'The Best Coffee Shops'** y destaca una decena de locales en toda España que, afirma el jurado, **alcanzan «la excelencia»** en los siguientes criterios: la **calidad del servicio**, el nivel de los baristas, la **calidad del café,** el **ambiente** y el confort del local y las especialidades de los lugares. **Galicia** cuenta con varios representantes en este listado; **dos de ellos, radicados en Vigo**: la cafetería La Manière y The Hippie Baker. Una de las cafeterías distinguidas por 'The Best Coffee Shops' es La Manière, todo un referente en la ciudad olívica para los amantes del café de especialidad. Está ubicada en el **número 59 de la calle Tomás Alonso** y su carta dispone principalmente de cafés de la marca Nomad e introduce cada cierto tiempo nuevas etiquetas. La segunda cafetería viguesa del ranking es The Hippie Baker, un pequeño obrador de pastelería vegana oculto en el **número 10 de la Baixada da Fonte.** * La cafetería perfecta para amantes del brunch y la serie 'Friends' abre sus puertas a 30 minutos de Vigo 8. El peatón recupera uno de los mejores miradores de la ría de Vigo: así será el nuevo acceso en A Guía",
+          "score": 0.26045105
+        },
+        {
+          "title": "Últimas noticias sobre Reina Sofía. La Voz de Galicia",
+          "url": "https://lavozdegalicia.es/temas/reina-sofia/2",
+          "content": "#### Concentración del BNG contra la monarquía por la botadura de la primera F-110 en Ferrol El presidente del Gobierno, Pedro Sánchez, en el arranque de la segunda F-110 #### Pedro Sánchez presidirá la botadura de la primera fragata F-110 en Ferrol La ministra de Defensa, Margarita Robles, acudirá por la mañana al astillero a comprobar el avance del programa, y la de Trabajo, Yolanda Díaz, estará también en el acto Rafael Seijo, director del programa de las fragatas F-110, delante de la primera unidad, lista para su botadura La reina Doña Sofía será la madrina del buque construido en Navantia Ferrol La F-111 Bonifaz está ya preparada para su botadura en una grada de Navantia Ferrol #### La princesa Leonor y la infanta Sofía debutan en Marivent Tanto su padre, el rey Felipe, como sus abuelos paternos estuvieron varias veces en la ciudad #### Pedro Llorca, presidente de la Federación de Bancos de Alimentos: «Me crie en un hogar del pescador» Afirma que todos los días se levanta a las seis de la mañana para participar en los repartos: «No entiendo que yo me quede en mi casa y el resto estén trabajando» #### El comandante de la operación Atalanta constata una caída de la piratería en el Índico tras los 46 casos del año pasado La reina Sofía presidió la  clausura del Congreso de los Bancos de Alimentos. La reina Sofía clausuró el congreso de la federación nacional en Ourense #### Las infantas Elena y Cristina pasarán la Semana Santa en Abu Dabi con el rey emérito La reina Sofía matiene su agenda culturar y religiosa en España, con visitas a Palma de Mallorca y a Sevilla La Fundación Reina Sofía impulsa una campaña que concienciación sobre las donaciones de tejido cerebral, que en España no superan las 200 anuales #### La fragata Reina Sofía asiste a los tripulantes de un pesquero yemení secuestrado y abandonado por piratas somalíes #### La fragata Reina Sofía parte desde Rota para su quinto despliegue en la operación Atalanta La embarcación zarpó este martes con 226 miembros de la dotación del barco (40 mujeres), que controlarán la piratería en el cuerno de África hasta mediados de junio",
+          "score": 0.19966704
+        },
+        {
+          "title": "Últimas noticias sobre Reina Sofía. La Voz de Galicia",
+          "url": "https://lavozdegalicia.es/temas/reina-sofia",
+          "content": "Doña Sofía, los reyes, sus hijas y las infantas han acudido al responso, que se celebra en la Catedral Ortodoxa Griega de San Andrés y San Demetrio Mañana sábado la capilla ardiente abrirá durante unas horas en la catedral ortodoxa de Madrid y el lunes será enterrada en Atenas Irene de Grecia, junto a la reina Sofía, en un concierto en diciembre del 2024 Los Reyes eligen una foto junto a sus hijas en Valdesoto para felicitar este año la Navidad #### Los Reyes eligen una foto junto a sus hijas en Valdesoto para felicitar este año la Navidad La Infanta Sofía, la Princesa Leonor, la Reina Letizia y el Rey Felipe a su llegada al Palacio El Pardo, a 22 de noviembre de 2025, en Madrid. #### El rey emérito estuvo presente en el almuerzo de la familia real en El Pardo Juan Carlos I formó parte de un almuerzo privado, en el que se reencontraba con sus familiares después de la publicación de las memorias. Felipe VI ensalza el «servicio ejemplar» de la reina Sofía y su apoyo a Juan Carlos I en su «acertada apertura democrática» El rey Felipe VI y la princesa Leonor charlando. La reina Sofía y la princesa Leonor, en los últimos premios Princesa de Asturias Juan Carlos I en su abdicación el <strong>18-6-2014: «Lo hice sin amargura ni resentimientos, y con la certeza de que mi hijo actuaría a su manera en interés de la Corona»</strong> #### Las memorias de Juan Carlos I: del respeto a Franco a la insensibilidad de su hijo «por deber» y su soledad en Abu Dabi El rey emérito reivindica en sus memorias su papel en la transición a la democracia #### La parodia viral de Valdesoto antes de la llegada de los Reyes: «¿Garraránme a tiempo en la peluquería?» El jefe del Ejecutivo, Pedro Sánchez, presidió una ceremonia en la que auguró nuevos contratos para los astilleros y en la que la reina Sofía fue la madrina del nuevo buque Da por hecho que la muralla del Arsenal se derribará pronto y no descarta la construcción de un nuevo portaviones en Ferrol",
+          "score": 0.19346753
+        },
+        {
+          "title": "La reina Sofía, un 87 cumpleaños con todas las miradas sobre las memorias de Juan Carlos I",
+          "url": "https://lavozdegalicia.es/noticia/sociedad/2025/11/02/reina-sofia-87-cumpleanos-miradas-memorias-juan-carlos-i/00031762080509049174905.htm",
+          "content": "La reina Sofía y la princesa Leonor, en los últimos premios Princesa de Asturias ### En «Reconciliación», que se publicará en España el 3 de diciembre, la define como «una mujer excepcional» En *Reconciliación*, el libro que saldrá a la luz el miércoles en Francia y el 3 de diciembre en España, el emérito dedica unas palabras a su esposa, que este 2 de noviembre cumple 87 años. No le gusta que la llame ‘gran profesional', pero España no podría haber tenido una reina más entregada e irreprochable… Somos diferentes, pero compartimos el mismo sentido del deber». Y es que ese es el papel de la reina Sofía hoy en día. La prensa francesa la ha definido como «una guía moral» del monarca, dice *Point de Vue.* Y es que la madre del rey sigue al pie del cañón en lo que tiene que ver con sus compromisos oficiales y durante este año no ha dejado de viajar a París, Grecia o Washington. Es más, **a principios del 2025, el rey le impuso la distinción del Toisón de Oro** para reconocer públicamente su dedicación y entrega al servicio de España y de la Corona. El acto oficial se celebrará el próximo 21 de noviembre en el Palacio Real, en el marco de las celebraciones del 50 aniversario de la monarquía, en el que no estará Juan Carlos I. Juan Carlos I en su abdicación el <strong>18-6-2014: «Lo hice sin amargura ni resentimientos, y con la certeza de que mi hijo actuaría a su manera en interés de la Corona»</strong> #### Las memorias de Juan Carlos I: del respeto a Franco a la insensibilidad de su hijo «por deber» y su soledad en Abu Dabi Juan Carlos I en su abdicación el <strong>18-6-2014: «Lo hice sin amargura ni resentimientos, y con la certeza de que mi hijo actuaría a su manera en interés de la Corona»</strong> #### Las memorias de Juan Carlos I: del respeto a Franco a la insensibilidad de su hijo «por deber» y su soledad en Abu Dabi Según informa *Hola*, la monarca ha organizado un almuerzo con sus hijos y nietos en en el Palacio de la Zarzuela.",
+          "score": 0.17865509
+        }
+      ]
+    }
+  ],
+  "successful": 4,
+  "total_queries": 4,
+  "searched_at": "2026-01-28T14:40:47.786148Z"
+}

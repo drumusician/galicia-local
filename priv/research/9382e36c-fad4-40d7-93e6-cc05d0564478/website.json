@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "description": "Bienvenidos a La Granera. Descúbrenos y sorprende a tu paladar, con la mejor experiencia gastronómica en A Coruña",
+    "title": "Bienvenidos - La Granera",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Bienvenidos a La Granera. Descúbrenos y sorprende a tu paladar, con la mejor experiencia gastronómica en A Coruña",
+      "title": "Bienvenidos - La Granera",
+      "url": "http://www.lagranera.es/",
+      "language": "es",
+      "content": "Bienvenidos - La Granera Saltar al contenido Bienvenidos a RESERVAR MESA consultar CARTA consultar CARTA Descúbrenos y sorprende a tu paladar Nuestro proyecto está soñado por y para ti. Un lugar de referencia gastronómica que hemos aderezado con los mejores ingredientes. La calidad de los productos, el brillo de las copas, el diseño de cada rincón, y lo más importante, la ilusión de mimarte en tu visita. Desayunar o merendar, comer o cenar con amigos, disfrutar de un aperitivo o un cóctel.  Tú eliges la hora y el momento. Nosotros nos encargamos de todo lo demás. ¡Bienvenidos!  consultar CARTA consultar CARTA Encuéntranos en La Granera Espacio gastronómico, ecléctico y de vanguardia situado en pleno centro de A Coruña. Desayunos, bollerías, cafés, tés e infusiones, vermuts, cervezas, refrescos, copas, meriendas, tapas, menú del día, comidas y cenas. Disponemos de terraza cubierta y conexión wifi para los clientes. CÓMO LLEGAR Haz aquí tu reserva Las reservas con menos de 48h de antelación se realizarán sólo por teléfono reservar mesa reserva para eventos INICIO VER CARTA TAKE AWAY RESERVAR EVENTOS CONTACTO Instagram Facebook-f Pl. Fabrica de Tabacos, 1, 15006 – A Coruña 981 15 40 61",
+      "headings": [
+        "Bienvenidos a",
+        "Descúbrenos y sorprende a tu paladar",
+        "Encuéntranos en",
+        "La Granera",
+        "Haz aquí tu reserva",
+        "eSTAMOS EN",
+        "más información",
+        "INICIO",
+        "VER CARTA",
+        "TAKE AWAY",
+        "RESERVAR",
+        "EVENTOS",
+        "CONTACTO"
+      ],
+      "content_length": 1201
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 1201,
+  "crawled_at": "2026-01-28T15:55:22.409480Z"
+}

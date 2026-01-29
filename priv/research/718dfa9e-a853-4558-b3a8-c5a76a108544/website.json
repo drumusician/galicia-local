@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "description": "Tienda creada con PrestaShop",
+    "title": "A Despensa de Cambados",
+    "languages_detected": [
+      "es-ES"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Tienda creada con PrestaShop",
+      "title": "A Despensa de Cambados",
+      "url": "https://www.adespensadecambados.com/",
+      "language": "es-ES",
+      "content": "A Despensa de Cambados   Productos Destacados  Vista rápida MIRTO RAMON BILBAO 60,00 €  Vista rápida ALBARIÑO PAZO CILLEIRO LIAS 17,30 €  Vista rápida ZARATE ORUJO HIERVAS 18,50 €  Vista rápida MIEL DE BREZO 400G. O PODER... 11,40 € Nuevo  Vista rápida NAVAJAS AL NATURAL 11,95 €  Vista rápida Galletas de mantequilla... 8,50 €  Vista rápida VIÑA CORZO GODELLO 9,95 €  Vista rápida O MEU MEL 1KG 19,90 €  Vista rápida ROCAS DE CHOCOLATE ESSENZO 18,90 € Fuera de stock  Vista rápida RIBERA DEL DUERO REMINOR 12,50 €  Vista rápida ULTREIA GODELLO 19,00 €  Vista rápida PAZO BARRANTES 2020 44,95 €  Vista rápida ALBARIÑO SEGREL 12,50 €  Vista rápida Albariño Pazo Señorans 18,40 €  Vista rápida Bonito fresco de Burela en... 7,50 € Fuera de stock  Vista rápida ZARATE CAIÑO 33,80 €  Vista rápida ANTIDOTO RIBERA DEL DUERO 21,00 €  Vista rápida GOTAS DE SANTIAGO CREMA DE... 11,95 €  Vista rápida PACK DUO MINI HABELAS HAILAS 9,50 €  Vista rápida RIOJA VIUDA NEGRA 12,50 €  Vista rápida CHAMPAGNE VEUVE CLICQOUT ROSE 72,00 € Nuevo  Vista rápida MEMBRILLO DULCE FRUTA/CARNE 7,00 €  Vista rápida MAGNUN MARIA MANUELA 43,00 €  Vista rápida Ribada Selección Barrica 25,95 €  Vista rápida LICOR HIBISCUS ESCARCHADO... 14,20 €  Vista rápida ALBARIÑO PROLOGO 15,00 €  Vista rápida CHOCOLATE TAILANDIA 72% 7,80 €  Vista rápida PONTE DA BOGA GODELLO 16,00 €  Vista rápida ACEITE ALMA MEIGA ARBEQUINA... 7,50 € Nuevo  Vista rápida PEZA DO REI MENCIA RIBEIRA... 11,50 €  Vista rápida MIEL CASTIÑEIRO 800G. O... 15,50 € Nuevo  Vista rápida NOELIA BEBELIA 17,95 €  Vista rápida PASTAS SUSPIROS DEL APOSTOL 6,95 €  Vista rápida PASTAS SANTIAGUIÑOS 8,95 €  Vista rápida MALLEOLUS EMILIO MORO 43,00 €  Vista rápida CHAMPAGNE LOIS PERDRIER 16,20 € Nuevo  Vista rápida PENAFURADA SILIUS EDICION... 18,00 €  Vista rápida Pan do mar pate de mejillones 7,00 €  Vista rápida Godello Carlos Villanueva 10,50 €  Vista rápida Rectoral do Umia 14,99 € Todos los productos  En A Despensa de Cambados encontrarás productos gallegos de inmejorable calidad que destacan en cualquier reunión. En una mesa gallega no puede faltar un buen vino, unas conservas gourmet o paté de marisco y, como no, un buen aguardiente para ésas sobremesas eternas que tanto nos gustan.",
+      "headings": [
+        "Productos Destacados",
+        "MIRTO RAMON BILBAO",
+        "ALBARIÑO PAZO CILLEIRO LIAS",
+        "ZARATE ORUJO HIERVAS",
+        "MIEL DE BREZO 400G. O PODER...",
+        "NAVAJAS AL NATURAL",
+        "Galletas de mantequilla...",
+        "VIÑA CORZO GODELLO",
+        "O MEU MEL 1KG",
+        "ROCAS DE CHOCOLATE ESSENZO",
+        "RIBERA DEL DUERO REMINOR",
+        "ULTREIA GODELLO",
+        "PAZO BARRANTES 2020",
+        "ALBARIÑO SEGREL",
+        "Albariño Pazo Señorans",
+        "Bonito fresco de Burela en...",
+        "ZARATE CAIÑO",
+        "ANTIDOTO RIBERA DEL DUERO",
+        "GOTAS DE SANTIAGO CREMA DE...",
+        "PACK DUO MINI HABELAS HAILAS"
+      ],
+      "content_length": 2274
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 2274,
+  "crawled_at": "2026-01-28T18:07:23.648973Z"
+}

@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "description": "Panadería Hernán Cortés somos especialistas en todo tipo de panes y dulces , encuentra nuestra panadería en Vigo.",
+    "title": "Panadería Hernán Cortés - Tu panadería en Vigo",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Panadería Hernán Cortés somos especialistas en todo tipo de panes y dulces , encuentra nuestra panadería en Vigo.",
+      "title": "Panadería Hernán Cortés - Tu panadería en Vigo",
+      "url": "https://panaderiahernancortes.com/",
+      "language": "es",
+      "content": "Panadería Hernán Cortés - Tu panadería en Vigo",
+      "headings": [],
+      "content_length": 46
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 46,
+  "crawled_at": "2026-01-28T15:16:55.121595Z"
+}

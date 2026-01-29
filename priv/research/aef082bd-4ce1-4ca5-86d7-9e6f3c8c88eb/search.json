@@ -1,0 +1,75 @@
+{
+  "failed": 0,
+  "queries": [
+    {
+      "query": "\"Salón de peiteado Beymar\" Santiago de Compostela reviews opinions",
+      "results": [
+        {
+          "title": "TOP 10 BEST Coiffeur & Salon De Coiffure in Santiago de ... - Yelp",
+          "url": "https://www.yelp.com/search?find_desc=Coiffeur+%26+Salon+De+Coiffure&find_loc=Santiago+de+Compostela%2C+A+Coru%C3%B1a",
+          "content": "Top 10 Best Coiffeur & Salon De Coiffure Near Santiago de Compostela, A Coruña · 1. ROIS Llongueras · 2. Estilista Juan José · 3. Vazquez Dieguez Maria de la Salud.",
+          "score": 0.9142907
+        },
+        {
+          "title": "Catalogo Novelas | PDF - Scribd",
+          "url": "https://www.scribd.com/document/775646765/Catalogo-Novelas",
+          "content": "El salón de baile Anna Hope El salón de Wurtemberg Pascal Quignard El salto cuántico Carlos Daniel Marchio El salto de la araña Graziella Moreno Graupera El",
+          "score": 4.7285447e-4
+        }
+      ]
+    },
+    {
+      "query": "\"Salón de peiteado Beymar\" Hair Salons specialist expertise",
+      "results": [
+        {
+          "title": "Mejor peinado para Phil Foden: ¿Ronaldo o Mo's Barbers? - TikTok",
+          "url": "https://www.tiktok.com/@mosbarbers1/video/7555568473632492803",
+          "content": "332.7K Likes, 1888 Comments. TikTok video from Mo's Barbers (@mosbarbers1): “Descubre qué peinado le quedaría mejor a Phil Foden, ¿el de",
+          "score": 0.02863371
+        }
+      ]
+    },
+    {
+      "query": "\"Salón de peiteado Beymar\" Santiago de Compostela news",
+      "results": [
+        {
+          "title": "Salón de peiteado Hermitas - Rúa de San Roque, 3, 15704 ... - Fresha",
+          "url": "https://www.fresha.com/es/lvp/salon-de-peiteado-hermitas-rua-de-san-roque-santiago-de-compostela-EkMKgL",
+          "content": "Salón de peiteado Hermitas. Mostrar número. Rúa de San Roque, 3, 15704 Santiago de Compostela, A Coruña, Spain. Cómo llegar · Llamar para reservar.",
+          "score": 0.99783427
+        },
+        {
+          "title": "Marta Alvarez Salon de Peiteado e Estetica | Santiago de Compostela",
+          "url": "https://www.facebook.com/100083318313925/reels/",
+          "content": "Marta Alvarez Salon de Peiteado e Estetica, Santiago de Compostela. 72 likes · 4 were here. Beauty, cosmetic & personal care.",
+          "score": 0.9956346
+        },
+        {
+          "title": "Salón 21 | Santiago de Compostela - Facebook",
+          "url": "https://www.facebook.com/peluqueriasalon21/",
+          "content": "Salón 21 · Mañana sábado 18 de Diciembre estaremos abiertos desde las 10:00. · ¿Tu cabello pide hidratación profunda? · Antes y después de un alisado orgánico ✨ Un",
+          "score": 0.9931496
+        },
+        {
+          "title": "Salón Moema | Santiago de Compostela - Facebook",
+          "url": "https://www.facebook.com/SalonMoema/",
+          "content": "Salón Moema. Nuestro objetivo y filosofía es cuidar de nuestros clientes atendiéndolos con profesionalida... See",
+          "score": 0.97324073
+        },
+        {
+          "title": "TOP 10 BEST Coiffeur & Salon De Coiffure in Santiago de ... - Yelp",
+          "url": "https://www.yelp.com/search?find_desc=Coiffeur+%26+Salon+De+Coiffure&find_loc=Santiago+de+Compostela%2C+A+Coru%C3%B1a",
+          "content": "Top 10 Best Coiffeur & Salon De Coiffure Near Santiago de Compostela, A Coruña · 1. ROIS Llongueras · 2. Estilista Juan José · 3. Vazquez Dieguez Maria de la Salud.",
+          "score": 0.9046505
+        }
+      ]
+    },
+    {
+      "query": "\"Salón de peiteado Beymar\" site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net",
+      "results": []
+    }
+  ],
+  "successful": 4,
+  "total_queries": 4,
+  "searched_at": "2026-01-28T16:01:54.883235Z"
+}

@@ -1,0 +1,93 @@
+{
+  "failed": 0,
+  "queries": [
+    {
+      "query": "\"Instec fontaneria\" Santiago de Compostela reviews opinions",
+      "results": [
+        {
+          "title": "Instec Fontanería S.L | Santiago de Compostela - Facebook",
+          "url": "https://www.facebook.com/InstecFontaneriasl/",
+          "content": "✨ En Instec Fontanería somos expertos en mantenimiento de calderas y estamos aquí para que no tengas que preocuparte por nada. ¡Contáctanos hoy mismo! #",
+          "score": 0.9999738
+        },
+        {
+          "title": "Contratos menores 2020 Perfil del contratante.xlsx",
+          "url": "https://www.urjc.es/images/perfil_contratante/contratos_menores/Contratos%20menores%202020.pdf",
+          "content": "Abono por trabajos de realización de un conducto con fibra de vidrio en el techo para la sala de ordenadores del Aulario.",
+          "score": 7.197912e-5
+        }
+      ]
+    },
+    {
+      "query": "\"Instec fontaneria\" Plumbers specialist expertise",
+      "results": [
+        {
+          "title": "Installing a Toilet Flange on Concrete Floor - TikTok",
+          "url": "https://www.tiktok.com/@ufix247/video/7510342628114730283",
+          "content": "copper reticulation techniques, expert plumbing services, plumbing tips for homeowners, professional plumbing ... Tutorial práctico de fontanería",
+          "score": 0.13648199
+        },
+        {
+          "title": "ABRIENDO ESPACIOS DE PAZ Y CONVIVENCIA - asociación cinde",
+          "url": "https://asociacioncinde.org/abriendo-espacios-de-paz-y-convivencia/",
+          "content": "Empresa con más de 30 de años de experiencia al servicio de nuestros clientes, tanto instaladores como particulares. Estamos especializados en",
+          "score": 0.077608645
+        },
+        {
+          "title": "DIY Plumbing: Repair Coupling on a 3\" Vent | TikTok",
+          "url": "https://www.tiktok.com/@plumberjohn_/video/7257925012710018346",
+          "content": "Pro Plumber Shows How to Install ... Oatey Co. Here's the 101 on our Set-Rite toilet flange from one of our Master Plumbers and technical experts.",
+          "score": 0.07264344
+        },
+        {
+          "title": "Carrer del Duc de Rubí 3, 07198 Son Ferriol - Yelp",
+          "url": "https://www.yelp.com/search?cflt=homeservices&find_loc=Carrer%20del%20Duc%20de%20Rub%C3%AD%203%2C%2007198%20Son%20Ferriol&start=30",
+          "content": "The worst after sales service I have ever experienced in fifty years in business. The staff at this company have no understanding of customer care,",
+          "score": 0.04239202
+        }
+      ]
+    },
+    {
+      "query": "\"Instec fontaneria\" Santiago de Compostela news",
+      "results": [
+        {
+          "title": "Instec Fontanería S.L | Santiago de Compostela - Facebook",
+          "url": "https://www.facebook.com/InstecFontaneriasl/",
+          "content": "✨ En Instec Fontanería somos expertos en mantenimiento de calderas y estamos aquí para que no tengas que preocuparte por nada. ¡Contáctanos hoy mismo! #",
+          "score": 0.9999914
+        },
+        {
+          "title": "Fontanería y Calefacción Instec en Santiago - Páxinas Galegas",
+          "url": "https://www.paxinasgalegas.es/instec-625496em.html",
+          "content": "Instalación de calderas, bombas de calor, suelos radiantes, etc. 657 834 128. Email. Enviar Whatsapp. Lunes a Viernes de 8:00 a",
+          "score": 0.99947256
+        },
+        {
+          "title": "Instec Fontanería - Servicios",
+          "url": "https://instecfontaneria.com/es-es/servicios",
+          "content": "Nos referimos a las instalaciones interiores y exteriores, acometidas, distribución de tuberías, desagües y accesorios que permiten el suministro de agua",
+          "score": 0.99857855
+        },
+        {
+          "title": "Instec - Facebook",
+          "url": "https://m.facebook.com/InstecFontaneriasl/photos/cuando-llegue-el-invierno-ser%C3%A1-demasiado-tarde-el-verano-es-el-mejor-momento-par/122176158392072171/",
+          "content": "Escríbenos y deja que Instec Fontanería se encargue de devolverte la comodidad en tu hogar! #fontanería #acs #galicia #presióndelagua · No",
+          "score": 0.9981178
+        },
+        {
+          "title": "Instec - Facebook",
+          "url": "https://www.facebook.com/InstecFontaneriasl/photos/con-el-objetivo-de-estar-m%C3%A1s-cerca-de-ti-hemos-ampliado-nuestra-presencia-en-las/122111325068072171/",
+          "content": "Con el objetivo de estar más cerca de ti, hemos ampliado nuestra presencia en las redes sociales y hemos lanzado nuestro sitio web",
+          "score": 0.99760324
+        }
+      ]
+    },
+    {
+      "query": "\"Instec fontaneria\" site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net",
+      "results": []
+    }
+  ],
+  "successful": 4,
+  "total_queries": 4,
+  "searched_at": "2026-01-28T16:02:41.297635Z"
+}

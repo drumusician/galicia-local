@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "description": "Academia de Inglés en Cambados",
+    "title": "Site is undergoing maintenance",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": "Academia de Inglés en Cambados",
+      "title": "Site is undergoing maintenance",
+      "url": "https://www.academiabloom.com/",
+      "language": "es",
+      "content": "Site is undergoing maintenance El modo mantenimiento está activado Site will be available soon. Thank you for your patience! Acceso del usuario Contraseña perdida",
+      "headings": [
+        "Academia Bloom",
+        "El modo mantenimiento está activado"
+      ],
+      "content_length": 162
+    }
+  ],
+  "pages_crawled": 1,
+  "has_english_version": false,
+  "total_content_length": 162,
+  "crawled_at": "2026-01-28T18:05:39.067556Z"
+}

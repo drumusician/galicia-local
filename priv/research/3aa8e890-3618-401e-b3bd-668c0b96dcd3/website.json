@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "description": null,
+    "title": "Grupo Acuña Ons",
+    "languages_detected": [
+      "es"
+    ]
+  },
+  "pages": [
+    {
+      "description": null,
+      "title": "Grupo Acuña Ons",
+      "url": "http://www.grupoacunaons.com/",
+      "language": "es",
+      "content": "Grupo Acuña Ons ¡Bienvenid@s al Grupo Acuña Ons! Descubre todas las empresas que forman parte de nuestro grupo especializado en experiencias turísticas únicas en Galicia. Transporte marítimo, rutas a las islas, gastronomía, alojamiento y mucho más, todo en un solo lugar. Haz clic en cada logo para conocer en detalle los servicios que ofrecemos desde nuestras distintas marcas. Grupo Acuña Ons: expertos en conectar tierra, mar y emoción. Prensa y recursos",
+      "headings": [
+        "¡Bienvenid@s al Grupo Acuña Ons!"
+      ],
+      "content_length": 457
+    },
+    {
+      "description": null,
+      "title": "Prensa &#8211; Grupo Acuña Ons",
+      "url": "http://www.grupoacunaons.com/prensa",
+      "language": "es",
+      "content": "Prensa &#8211; Grupo Acuña Ons Desde aquí puedes descargar la imagen corporativa y los logotipos de las empresas de nuestro grupo, así como encontrar las directrices a seguir para utilizarlos. Descargar Descargar Descargar Descargar Descargar Descargar Descargar Descargar",
+      "headings": [],
+      "content_length": 272
+    }
+  ],
+  "pages_crawled": 2,
+  "has_english_version": false,
+  "total_content_length": 729,
+  "crawled_at": "2026-01-28T15:16:33.899128Z"
+}
