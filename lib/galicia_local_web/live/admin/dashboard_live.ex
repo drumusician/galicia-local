@@ -57,7 +57,7 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                 <span class="hero-home w-4 h-4"></span>
                 View Site
               </.link>
-              <.link href={~p"/sign-out"} method="delete" class="btn btn-ghost btn-sm">
+              <.link href={~p"/sign-out"} class="btn btn-ghost btn-sm">
                 <span class="hero-arrow-right-on-rectangle w-4 h-4"></span>
                 Sign Out
               </.link>
