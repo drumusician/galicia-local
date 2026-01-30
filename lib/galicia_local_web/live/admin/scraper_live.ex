@@ -146,14 +146,14 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
     ~H"""
     <div class="min-h-screen bg-base-100 p-6">
       <div class="container mx-auto max-w-6xl">
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4 mb-8">
+          <.link navigate={~p"/admin"} class="btn btn-ghost btn-sm btn-circle">
+            <span class="hero-arrow-left w-5 h-5"></span>
+          </.link>
           <div>
             <h1 class="text-3xl font-bold text-base-content">Scraper Admin</h1>
             <p class="text-base-content/60">Import businesses from Google Places & other sources</p>
           </div>
-          <.link navigate={~p"/"} class="btn btn-ghost">
-            ← Back to Home
-          </.link>
         </div>
 
         <!-- Alert Message -->

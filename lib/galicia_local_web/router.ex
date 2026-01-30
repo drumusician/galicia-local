@@ -22,6 +22,10 @@ defmodule GaliciaLocalWeb.Router do
     plug :set_actor, :user
   end
 
+  pipeline :require_admin do
+    plug :require_admin_user
+  end
+
   scope "/", GaliciaLocalWeb do
     pipe_through :browser
 
@@ -102,27 +106,38 @@ defmodule GaliciaLocalWeb.Router do
   #   pipe_through :api
   # end
 
-  # Enable LiveDashboard and Swoosh mailbox preview in development
-  if Application.compile_env(:galicia_local, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
-    import Phoenix.LiveDashboard.Router
+  import Phoenix.LiveDashboard.Router
 
+  scope "/admin" do
+    pipe_through [:browser, :require_admin]
+
+    live_dashboard "/dashboard", metrics: GaliciaLocalWeb.Telemetry
+  end
+
+  # Swoosh mailbox preview in development
+  if Application.compile_env(:galicia_local, :dev_routes) do
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: GaliciaLocalWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
-
   end
 
   scope "/" do
     pipe_through :browser
 
     oban_dashboard("/admin/oban", resolver: GaliciaLocalWeb.ObanResolver)
+  end
+
+  defp require_admin_user(conn, _opts) do
+    user = conn.assigns[:current_user]
+
+    if user && user.is_admin do
+      conn
+    else
+      conn
+      |> Phoenix.Controller.redirect(to: "/")
+      |> Plug.Conn.halt()
+    end
   end
 end

@@ -123,7 +123,7 @@ defmodule GaliciaLocalWeb.Admin.CategoriesLive do
         <%= if @editing do %>
           <div class="modal modal-open">
             <div class="modal-box">
-              <h3 class="font-bold text-lg mb-4">Edit {Ash.CiString.value(@editing.name)}</h3>
+              <h3 class="font-bold text-lg mb-4">Edit {@editing.name}</h3>
               <form phx-submit="save">
                 <div class="form-control mb-4">
                   <label class="label">

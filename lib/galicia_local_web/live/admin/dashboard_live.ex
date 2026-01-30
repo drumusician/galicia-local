@@ -170,7 +170,7 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
           </.link>
 
           <!-- Oban Dashboard -->
-          <a href="/oban" target="_blank" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+          <a href="/admin/oban" target="_blank" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
             <div class="card-body">
               <div class="flex items-center gap-4">
                 <div class="bg-warning/10 rounded-xl p-3">
@@ -188,7 +188,7 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
           </a>
 
           <!-- Phoenix Dashboard -->
-          <a href="/dev/dashboard" target="_blank" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+          <a href="/admin/dashboard" target="_blank" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
             <div class="card-body">
               <div class="flex items-center gap-4">
                 <div class="bg-error/10 rounded-xl p-3">
