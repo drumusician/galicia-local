@@ -23,6 +23,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:lookup_results, [])
      |> assign(:loading, false)
      |> assign(:form_data, %{})
+     |> assign(:inline_error, nil)
      |> reload_cities()}
   end
 
@@ -92,7 +93,8 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:creating, false)
      |> assign(:lookup_results, [])
      |> assign(:form_data, %{})
-     |> assign(:loading, false)}
+     |> assign(:loading, false)
+     |> assign(:inline_error, nil)}
   end
 
   @impl true
@@ -178,7 +180,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
 
       {:noreply, socket}
     else
-      {:noreply, put_flash(socket, :error, "Name and province required for description generation")}
+      {:noreply, assign(socket, :inline_error, "Name and province required for description generation")}
     end
   end
 
@@ -252,14 +254,15 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     {:noreply,
      socket
      |> assign(:lookup_results, results)
-     |> assign(:loading, false)}
+     |> assign(:loading, false)
+     |> assign(:inline_error, nil)}
   end
 
   def handle_info({:lookup_result, {:error, _}}, socket) do
     {:noreply,
      socket
      |> assign(:loading, false)
-     |> put_flash(:error, "City lookup failed")}
+     |> assign(:inline_error, "City lookup failed")}
   end
 
   def handle_info({:descriptions_result, {:ok, %{description: desc, description_es: desc_es} = result}}, socket) do
@@ -272,14 +275,15 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     {:noreply,
      socket
      |> assign(:form_data, form_data)
-     |> assign(:loading, false)}
+     |> assign(:loading, false)
+     |> assign(:inline_error, nil)}
   end
 
   def handle_info({:descriptions_result, {:error, _}}, socket) do
     {:noreply,
      socket
      |> assign(:loading, false)
-     |> put_flash(:error, "Failed to generate descriptions")}
+     |> assign(:inline_error, "Failed to generate descriptions")}
   end
 
   def handle_info({:enrich_result, lookup, descriptions}, socket) do
@@ -523,6 +527,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             form_data={@form_data}
             lookup_results={@lookup_results}
             loading={@loading}
+            inline_error={@inline_error}
           />
         <% end %>
 
@@ -536,6 +541,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             form_data={@form_data}
             lookup_results={@lookup_results}
             loading={@loading}
+            inline_error={@inline_error}
           />
         <% end %>
       </main>
@@ -550,6 +556,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   attr :form_data, :map, required: true
   attr :lookup_results, :list, default: []
   attr :loading, :boolean, default: false
+  attr :inline_error, :string, default: nil
 
   defp city_modal(assigns) do
     ~H"""
@@ -561,6 +568,13 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             <span class="loading loading-spinner loading-sm text-primary"></span>
           <% end %>
         </div>
+
+        <%= if @inline_error do %>
+          <div class="alert alert-error alert-sm py-2 text-sm">
+            <span class="hero-exclamation-circle w-4 h-4"></span>
+            {@inline_error}
+          </div>
+        <% end %>
 
         <form phx-submit={@action} phx-change="update_form" class="space-y-5">
           <!-- Name + Lookup -->

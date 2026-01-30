@@ -8,15 +8,23 @@ defmodule GaliciaLocalWeb.Admin.CategoriesLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    categories = Category.list!()
-                 |> Ash.load!([:business_count])
-                 |> Enum.sort_by(& &1.priority)
-
     {:ok,
      socket
      |> assign(:page_title, "Manage Categories")
-     |> assign(:categories, categories)
-     |> assign(:editing, nil)}
+     |> assign(:categories, load_categories())
+     |> assign(:editing, nil)
+     |> assign(:creating, false)}
+  end
+
+  defp load_categories do
+    Category.list!()
+    |> Ash.load!([:business_count])
+    |> Enum.sort_by(& &1.priority)
+  end
+
+  @impl true
+  def handle_event("new", _params, socket) do
+    {:noreply, assign(socket, :creating, true)}
   end
 
   @impl true
@@ -27,7 +35,30 @@ defmodule GaliciaLocalWeb.Admin.CategoriesLive do
 
   @impl true
   def handle_event("cancel", _params, socket) do
-    {:noreply, assign(socket, :editing, nil)}
+    {:noreply, socket |> assign(:editing, nil) |> assign(:creating, false)}
+  end
+
+  @impl true
+  def handle_event("create", %{"category" => params}, socket) do
+    # Auto-generate slug from name if not provided
+    params =
+      if params["slug"] in [nil, ""] do
+        Map.put(params, "slug", Slug.slugify(params["name"] || ""))
+      else
+        params
+      end
+
+    case Category.create(params) do
+      {:ok, _category} ->
+        {:noreply,
+         socket
+         |> assign(:categories, load_categories())
+         |> assign(:creating, false)
+         |> put_flash(:info, "Category created successfully")}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to create category")}
+    end
   end
 
   @impl true
@@ -36,13 +67,9 @@ defmodule GaliciaLocalWeb.Admin.CategoriesLive do
 
     case Ash.update(category, params) do
       {:ok, _updated} ->
-        categories = Category.list!()
-                     |> Ash.load!([:business_count])
-                     |> Enum.sort_by(& &1.priority)
-
         {:noreply,
          socket
-         |> assign(:categories, categories)
+         |> assign(:categories, load_categories())
          |> assign(:editing, nil)
          |> put_flash(:info, "Category updated successfully")}
 
@@ -64,6 +91,10 @@ defmodule GaliciaLocalWeb.Admin.CategoriesLive do
               </.link>
               <h1 class="text-2xl font-bold">Manage Categories</h1>
             </div>
+            <button type="button" phx-click="new" class="btn btn-primary btn-sm">
+              <span class="hero-plus w-4 h-4"></span>
+              Add Category
+            </button>
           </div>
         </div>
       </header>
@@ -119,6 +150,97 @@ defmodule GaliciaLocalWeb.Admin.CategoriesLive do
           </div>
         </div>
 
+        <!-- Create Modal -->
+        <%= if @creating do %>
+          <div class="modal modal-open">
+            <div class="modal-box">
+              <h3 class="font-bold text-lg mb-4">Add Category</h3>
+              <form phx-submit="create">
+                <div class="form-control mb-4">
+                  <label class="label">
+                    <span class="label-text">Name (English)</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="category[name]"
+                    class="input input-bordered"
+                    required
+                  />
+                </div>
+
+                <div class="form-control mb-4">
+                  <label class="label">
+                    <span class="label-text">Name (Spanish)</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="category[name_es]"
+                    class="input input-bordered"
+                  />
+                </div>
+
+                <div class="form-control mb-4">
+                  <label class="label">
+                    <span class="label-text">Slug (auto-generated if empty)</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="category[slug]"
+                    class="input input-bordered"
+                    placeholder="e.g. music-schools"
+                  />
+                </div>
+
+                <div class="form-control mb-4">
+                  <label class="label">
+                    <span class="label-text">
+                      Icon —
+                      <a href="https://heroicons.com" target="_blank" class="link link-primary text-xs">
+                        browse heroicons.com
+                      </a>
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    name="category[icon]"
+                    class="input input-bordered"
+                    placeholder="e.g. musical-note"
+                  />
+                </div>
+
+                <div class="form-control mb-4">
+                  <label class="label">
+                    <span class="label-text">Priority (lower = higher)</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="category[priority]"
+                    value="4"
+                    class="input input-bordered w-24"
+                  />
+                </div>
+
+                <div class="form-control mb-4">
+                  <label class="label">
+                    <span class="label-text">Description</span>
+                  </label>
+                  <textarea
+                    name="category[description]"
+                    class="textarea textarea-bordered"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <div class="modal-action">
+                  <button type="button" phx-click="cancel" class="btn btn-ghost">Cancel</button>
+                  <button type="submit" class="btn btn-primary">Create Category</button>
+                </div>
+              </form>
+            </div>
+            <div class="modal-backdrop" phx-click="cancel"></div>
+          </div>
+        <% end %>
+
         <!-- Edit Modal -->
         <%= if @editing do %>
           <div class="modal modal-open">
@@ -151,7 +273,12 @@ defmodule GaliciaLocalWeb.Admin.CategoriesLive do
 
                 <div class="form-control mb-4">
                   <label class="label">
-                    <span class="label-text">Icon (Heroicon name, e.g. "scale", "heart")</span>
+                    <span class="label-text">
+                      Icon —
+                      <a href="https://heroicons.com" target="_blank" class="link link-primary text-xs">
+                        browse heroicons.com
+                      </a>
+                    </span>
                   </label>
                   <div class="flex items-center gap-3">
                     <input
