@@ -118,10 +118,11 @@ defmodule GaliciaLocalWeb.Router do
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
 
-    scope "/" do
-      pipe_through :browser
+  end
 
-      oban_dashboard("/oban")
-    end
+  scope "/" do
+    pipe_through :browser
+
+    oban_dashboard("/admin/oban", resolver: GaliciaLocalWeb.ObanResolver)
   end
 end
