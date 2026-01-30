@@ -9,6 +9,7 @@
     <.live_title default="GaliciaLocal" suffix=" · Phoenix Framework">
       {assigns[:page_title]}
     </.live_title>
+    <link rel="icon" type="image/png" href={~p"/favicon.png"} />
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
@@ -27,7 +28,7 @@
           setTheme(localStorage.getItem("phx:theme") || "system");
         }
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        
+
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
@@ -38,45 +39,61 @@
         <div class="container mx-auto max-w-6xl px-4 flex items-center h-14">
           <!-- Brand -->
           <div class="flex-1">
-            <a href="/" class="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
+            <a
+              href="/"
+              class="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity"
+            >
               <span class="text-2xl">🐚</span>
               <span class="text-xl font-bold tracking-tight">GaliciaLocal</span>
             </a>
           </div>
-
-          <!-- Desktop nav -->
+          
+<!-- Desktop nav -->
           <div class="hidden md:flex items-center gap-1">
             <a href="/search" class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-magnifying-glass w-4 h-4"></span>
-              Search
+              <span class="hero-magnifying-glass w-4 h-4"></span> Search
             </a>
             <a href="/cities" class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-map w-4 h-4"></span>
-              Cities
+              <span class="hero-map w-4 h-4"></span> Cities
             </a>
             <a href="/categories" class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-squares-2x2 w-4 h-4"></span>
-              Categories
+              <span class="hero-squares-2x2 w-4 h-4"></span> Categories
             </a>
             <div class="divider divider-horizontal mx-1 h-6"></div>
             <%= if assigns[:current_user] do %>
               <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-sm gap-2">
                   <span class="inline-flex items-center justify-center bg-primary text-primary-content rounded-full w-6 h-6 text-xs font-medium">
-                    <%= String.first(assigns[:current_user].display_name || assigns[:current_user].email |> to_string()) %>
+                    {String.first(
+                      assigns[:current_user].display_name ||
+                        assigns[:current_user].email |> to_string()
+                    )}
                   </span>
                   <span class="hero-chevron-down w-3 h-3"></span>
                 </div>
-                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg border border-base-200 mt-2">
+                <ul
+                  tabindex="0"
+                  class="dropdown-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg border border-base-200 mt-2"
+                >
                   <li class="menu-title text-xs opacity-60 px-2 pt-1">
-                    <%= assigns[:current_user].display_name || assigns[:current_user].email %>
+                    {assigns[:current_user].display_name || assigns[:current_user].email}
                   </li>
-                  <li><a href="/profile"><span class="hero-user-circle w-4 h-4"></span> My Profile</a></li>
+                  <li>
+                    <a href="/profile">
+                      <span class="hero-user-circle w-4 h-4"></span> My Profile
+                    </a>
+                  </li>
                   <%= if assigns[:current_user].is_admin do %>
-                    <li><a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> Admin</a></li>
+                    <li>
+                      <a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> Admin</a>
+                    </li>
                   <% end %>
                   <li></li>
-                  <li><a href="/sign-out" class="text-base-content/60"><span class="hero-arrow-right-start-on-rectangle w-4 h-4"></span> Sign Out</a></li>
+                  <li>
+                    <a href="/sign-out" class="text-base-content/60">
+                      <span class="hero-arrow-right-start-on-rectangle w-4 h-4"></span> Sign Out
+                    </a>
+                  </li>
                 </ul>
               </div>
             <% else %>
@@ -84,27 +101,54 @@
               <a href="/register" class="btn btn-primary btn-sm">Join Community</a>
             <% end %>
           </div>
-
-          <!-- Mobile hamburger -->
+          
+<!-- Mobile hamburger -->
           <div class="md:hidden">
             <div class="dropdown dropdown-end">
               <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
                 <span class="hero-bars-3 w-5 h-5"></span>
               </div>
-              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-lg border border-base-200 mt-2">
-                <li><a href="/search"><span class="hero-magnifying-glass w-4 h-4"></span> Search</a></li>
+              <ul
+                tabindex="0"
+                class="dropdown-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-lg border border-base-200 mt-2"
+              >
+                <li>
+                  <a href="/search"><span class="hero-magnifying-glass w-4 h-4"></span> Search</a>
+                </li>
                 <li><a href="/cities"><span class="hero-map w-4 h-4"></span> Cities</a></li>
-                <li><a href="/categories"><span class="hero-squares-2x2 w-4 h-4"></span> Categories</a></li>
+                <li>
+                  <a href="/categories">
+                    <span class="hero-squares-2x2 w-4 h-4"></span> Categories
+                  </a>
+                </li>
                 <li></li>
                 <%= if assigns[:current_user] do %>
-                  <li><a href="/profile"><span class="hero-user-circle w-4 h-4"></span> My Profile</a></li>
+                  <li>
+                    <a href="/profile">
+                      <span class="hero-user-circle w-4 h-4"></span> My Profile
+                    </a>
+                  </li>
                   <%= if assigns[:current_user].is_admin do %>
-                    <li><a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> Admin</a></li>
+                    <li>
+                      <a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> Admin</a>
+                    </li>
                   <% end %>
-                  <li><a href="/sign-out"><span class="hero-arrow-right-start-on-rectangle w-4 h-4"></span> Sign Out</a></li>
+                  <li>
+                    <a href="/sign-out">
+                      <span class="hero-arrow-right-start-on-rectangle w-4 h-4"></span> Sign Out
+                    </a>
+                  </li>
                 <% else %>
-                  <li><a href="/sign-in"><span class="hero-arrow-right-end-on-rectangle w-4 h-4"></span> Sign In</a></li>
-                  <li><a href="/register" class="text-primary font-semibold"><span class="hero-user-plus w-4 h-4"></span> Join Community</a></li>
+                  <li>
+                    <a href="/sign-in">
+                      <span class="hero-arrow-right-end-on-rectangle w-4 h-4"></span> Sign In
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/register" class="text-primary font-semibold">
+                      <span class="hero-user-plus w-4 h-4"></span> Join Community
+                    </a>
+                  </li>
                 <% end %>
               </ul>
             </div>
