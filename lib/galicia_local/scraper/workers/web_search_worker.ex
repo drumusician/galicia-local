@@ -70,29 +70,12 @@ defmodule GaliciaLocal.Scraper.Workers.WebSearchWorker do
     city_name = get_city_name(business)
     category_name = get_category_name(business)
 
-    base_queries = [
-      # Reviews and reputation
-      "\"#{name}\" #{city_name} reviews opinions",
-      # Expertise and specialization
-      "\"#{name}\" #{category_name} specialist expertise",
-      # News and mentions
-      "\"#{name}\" #{city_name} news"
+    [
+      # Combined reviews, reputation and expertise
+      "\"#{name}\" #{city_name} #{category_name} reviews opinions",
+      # Local Galician media mentions
+      "\"#{name}\" #{city_name} site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net"
     ]
-
-    # Add LinkedIn search for professional services
-    linkedin_query =
-      if professional_service?(category_name) do
-        ["\"#{name}\" #{city_name} site:linkedin.com"]
-      else
-        []
-      end
-
-    # Add local newspaper search for Galicia
-    local_news_queries = [
-      "\"#{name}\" site:lavozdegalicia.es OR site:farodevigo.es OR site:atlantico.net"
-    ]
-
-    base_queries ++ linkedin_query ++ local_news_queries
   end
 
   defp get_city_name(business) do
@@ -107,28 +90,6 @@ defmodule GaliciaLocal.Scraper.Workers.WebSearchWorker do
       %{name: name} -> name
       _ -> "business"
     end
-  end
-
-  defp professional_service?(category_name) do
-    professional_categories = [
-      "lawyer",
-      "abogado",
-      "legal",
-      "accountant",
-      "contador",
-      "consultant",
-      "doctor",
-      "dentist",
-      "veterinarian",
-      "architect",
-      "engineer",
-      "notary",
-      "gestor",
-      "asesor"
-    ]
-
-    category_lower = String.downcase(category_name)
-    Enum.any?(professional_categories, &String.contains?(category_lower, &1))
   end
 
   defp ensure_research_dir(business_id) do
