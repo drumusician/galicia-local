@@ -38,4 +38,5 @@ npm-debug.log
 # Environment secrets
 .envrc
 dets_simple_storage
+.DS_Store
 
