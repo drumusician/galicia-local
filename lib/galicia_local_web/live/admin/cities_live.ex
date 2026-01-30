@@ -5,6 +5,8 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   use GaliciaLocalWeb, :live_view
 
   alias GaliciaLocal.Directory.City
+  alias GaliciaLocal.Scraper.GooglePlaces
+  alias GaliciaLocal.AI.Claude
   alias GaliciaLocalWeb.Layouts
 
   @provinces ["A Coruña", "Lugo", "Ourense", "Pontevedra"]
@@ -18,6 +20,9 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:editing, nil)
      |> assign(:creating, false)
      |> assign(:filter_province, "all")
+     |> assign(:lookup_results, [])
+     |> assign(:loading, false)
+     |> assign(:form_data, %{})
      |> reload_cities()}
   end
 
@@ -41,13 +46,42 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
 
   @impl true
   def handle_event("new", _params, socket) do
-    {:noreply, assign(socket, :creating, true)}
+    {:noreply,
+     socket
+     |> assign(:creating, true)
+     |> assign(:form_data, %{})
+     |> assign(:lookup_results, [])}
   end
 
   @impl true
   def handle_event("edit", %{"id" => id}, socket) do
     city = Enum.find(socket.assigns.cities, &(&1.id == id))
-    {:noreply, assign(socket, :editing, city)}
+    {:noreply,
+     socket
+     |> assign(:editing, city)
+     |> assign(:form_data, city_to_form_data(city))
+     |> assign(:lookup_results, [])}
+  end
+
+  @impl true
+  def handle_event("enrich", %{"id" => id}, socket) do
+    city = Enum.find(socket.assigns.cities, &(&1.id == id))
+
+    socket =
+      socket
+      |> assign(:editing, city)
+      |> assign(:form_data, city_to_form_data(city))
+      |> assign(:loading, true)
+
+    # Run lookup + descriptions in background
+    pid = self()
+    Task.start(fn ->
+      lookup = GooglePlaces.lookup_city(city.name)
+      descriptions = Claude.generate_city_descriptions(city.name, city.province)
+      send(pid, {:enrich_result, lookup, descriptions})
+    end)
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -55,7 +89,103 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     {:noreply,
      socket
      |> assign(:editing, nil)
-     |> assign(:creating, false)}
+     |> assign(:creating, false)
+     |> assign(:lookup_results, [])
+     |> assign(:form_data, %{})
+     |> assign(:loading, false)}
+  end
+
+  @impl true
+  def handle_event("lookup_city", %{"name" => name}, socket) when byte_size(name) > 2 do
+    socket = assign(socket, :loading, true)
+
+    pid = self()
+    Task.start(fn ->
+      result = GooglePlaces.lookup_city(name)
+      send(pid, {:lookup_result, result})
+    end)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("lookup_city", _params, socket) do
+    {:noreply, assign(socket, :lookup_results, [])}
+  end
+
+  @impl true
+  def handle_event("apply_lookup", %{"index" => index_str}, socket) do
+    index = String.to_integer(index_str)
+    result = Enum.at(socket.assigns.lookup_results, index)
+
+    if result do
+      form_data = socket.assigns.form_data
+      province = detect_province(result.address)
+      name = result.name || form_data["name"] || ""
+      slug = name |> String.downcase() |> String.replace(~r/[^a-z0-9]+/, "-") |> String.trim("-")
+
+      # Check if city already exists by slug
+      existing = Enum.find(socket.assigns.cities, &(&1.slug == slug))
+
+      if existing && socket.assigns.creating do
+        # Switch to editing the existing city, merging lookup data
+        existing_data = city_to_form_data(existing)
+        updated =
+          existing_data
+          |> Map.put("latitude", to_string(result.latitude))
+          |> Map.put("longitude", to_string(result.longitude))
+          |> then(fn fd -> if result.image_url, do: Map.put(fd, "image_url", result.image_url), else: fd end)
+
+        {:noreply,
+         socket
+         |> assign(:creating, false)
+         |> assign(:editing, existing)
+         |> assign(:form_data, updated)
+         |> assign(:lookup_results, [])
+         |> put_flash(:info, "#{existing.name} already exists — switched to edit mode")}
+      else
+        updated =
+          form_data
+          |> Map.put("name", name)
+          |> Map.put("slug", slug)
+          |> Map.put("latitude", to_string(result.latitude))
+          |> Map.put("longitude", to_string(result.longitude))
+          |> Map.put("image_url", result.image_url || form_data["image_url"] || "")
+          |> then(fn fd -> if province, do: Map.put(fd, "province", province), else: fd end)
+
+        {:noreply,
+         socket
+         |> assign(:form_data, updated)
+         |> assign(:lookup_results, [])}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_event("generate_descriptions", _params, socket) do
+    name = socket.assigns.form_data["name"] || ""
+    province = socket.assigns.form_data["province"] || ""
+
+    if name != "" and province != "" do
+      socket = assign(socket, :loading, true)
+      pid = self()
+
+      Task.start(fn ->
+        result = Claude.generate_city_descriptions(name, province)
+        send(pid, {:descriptions_result, result})
+      end)
+
+      {:noreply, socket}
+    else
+      {:noreply, put_flash(socket, :error, "Name and province required for description generation")}
+    end
+  end
+
+  @impl true
+  def handle_event("update_form", %{"city" => params}, socket) do
+    form_data = Map.merge(socket.assigns.form_data, params)
+    {:noreply, assign(socket, :form_data, form_data)}
   end
 
   @impl true
@@ -68,10 +198,12 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
          socket
          |> reload_cities()
          |> assign(:creating, false)
+         |> assign(:form_data, %{})
          |> put_flash(:info, "#{city.name} added successfully")}
 
       {:error, error} ->
-        {:noreply, put_flash(socket, :error, "Failed to create city: #{inspect(error)}")}
+        message = format_ash_error(error)
+        {:noreply, put_flash(socket, :error, message)}
     end
   end
 
@@ -86,10 +218,12 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
          socket
          |> reload_cities()
          |> assign(:editing, nil)
+         |> assign(:form_data, %{})
          |> put_flash(:info, "#{updated.name} updated successfully")}
 
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update city")}
+      {:error, error} ->
+        message = format_ash_error(error)
+        {:noreply, put_flash(socket, :error, message)}
     end
   end
 
@@ -111,6 +245,93 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
       _ ->
         {:noreply, put_flash(socket, :error, "City not found")}
     end
+  end
+
+  @impl true
+  def handle_info({:lookup_result, {:ok, results}}, socket) do
+    {:noreply,
+     socket
+     |> assign(:lookup_results, results)
+     |> assign(:loading, false)}
+  end
+
+  def handle_info({:lookup_result, {:error, _}}, socket) do
+    {:noreply,
+     socket
+     |> assign(:loading, false)
+     |> put_flash(:error, "City lookup failed")}
+  end
+
+  def handle_info({:descriptions_result, {:ok, %{description: desc, description_es: desc_es} = result}}, socket) do
+    form_data =
+      socket.assigns.form_data
+      |> Map.put("description", desc)
+      |> Map.put("description_es", desc_es)
+      |> then(fn fd -> if result[:population], do: Map.put(fd, "population", to_string(result[:population])), else: fd end)
+
+    {:noreply,
+     socket
+     |> assign(:form_data, form_data)
+     |> assign(:loading, false)}
+  end
+
+  def handle_info({:descriptions_result, {:error, _}}, socket) do
+    {:noreply,
+     socket
+     |> assign(:loading, false)
+     |> put_flash(:error, "Failed to generate descriptions")}
+  end
+
+  def handle_info({:enrich_result, lookup, descriptions}, socket) do
+    form_data = socket.assigns.form_data
+
+    # Apply lookup data
+    form_data =
+      case lookup do
+        {:ok, [first | _]} ->
+          form_data
+          |> Map.put("latitude", to_string(first.latitude))
+          |> Map.put("longitude", to_string(first.longitude))
+          |> then(fn fd ->
+            if first.image_url, do: Map.put(fd, "image_url", first.image_url), else: fd
+          end)
+
+        _ ->
+          form_data
+      end
+
+    # Apply descriptions
+    form_data =
+      case descriptions do
+        {:ok, %{description: desc, description_es: desc_es} = result} ->
+          form_data
+          |> Map.put("description", desc)
+          |> Map.put("description_es", desc_es)
+          |> then(fn fd -> if result[:population], do: Map.put(fd, "population", to_string(result[:population])), else: fd end)
+
+        _ ->
+          form_data
+      end
+
+    {:noreply,
+     socket
+     |> assign(:form_data, form_data)
+     |> assign(:loading, false)}
+  end
+
+  defp city_to_form_data(city) do
+    %{
+      "name" => city.name || "",
+      "slug" => city.slug || "",
+      "province" => city.province || "",
+      "population" => if(city.population, do: to_string(city.population), else: ""),
+      "latitude" => if(city.latitude, do: to_string(city.latitude), else: ""),
+      "longitude" => if(city.longitude, do: to_string(city.longitude), else: ""),
+      "image_url" => city.image_url || "",
+      "description" => city.description || "",
+      "description_es" => city.description_es || "",
+      "featured" => city.featured
+    }
   end
 
   defp process_params(params) do
@@ -144,6 +365,28 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
           :error -> params
         end
       _ -> params
+    end
+  end
+
+  defp format_ash_error(%Ash.Error.Invalid{errors: errors}) do
+    errors
+    |> Enum.map(fn
+      %{field: field, message: message} -> "#{field} #{message}"
+      other -> inspect(other)
+    end)
+    |> Enum.join(", ")
+  end
+
+  defp format_ash_error(error), do: "Failed: #{inspect(error)}"
+
+  defp detect_province(nil), do: nil
+  defp detect_province(address) do
+    cond do
+      String.contains?(address, "A Coruña") or String.contains?(address, "La Coruña") -> "A Coruña"
+      String.contains?(address, "Lugo") -> "Lugo"
+      String.contains?(address, "Ourense") or String.contains?(address, "Orense") -> "Ourense"
+      String.contains?(address, "Pontevedra") -> "Pontevedra"
+      true -> nil
     end
   end
 
@@ -253,6 +496,10 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
                   >
                     <span class="hero-trash w-4 h-4"></span>
                   </button>
+                  <button type="button" phx-click="enrich" phx-value-id={city.id} class="btn btn-sm btn-ghost text-info">
+                    <span class="hero-sparkles w-4 h-4"></span>
+                    Enrich
+                  </button>
                   <button type="button" phx-click="edit" phx-value-id={city.id} class="btn btn-sm btn-ghost">
                     <span class="hero-pencil w-4 h-4"></span>
                     Edit
@@ -268,12 +515,28 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
 
         <!-- Create Modal -->
         <%= if @creating do %>
-          <.city_modal title="Add New City" action="create" city={nil} provinces={@provinces} />
+          <.city_modal
+            title="Add New City"
+            action="create"
+            city={nil}
+            provinces={@provinces}
+            form_data={@form_data}
+            lookup_results={@lookup_results}
+            loading={@loading}
+          />
         <% end %>
 
         <!-- Edit Modal -->
         <%= if @editing do %>
-          <.city_modal title={"Edit #{@editing.name}"} action="save" city={@editing} provinces={@provinces} />
+          <.city_modal
+            title={"Edit #{@editing.name}"}
+            action="save"
+            city={@editing}
+            provinces={@provinces}
+            form_data={@form_data}
+            lookup_results={@lookup_results}
+            loading={@loading}
+          />
         <% end %>
       </main>
     </div>
@@ -284,159 +547,209 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   attr :action, :string, required: true
   attr :city, :map, default: nil
   attr :provinces, :list, required: true
+  attr :form_data, :map, required: true
+  attr :lookup_results, :list, default: []
+  attr :loading, :boolean, default: false
 
   defp city_modal(assigns) do
     ~H"""
     <div class="modal modal-open">
       <div class="modal-box max-w-2xl">
-        <h3 class="font-bold text-lg mb-4">{@title}</h3>
-        <form phx-submit={@action}>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Name -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Name *</span>
-              </label>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-xl">{@title}</h3>
+          <%= if @loading do %>
+            <span class="loading loading-spinner loading-sm text-primary"></span>
+          <% end %>
+        </div>
+
+        <form phx-submit={@action} phx-change="update_form" class="space-y-5">
+          <!-- Name + Lookup -->
+          <div>
+            <label class="block text-sm font-medium mb-1.5">Name *</label>
+            <div class="join w-full">
               <input
                 type="text"
                 name="city[name]"
-                value={@city && @city.name}
+                value={@form_data["name"] || (@city && @city.name)}
                 required
-                class="input input-bordered"
+                class="input input-bordered join-item w-full"
                 placeholder="e.g., Cambados"
               />
+              <button
+                type="button"
+                phx-click="lookup_city"
+                phx-value-name={@form_data["name"] || (@city && @city.name) || ""}
+                class="btn btn-outline join-item"
+                disabled={@loading}
+              >
+                <span class="hero-magnifying-glass w-4 h-4"></span>
+                Lookup
+              </button>
             </div>
+          </div>
 
-            <!-- Slug -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Slug *</span>
-              </label>
+          <!-- Lookup Results -->
+          <%= if @lookup_results != [] do %>
+            <div class="space-y-2">
+              <p class="text-xs font-semibold text-info uppercase tracking-wider">Places API Results</p>
+              <%= for {result, index} <- Enum.with_index(@lookup_results) do %>
+                <div class="flex items-center justify-between bg-info/10 rounded-lg px-4 py-2.5">
+                  <div class="min-w-0">
+                    <p class="font-medium text-sm">{result.name}</p>
+                    <p class="text-xs text-base-content/60 truncate">{result.address}</p>
+                    <p class="text-xs text-base-content/40">{result.latitude}, {result.longitude}</p>
+                  </div>
+                  <button
+                    type="button"
+                    phx-click="apply_lookup"
+                    phx-value-index={index}
+                    class="btn btn-xs btn-info btn-outline ml-3 shrink-0"
+                  >
+                    Apply
+                  </button>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <!-- Slug + Province -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Slug *</label>
               <input
                 type="text"
                 name="city[slug]"
-                value={@city && @city.slug}
+                value={@form_data["slug"] || (@city && @city.slug)}
                 required
-                class="input input-bordered"
+                class="input input-bordered w-full"
                 placeholder="e.g., cambados"
               />
             </div>
-
-            <!-- Province -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Province *</span>
-              </label>
-              <select name="city[province]" required class="select select-bordered">
-                <option value="">Select province...</option>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Province *</label>
+              <select name="city[province]" required class="select select-bordered w-full">
+                <option value="">Select...</option>
                 <%= for province <- @provinces do %>
-                  <option value={province} selected={@city && @city.province == province}>
+                  <option
+                    value={province}
+                    selected={(@form_data["province"] || (@city && @city.province)) == province}
+                  >
                     {province}
                   </option>
                 <% end %>
               </select>
             </div>
+          </div>
 
-            <!-- Population -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Population</span>
-              </label>
-              <input
-                type="number"
-                name="city[population]"
-                value={@city && @city.population}
-                class="input input-bordered"
-                placeholder="e.g., 13000"
-              />
-            </div>
+          <div class="divider text-xs text-base-content/40 my-1">LOCATION</div>
 
-            <!-- Latitude -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Latitude</span>
-              </label>
+          <!-- Coordinates + Population -->
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Latitude</label>
               <input
                 type="text"
                 name="city[latitude]"
-                value={@city && @city.latitude}
-                class="input input-bordered"
-                placeholder="e.g., 42.5138"
+                value={@form_data["latitude"] || (@city && @city.latitude)}
+                class="input input-bordered input-sm w-full"
+                placeholder="42.5138"
               />
             </div>
-
-            <!-- Longitude -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Longitude</span>
-              </label>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Longitude</label>
               <input
                 type="text"
                 name="city[longitude]"
-                value={@city && @city.longitude}
-                class="input input-bordered"
-                placeholder="e.g., -8.8147"
+                value={@form_data["longitude"] || (@city && @city.longitude)}
+                class="input input-bordered input-sm w-full"
+                placeholder="-8.8147"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Population</label>
+              <input
+                type="number"
+                name="city[population]"
+                value={@form_data["population"] || (@city && @city.population)}
+                class="input input-bordered input-sm w-full"
+                placeholder="13000"
               />
             </div>
           </div>
 
+          <div class="divider text-xs text-base-content/40 my-1">MEDIA & OPTIONS</div>
+
           <!-- Image URL -->
-          <div class="form-control mt-4">
-            <label class="label">
-              <span class="label-text">Image URL</span>
-            </label>
+          <div>
+            <label class="block text-sm font-medium mb-1.5">Image URL</label>
             <input
               type="text"
               name="city[image_url]"
-              value={@city && @city.image_url}
-              class="input input-bordered"
+              value={@form_data["image_url"] || (@city && @city.image_url)}
+              class="input input-bordered w-full"
               placeholder="https://..."
             />
-          </div>
-
-          <!-- Description (English) -->
-          <div class="form-control mt-4">
-            <label class="label">
-              <span class="label-text">Description (English)</span>
-            </label>
-            <textarea
-              name="city[description]"
-              rows="2"
-              class="textarea textarea-bordered"
-              placeholder="A brief description of the city..."
-            >{@city && @city.description}</textarea>
-          </div>
-
-          <!-- Description (Spanish) -->
-          <div class="form-control mt-4">
-            <label class="label">
-              <span class="label-text">Description (Spanish)</span>
-            </label>
-            <textarea
-              name="city[description_es]"
-              rows="2"
-              class="textarea textarea-bordered"
-              placeholder="Una breve descripción de la ciudad..."
-            >{@city && @city.description_es}</textarea>
+            <%= if (@form_data["image_url"] || (@city && @city.image_url)) not in [nil, ""] do %>
+              <div class="mt-2 rounded-lg overflow-hidden h-20 w-36">
+                <img
+                  src={@form_data["image_url"] || (@city && @city.image_url)}
+                  class="w-full h-full object-cover"
+                  alt="Preview"
+                />
+              </div>
+            <% end %>
           </div>
 
           <!-- Featured -->
-          <div class="form-control mt-4">
-            <label class="label cursor-pointer justify-start gap-4">
-              <input
-                type="checkbox"
-                name="city[featured]"
-                value="true"
-                checked={@city && @city.featured}
-                class="checkbox checkbox-primary"
-              />
-              <span class="label-text">Featured on homepage</span>
-            </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="city[featured]"
+              value="true"
+              checked={if(is_nil(@form_data["featured"]), do: @city && @city.featured, else: @form_data["featured"])}
+              class="checkbox checkbox-primary checkbox-sm"
+            />
+            <span class="text-sm">Featured on homepage</span>
+          </label>
+
+          <div class="divider text-xs text-base-content/40 my-1">DESCRIPTIONS</div>
+
+          <!-- Descriptions -->
+          <div class="space-y-3">
+            <div class="flex justify-end">
+              <button
+                type="button"
+                phx-click="generate_descriptions"
+                class="btn btn-xs btn-outline btn-secondary"
+                disabled={@loading}
+              >
+                <span class="hero-sparkles w-3 h-3"></span>
+                Generate with AI
+              </button>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">English</label>
+              <textarea
+                name="city[description]"
+                rows="2"
+                class="textarea textarea-bordered w-full text-sm"
+                placeholder="A brief description of the city..."
+              >{@form_data["description"] || (@city && @city.description)}</textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Spanish</label>
+              <textarea
+                name="city[description_es]"
+                rows="2"
+                class="textarea textarea-bordered w-full text-sm"
+                placeholder="Una breve descripción de la ciudad..."
+              >{@form_data["description_es"] || (@city && @city.description_es)}</textarea>
+            </div>
           </div>
 
           <div class="modal-action">
-            <button type="button" phx-click="cancel" class="btn btn-ghost">Cancel</button>
-            <button type="submit" class="btn btn-primary">
+            <button type="button" phx-click="cancel" class="btn btn-ghost btn-sm">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">
               <%= if @city, do: "Save Changes", else: "Add City" %>
             </button>
           </div>

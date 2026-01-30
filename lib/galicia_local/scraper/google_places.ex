@@ -286,6 +286,89 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
     System.get_env("GOOGLE_PLACES_API_KEY")
   end
 
+  @doc """
+  Look up a city by name in Galicia. Returns basic location info.
+  """
+  def lookup_city(city_name) do
+    case api_key() do
+      nil ->
+        Logger.warning("GOOGLE_PLACES_API_KEY not set, using mock city data")
+        {:ok, mock_city_result(city_name)}
+
+      key ->
+        do_lookup_city(city_name, key)
+    end
+  end
+
+  defp do_lookup_city(city_name, api_key) do
+    body = %{
+      textQuery: "#{city_name}, Galicia, Spain",
+      languageCode: "en",
+      maxResultCount: 5
+    }
+
+    field_mask = [
+      "places.id",
+      "places.displayName",
+      "places.formattedAddress",
+      "places.location",
+      "places.photos",
+      "places.editorialSummary"
+    ]
+
+    headers = [
+      {"Content-Type", "application/json"},
+      {"X-Goog-Api-Key", api_key},
+      {"X-Goog-FieldMask", Enum.join(field_mask, ",")}
+    ]
+
+    url = "#{@base_url}/places:searchText"
+
+    case Req.post(url, json: body, headers: headers) do
+      {:ok, %{status: 200, body: %{"places" => places}}} ->
+        results =
+          places
+          |> Enum.map(fn place ->
+            photos = normalize_photos(place["photos"])
+
+            %{
+              name: get_in(place, ["displayName", "text"]),
+              address: place["formattedAddress"],
+              latitude: get_in(place, ["location", "latitude"]),
+              longitude: get_in(place, ["location", "longitude"]),
+              editorial_summary: get_in(place, ["editorialSummary", "text"]),
+              image_url: List.first(photos)
+            }
+          end)
+
+        {:ok, results}
+
+      {:ok, %{status: 200, body: _empty}} ->
+        {:ok, []}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Google Places city lookup error: #{status} - #{inspect(body)}")
+        {:error, {:api_error, status, body}}
+
+      {:error, reason} ->
+        Logger.error("Google Places city lookup failed: #{inspect(reason)}")
+        {:error, reason}
+    end
+  end
+
+  defp mock_city_result(city_name) do
+    [
+      %{
+        name: city_name,
+        address: "#{city_name}, Galicia, Spain",
+        latitude: 42.34 + :rand.uniform() * 0.5,
+        longitude: -8.5 + :rand.uniform() * 0.5,
+        editorial_summary: "A charming city in Galicia, northwestern Spain.",
+        image_url: nil
+      }
+    ]
+  end
+
   # Mock data for development without API key
   defp mock_search_results(query, opts) do
     location = Keyword.get(opts, :location, {42.3396, -7.8642})

@@ -64,6 +64,41 @@ defmodule GaliciaLocal.AI.Claude do
     {:error, :unexpected_response}
   end
 
+  @doc """
+  Generate English and Spanish descriptions for a city.
+  Returns {:ok, %{description: "...", description_es: "..."}} or {:error, reason}
+  """
+  def generate_city_descriptions(city_name, province) do
+    prompt = """
+    Write two brief descriptions (2-3 sentences each) for the city of #{city_name} in #{province}, Galicia, Spain.
+    These are for an expat guide website helping foreigners settle in Galicia.
+
+    Focus on: what makes the city interesting, quality of life, notable features, and relevance to expats.
+
+    Also include the approximate population of the city (most recent available data).
+
+    Respond ONLY with valid JSON in this exact format:
+    {"description": "English description here", "description_es": "Spanish description here", "population": 12345}
+    """
+
+    case complete(prompt, max_tokens: 512) do
+      {:ok, text} ->
+        case Jason.decode(text) do
+          {:ok, %{"description" => desc, "description_es" => desc_es} = parsed} ->
+            result = %{description: desc, description_es: desc_es}
+            result = if parsed["population"], do: Map.put(result, :population, parsed["population"]), else: result
+            {:ok, result}
+
+          _ ->
+            Logger.error("Failed to parse city descriptions JSON: #{text}")
+            {:error, :parse_error}
+        end
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
   defp get_api_key do
     System.get_env("ANTHROPIC_API_KEY")
   end
