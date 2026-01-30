@@ -130,11 +130,177 @@ const CitiesMap = {
   }
 }
 
+// Businesses Map Hook - multiple markers with update support
+const BusinessesMap = {
+  mounted() {
+    this.loadLeaflet(() => this.renderMap())
+    this.handleEvent("update-markers", ({ businesses }) => {
+      if (this.map) {
+        this.updateMarkers(businesses)
+      }
+    })
+  },
+
+  loadLeaflet(callback) {
+    if (!document.querySelector('link[href*="leaflet"]')) {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+      document.head.appendChild(link)
+    }
+
+    if (!window.L) {
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+      script.onload = callback
+      document.head.appendChild(script)
+    } else {
+      callback()
+    }
+  },
+
+  updateMarkers(businesses) {
+    this.markersLayer.clearLayers()
+    const bounds = []
+
+    businesses.forEach(biz => {
+      if (!biz.lat || !biz.lng) return
+      const pos = [biz.lat, biz.lng]
+      bounds.push(pos)
+
+      const popup = L.popup().setContent(
+        `<div style="min-width:140px">` +
+        `<strong style="font-size:13px">${biz.name}</strong><br>` +
+        `<span style="color:#666;font-size:12px">${biz.city}</span><br>` +
+        (biz.address ? `<span style="color:#888;font-size:11px">${biz.address}</span><br>` : '') +
+        `<a href="/businesses/${biz.id}" style="color:#6419e6;font-weight:600;font-size:12px">View details →</a>` +
+        `</div>`
+      )
+
+      L.marker(pos).addTo(this.markersLayer).bindPopup(popup)
+    })
+
+    const userLat = parseFloat(this.el.dataset.userLat)
+    const userLng = parseFloat(this.el.dataset.userLng)
+    if (!isNaN(userLat) && !isNaN(userLng)) {
+      const userIcon = L.divIcon({
+        html: '<div style="background:#3b82f6;width:14px;height:14px;border-radius:50%;border:3px solid white;box-shadow:0 0 6px rgba(0,0,0,0.3)"></div>',
+        iconSize: [14, 14],
+        className: ''
+      })
+      L.marker([userLat, userLng], { icon: userIcon })
+        .addTo(this.markersLayer)
+        .bindPopup('You are here')
+    }
+
+    if (bounds.length > 0) {
+      this.skipBoundsEvent = true
+      this.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 })
+    }
+  },
+
+  renderMap() {
+    const businesses = JSON.parse(this.el.dataset.businesses || '[]')
+    const userLat = parseFloat(this.el.dataset.userLat)
+    const userLng = parseFloat(this.el.dataset.userLng)
+
+    if (!this.map) {
+      this.el.innerHTML = ""
+      this.map = L.map(this.el).setView([42.6, -8.0], 8)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(this.map)
+      this.markersLayer = L.layerGroup().addTo(this.map)
+      this.skipBoundsEvent = true
+
+      this.map.on('moveend', () => {
+        if (this.skipBoundsEvent) {
+          this.skipBoundsEvent = false
+          return
+        }
+        const b = this.map.getBounds()
+        this.pushEvent('map_bounds', {
+          south: b.getSouth(),
+          north: b.getNorth(),
+          west: b.getWest(),
+          east: b.getEast()
+        })
+      })
+    }
+
+    this.markersLayer.clearLayers()
+    const bounds = []
+
+    businesses.forEach(biz => {
+      if (!biz.lat || !biz.lng) return
+      const pos = [biz.lat, biz.lng]
+      bounds.push(pos)
+
+      const popup = L.popup().setContent(
+        `<div style="min-width:140px">` +
+        `<strong style="font-size:13px">${biz.name}</strong><br>` +
+        `<span style="color:#666;font-size:12px">${biz.city}</span><br>` +
+        (biz.address ? `<span style="color:#888;font-size:11px">${biz.address}</span><br>` : '') +
+        `<a href="/businesses/${biz.id}" style="color:#6419e6;font-weight:600;font-size:12px">View details →</a>` +
+        `</div>`
+      )
+
+      L.marker(pos).addTo(this.markersLayer).bindPopup(popup)
+    })
+
+    if (!isNaN(userLat) && !isNaN(userLng)) {
+      const userIcon = L.divIcon({
+        html: '<div style="background:#3b82f6;width:14px;height:14px;border-radius:50%;border:3px solid white;box-shadow:0 0 6px rgba(0,0,0,0.3)"></div>',
+        iconSize: [14, 14],
+        className: ''
+      })
+      L.marker([userLat, userLng], { icon: userIcon })
+        .addTo(this.markersLayer)
+        .bindPopup('You are here')
+      bounds.push([userLat, userLng])
+    }
+
+    if (bounds.length > 0) {
+      this.skipBoundsEvent = true
+      this.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 })
+    }
+  }
+}
+
+// GeoLocate Hook - browser geolocation
+const GeoLocate = {
+  mounted() {
+    this.el.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        this.pushEvent('location_error', { reason: 'not_supported' })
+        return
+      }
+
+      this.el.classList.add('loading')
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          this.el.classList.remove('loading')
+          this.pushEvent('user_location', {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          })
+        },
+        (err) => {
+          this.el.classList.remove('loading')
+          this.pushEvent('location_error', { reason: err.message })
+        },
+        { timeout: 10000 }
+      )
+    })
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks, LeafletMap, CitiesMap},
+  hooks: {...colocatedHooks, LeafletMap, CitiesMap, BusinessesMap, GeoLocate},
 })
 
 // Show progress bar on live navigation and form submits

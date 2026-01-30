@@ -28,6 +28,8 @@ defmodule GaliciaLocalWeb.CategoryLive do
          |> assign(:cities, cities)
          |> assign(:selected_city, nil)
          |> assign(:english_only, false)
+         |> assign(:user_location, nil)
+         |> assign(:map_bounds, nil)
          |> assign(:filtered_businesses, businesses)}
 
       {:error, _} ->
@@ -48,17 +50,23 @@ defmodule GaliciaLocalWeb.CategoryLive do
         Enum.find(socket.assigns.cities, &(&1.slug == city_slug))
       end
 
-    filtered_businesses = filter_businesses(
+    filtered = filter_businesses(
       socket.assigns.businesses,
       selected_city,
       english_only
     )
 
+    filtered = maybe_sort_by_distance(filtered, socket.assigns.user_location)
+
+    map_businesses = filter_businesses(socket.assigns.businesses, selected_city, english_only)
+
     {:noreply,
      socket
      |> assign(:selected_city, selected_city)
      |> assign(:english_only, english_only)
-     |> assign(:filtered_businesses, filtered_businesses)}
+     |> assign(:map_bounds, nil)
+     |> assign(:filtered_businesses, filtered)
+     |> push_event("update-markers", %{businesses: businesses_list(map_businesses)})}
   end
 
   @impl true
@@ -67,6 +75,64 @@ defmodule GaliciaLocalWeb.CategoryLive do
     english = Map.get(params, "english") == "true"
     params = build_params(city_slug, english)
     {:noreply, push_patch(socket, to: ~p"/categories/#{socket.assigns.category.slug}?#{params}")}
+  end
+
+  @impl true
+  def handle_event("user_location", %{"lat" => lat, "lng" => lng}, socket) do
+    location = {lat, lng}
+
+    filtered =
+      filter_businesses(
+        socket.assigns.businesses,
+        socket.assigns.selected_city,
+        socket.assigns.english_only
+      )
+      |> maybe_sort_by_distance(location)
+
+    {:noreply,
+     socket
+     |> assign(:user_location, location)
+     |> assign(:filtered_businesses, filtered)}
+  end
+
+  @impl true
+  def handle_event("map_bounds", %{"south" => s, "north" => n, "west" => w, "east" => e}, socket) do
+    bounds = %{south: s, north: n, west: w, east: e}
+
+    filtered =
+      filter_businesses(
+        socket.assigns.businesses,
+        socket.assigns.selected_city,
+        socket.assigns.english_only
+      )
+      |> filter_by_bounds(bounds)
+      |> maybe_sort_by_distance(socket.assigns.user_location)
+
+    {:noreply,
+     socket
+     |> assign(:map_bounds, bounds)
+     |> assign(:filtered_businesses, filtered)}
+  end
+
+  @impl true
+  def handle_event("reset_bounds", _params, socket) do
+    filtered =
+      filter_businesses(
+        socket.assigns.businesses,
+        socket.assigns.selected_city,
+        socket.assigns.english_only
+      )
+      |> maybe_sort_by_distance(socket.assigns.user_location)
+
+    {:noreply,
+     socket
+     |> assign(:map_bounds, nil)
+     |> assign(:filtered_businesses, filtered)}
+  end
+
+  @impl true
+  def handle_event("location_error", _params, socket) do
+    {:noreply, socket}
   end
 
   defp filter_businesses(businesses, nil, false), do: businesses
@@ -80,13 +146,80 @@ defmodule GaliciaLocalWeb.CategoryLive do
     Enum.filter(businesses, &(&1.city_id == city.id and &1.speaks_english))
   end
 
+  defp filter_by_bounds(businesses, nil), do: businesses
+  defp filter_by_bounds(businesses, %{south: s, north: n, west: w, east: e}) do
+    Enum.filter(businesses, fn biz ->
+      if biz.latitude && biz.longitude do
+        lat = Decimal.to_float(biz.latitude)
+        lng = Decimal.to_float(biz.longitude)
+        lat >= s and lat <= n and lng >= w and lng <= e
+      else
+        true
+      end
+    end)
+  end
+
+  defp maybe_sort_by_distance(businesses, nil), do: businesses
+  defp maybe_sort_by_distance(businesses, {user_lat, user_lng}) do
+    Enum.sort_by(businesses, fn biz ->
+      if biz.latitude && biz.longitude do
+        haversine(user_lat, user_lng, Decimal.to_float(biz.latitude), Decimal.to_float(biz.longitude))
+      else
+        999_999
+      end
+    end)
+  end
+
+  defp haversine(lat1, lng1, lat2, lng2) do
+    r = 6371
+    dlat = deg_to_rad(lat2 - lat1)
+    dlng = deg_to_rad(lng2 - lng1)
+    a = :math.sin(dlat / 2) * :math.sin(dlat / 2) +
+        :math.cos(deg_to_rad(lat1)) * :math.cos(deg_to_rad(lat2)) *
+        :math.sin(dlng / 2) * :math.sin(dlng / 2)
+    2 * r * :math.asin(:math.sqrt(a))
+  end
+
+  defp deg_to_rad(deg), do: deg * :math.pi() / 180
+
+  defp distance_for(_business, nil), do: nil
+  defp distance_for(business, {user_lat, user_lng}) do
+    if business.latitude && business.longitude do
+      km = haversine(user_lat, user_lng, Decimal.to_float(business.latitude), Decimal.to_float(business.longitude))
+      Float.round(km, 1)
+    end
+  end
+
   defp build_params("", false), do: %{}
   defp build_params("", true), do: %{english: true}
   defp build_params(city, false), do: %{city: city}
   defp build_params(city, true), do: %{city: city, english: true}
 
+  defp businesses_list(businesses) do
+    businesses
+    |> Enum.filter(&(&1.latitude && &1.longitude))
+    |> Enum.map(fn biz ->
+      %{
+        id: biz.id,
+        name: biz.name,
+        lat: Decimal.to_float(biz.latitude),
+        lng: Decimal.to_float(biz.longitude),
+        city: biz.city.name,
+        address: biz.address
+      }
+    end)
+  end
+
+  defp businesses_json(businesses) do
+    businesses |> businesses_list() |> Jason.encode!()
+  end
+
   @impl true
   def render(assigns) do
+    assigns = assign(assigns, :businesses_json, businesses_json(assigns.businesses))
+    has_coords = Enum.any?(assigns.businesses, &(&1.latitude && &1.longitude))
+    assigns = assign(assigns, :has_coords, has_coords)
+
     ~H"""
     <div class="min-h-screen bg-base-100">
       <div class="container mx-auto max-w-6xl px-4 py-8">
@@ -116,7 +249,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
         </div>
 
         <!-- Filters -->
-        <form phx-change="filter" class="flex flex-wrap gap-4 mb-8 items-center">
+        <form phx-change="filter" class="flex flex-wrap gap-4 mb-6 items-center">
           <div class="form-control">
             <select
               class="select select-bordered"
@@ -145,18 +278,55 @@ defmodule GaliciaLocalWeb.CategoryLive do
             <span class="label-text">English speaking only</span>
           </label>
 
+          <button
+            type="button"
+            id="geolocate-btn"
+            phx-hook="GeoLocate"
+            class={["btn btn-sm btn-outline gap-1", @user_location && "btn-info"]}
+          >
+            <span class="hero-map-pin w-4 h-4"></span>
+            <%= if @user_location, do: "Near me ✓", else: "Near me" %>
+          </button>
+
           <div class="flex-1"></div>
+
+          <%= if @map_bounds do %>
+            <button type="button" phx-click="reset_bounds" class="btn btn-sm btn-ghost gap-1 text-warning">
+              <span class="hero-x-mark w-4 h-4"></span>
+              Show all
+            </button>
+          <% end %>
 
           <span class="text-sm text-base-content/60">
             {length(@filtered_businesses)} results
+            <%= if @map_bounds do %>
+              <span class="text-warning">(map area)</span>
+            <% end %>
           </span>
         </form>
+
+        <!-- Map -->
+        <%= if @has_coords do %>
+          <div
+            id="category-map"
+            class="h-64 bg-base-200 rounded-lg mb-8"
+            phx-hook="BusinessesMap"
+            phx-update="ignore"
+            data-businesses={@businesses_json}
+            data-user-lat={@user_location && elem(@user_location, 0)}
+            data-user-lng={@user_location && elem(@user_location, 1)}
+          >
+            <div class="flex items-center justify-center h-full text-base-content/40">
+              Loading map...
+            </div>
+          </div>
+        <% end %>
 
         <!-- Business List -->
         <%= if length(@filtered_businesses) > 0 do %>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <%= for business <- @filtered_businesses do %>
-              <.business_card business={business} />
+              <.business_card business={business} distance={distance_for(business, @user_location)} />
             <% end %>
           </div>
         <% else %>
@@ -174,6 +344,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
   end
 
   attr :business, :map, required: true
+  attr :distance, :float, default: nil
   defp business_card(assigns) do
     ~H"""
     <.link navigate={~p"/businesses/#{@business.id}"} class="group">
@@ -188,11 +359,16 @@ defmodule GaliciaLocalWeb.CategoryLive do
                 {@business.city.name}
               </p>
             </div>
-            <%= if @business.speaks_english do %>
-              <div class="tooltip" data-tip="English spoken">
-                <span class="badge badge-success">EN</span>
-              </div>
-            <% end %>
+            <div class="flex items-center gap-1">
+              <%= if @distance do %>
+                <span class="badge badge-info badge-sm">{@distance} km</span>
+              <% end %>
+              <%= if @business.speaks_english do %>
+                <div class="tooltip" data-tip="English spoken">
+                  <span class="badge badge-success">EN</span>
+                </div>
+              <% end %>
+            </div>
           </div>
 
           <p class="text-sm text-base-content/70 line-clamp-2 mt-2">
