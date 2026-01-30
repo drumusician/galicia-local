@@ -13,7 +13,7 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendPasswordResetEmail do
   @impl true
   def send(user, token, _) do
     new()
-    |> from({"GaliciaLocal", "noreply@galicialocal.es"})
+    |> from({"GaliciaLocal", "support@galicialocal.es"})
     |> to(to_string(user.email))
     |> subject("Reset your password")
     |> html_body(body(token: token))

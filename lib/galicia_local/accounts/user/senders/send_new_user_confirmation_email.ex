@@ -13,7 +13,7 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendNewUserConfirmationEmail do
   @impl true
   def send(user, token, _) do
     new()
-    |> from({"GaliciaLocal", "noreply@galicialocal.es"})
+    |> from({"GaliciaLocal", "support@galicialocal.es"})
     |> to(to_string(user.email))
     |> subject("Confirm your email address")
     |> html_body(body(token: token))
