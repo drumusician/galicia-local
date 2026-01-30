@@ -65,7 +65,9 @@ if config_env() == :prod do
     check_origin: [
       "https://galicia-local.fly.dev",
       "https://galicialocal.com",
-      "https://galicialocal.es"
+      "https://www.galicialocal.com",
+      "https://galicialocal.es",
+      "https://www.galicialocal.es"
     ],
     http: [
       # Enable IPv6 and bind on all interfaces.
