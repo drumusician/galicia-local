@@ -60,6 +60,30 @@ defmodule GaliciaLocal.Scraper do
     "language-schools" => "academias idiomas"
   }
 
+  # Sub-queries per category to get more comprehensive results
+  # Each query is searched separately, results are deduplicated by place_id
+  @category_sub_queries %{
+    "restaurants" => ["restaurantes", "tapas", "marisquería", "pizzería", "asador", "sidrería", "pulpería"],
+    "cafes" => ["cafeterías", "café", "pastelería", "chocolatería"],
+    "lawyers" => ["abogados", "bufete abogados", "asesoría legal", "notaría"],
+    "accountants" => ["contables", "asesoría fiscal", "gestoría"],
+    "doctors" => ["médicos", "clínica médica", "centro de salud", "médico de familia"],
+    "dentists" => ["dentistas", "clínica dental", "ortodoncia"],
+    "real-estate" => ["inmobiliarias", "agencia inmobiliaria", "venta pisos"],
+    "supermarkets" => ["supermercados", "hipermercado", "tienda alimentación"],
+    "plumbers" => ["fontaneros", "fontanería", "instalaciones sanitarias"],
+    "electricians" => ["electricistas", "instalaciones eléctricas"],
+    "veterinarians" => ["veterinarios", "clínica veterinaria"],
+    "hair-salons" => ["peluquerías", "salón de belleza", "barbería"],
+    "car-services" => ["talleres", "taller mecánico", "taller coches", "ITV"],
+    "wineries" => ["bodegas", "vinoteca", "enoteca"],
+    "bakeries" => ["panaderías", "panadería", "horno de pan"],
+    "butchers" => ["carnicerías", "carnicería"],
+    "markets" => ["mercados", "mercado municipal", "mercado de abastos"],
+    "language-schools" => ["academias idiomas", "escuela idiomas", "clases inglés"],
+    "cider-houses" => ["sidrerías", "sidrería"]
+  }
+
   # City name translations (Spanish names for search)
   @city_translations %{
     "ourense" => "ourense",
@@ -193,19 +217,34 @@ defmodule GaliciaLocal.Scraper do
       {:ok, job} = Scraper.search_google_places(city, category)
   """
   def search_google_places(%City{} = city, %Category{} = category) do
-    # Build search query in Spanish
-    category_es = Map.get(@category_translations, category.slug, category.name_es || category.slug)
-    query = "#{category_es} #{city.name}"
+    sub_queries = Map.get(@category_sub_queries, category.slug, [])
 
-    Logger.info("Queuing Google Places search: #{query}")
+    queries =
+      if sub_queries == [] do
+        # Fallback: single query with Spanish translation
+        category_es = Map.get(@category_translations, category.slug, category.name_es || category.slug)
+        ["#{category_es} #{city.name}"]
+      else
+        Enum.map(sub_queries, fn sq -> "#{sq} #{city.name}" end)
+      end
 
-    %{
-      query: query,
-      city_id: city.id,
-      category_id: category.id
-    }
-    |> GooglePlacesWorker.new()
-    |> Oban.insert()
+    Logger.info("Queuing #{length(queries)} Google Places searches for #{category.name} in #{city.name}")
+
+    jobs =
+      Enum.map(queries, fn query ->
+        {:ok, job} =
+          %{
+            query: query,
+            city_id: city.id,
+            category_id: category.id
+          }
+          |> GooglePlacesWorker.new()
+          |> Oban.insert()
+
+        job
+      end)
+
+    {:ok, jobs}
   end
 
   @doc """
@@ -232,9 +271,9 @@ defmodule GaliciaLocal.Scraper do
     categories = Category.list!()
 
     jobs =
-      Enum.map(categories, fn category ->
-        {:ok, job} = search_google_places(city, category)
-        {category.name, job.id}
+      Enum.flat_map(categories, fn category ->
+        {:ok, category_jobs} = search_google_places(city, category)
+        Enum.map(category_jobs, fn job -> {category.name, job.id} end)
       end)
 
     {:ok, jobs}

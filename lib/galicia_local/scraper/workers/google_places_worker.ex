@@ -135,22 +135,34 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
       category_id: category && category.id
     }
 
-    # Try to create, if fails due to uniqueness, update instead
-    case Business.create(attrs) do
-      {:ok, business} ->
-        Logger.info("Created business: #{business.name}")
-        # Queue website scraping if has website
-        if business.website, do: queue_website_scrape(business)
-        {:created, business}
+    # Check if business already exists by place_id
+    existing = find_by_place_id(place[:place_id], city)
 
-      {:error, %Ash.Error.Invalid{}} ->
-        # Business might already exist, try to find and update
-        Logger.debug("Business might exist: #{place.name}, skipping")
-        {:skipped, place.name}
+    case existing do
+      nil ->
+        # Create new business
+        case Business.create(attrs) do
+          {:ok, business} ->
+            Logger.info("Created business: #{business.name}")
+            if business.website, do: queue_website_scrape(business)
+            {:created, business}
 
-      error ->
-        Logger.warning("Failed to create business #{place.name}: #{inspect(error)}")
-        {:error, error}
+          {:error, %Ash.Error.Invalid{}} ->
+            Logger.debug("Business already exists: #{place.name}, skipping")
+            {:skipped, place.name}
+
+          error ->
+            Logger.warning("Failed to create business #{place.name}: #{inspect(error)}")
+            {:error, error}
+        end
+
+      business ->
+        # Update existing business with fresh data
+        Logger.debug("Updating existing business: #{business.name}")
+        case Ash.update(business, Map.drop(attrs, [:slug, :status, :source])) do
+          {:ok, updated} -> {:updated, updated}
+          {:error, _} -> {:skipped, business.name}
+        end
     end
   end
 
@@ -186,6 +198,23 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
       true ->
         # No English signal
         {false, Decimal.from_float(0.3)}
+    end
+  end
+
+  defp find_by_place_id(nil, _city), do: nil
+  defp find_by_place_id(place_id, city) do
+    import Ecto.Query
+
+    query =
+      from b in "businesses",
+        where: fragment("raw_data->>'place_id' = ?", ^place_id),
+        select: b.id
+
+    query = if city, do: where(query, [b], b.city_id == ^city.id), else: query
+
+    case GaliciaLocal.Repo.one(query) do
+      nil -> nil
+      id -> Business.get_by_id!(id)
     end
   end
 
