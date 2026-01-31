@@ -21,7 +21,7 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendMagicLinkEmail do
       end
 
     new()
-    |> from({"GaliciaLocal", "support@galicialocal.es"})
+    |> from({"GaliciaLocal", "support@galicialocal.com"})
     |> to(to_string(email))
     |> subject("Your login link")
     |> html_body(body(token: token, email: email))

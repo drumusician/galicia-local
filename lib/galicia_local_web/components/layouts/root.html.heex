@@ -13,15 +13,15 @@
     <%!-- SEO Meta Tags --%>
     <meta name="description" content={assigns[:meta_description] || gettext("Discover local businesses, learn Galician customs, and truly integrate into your new community. Your guide to making Galicia home.")} />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href={"https://galicialocal.com#{@conn.request_path}"} />
+    <link rel="canonical" href={"#{Application.get_env(:galicia_local, :base_url)}#{@conn.request_path}"} />
 
     <%!-- Open Graph --%>
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="GaliciaLocal" />
     <meta property="og:title" content={assigns[:page_title] || "GaliciaLocal – Integrate into Galician Life"} />
     <meta property="og:description" content={assigns[:meta_description] || gettext("Discover local businesses, learn Galician customs, and truly integrate into your new community. Your guide to making Galicia home.")} />
-    <meta property="og:image" content={assigns[:meta_image] || "https://galicialocal.com/images/og-default.jpg"} />
-    <meta property="og:url" content={"https://galicialocal.com#{@conn.request_path}"} />
+    <meta property="og:image" content={assigns[:meta_image] || "#{Application.get_env(:galicia_local, :base_url)}/images/og-default.jpg"} />
+    <meta property="og:url" content={"#{Application.get_env(:galicia_local, :base_url)}#{@conn.request_path}"} />
     <meta property="og:locale" content={if assigns[:locale] == "es", do: "es_ES", else: "en_US"} />
     <meta property="og:locale:alternate" content={if assigns[:locale] == "es", do: "en_US", else: "es_ES"} />
 
@@ -29,7 +29,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={assigns[:page_title] || "GaliciaLocal – Integrate into Galician Life"} />
     <meta name="twitter:description" content={assigns[:meta_description] || gettext("Discover local businesses, learn Galician customs, and truly integrate into your new community. Your guide to making Galicia home.")} />
-    <meta name="twitter:image" content={assigns[:meta_image] || "https://galicialocal.com/images/og-default.jpg"} />
+    <meta name="twitter:image" content={assigns[:meta_image] || "#{Application.get_env(:galicia_local, :base_url)}/images/og-default.jpg"} />
 
     <%!-- Structured Data --%>
     <script type="application/ld+json">
@@ -37,12 +37,12 @@
         "@context" => "https://schema.org",
         "@type" => "WebSite",
         "name" => "GaliciaLocal",
-        "url" => "https://galicialocal.com",
+        "url" => "#{Application.get_env(:galicia_local, :base_url)}",
         "description" => "Helping newcomers integrate into Galician life",
         "inLanguage" => [%{"@type" => "Language", "name" => "English", "alternateName" => "en"}, %{"@type" => "Language", "name" => "Spanish", "alternateName" => "es"}],
         "potentialAction" => %{
           "@type" => "SearchAction",
-          "target" => %{"@type" => "EntryPoint", "urlTemplate" => "https://galicialocal.com/search?q={search_term_string}"},
+          "target" => %{"@type" => "EntryPoint", "urlTemplate" => "#{Application.get_env(:galicia_local, :base_url)}/search?q={search_term_string}"},
           "query-input" => "required name=search_term_string"
         }
       })) %>

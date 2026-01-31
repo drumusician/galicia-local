@@ -90,6 +90,7 @@ config :gettext, default_locale: "en"
 config :galicia_local,
   ecto_repos: [GaliciaLocal.Repo],
   generators: [timestamp_type: :utc_datetime],
+  base_url: "https://galicialocal.com",
   ash_domains: [GaliciaLocal.Accounts, GaliciaLocal.Directory, GaliciaLocal.Community, GaliciaLocal.Analytics],
   ash_authentication: [return_error_on_invalid_magic_link_token?: true]
 
