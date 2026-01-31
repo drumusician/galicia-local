@@ -208,9 +208,12 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
     query =
       from b in "businesses",
         where: fragment("raw_data->>'place_id' = ?", ^place_id),
-        select: b.id
+        select: type(b.id, :string)
 
-    query = if city, do: where(query, [b], b.city_id == ^city.id), else: query
+    query =
+      if city,
+        do: where(query, [b], b.city_id == type(^city.id, Ecto.UUID)),
+        else: query
 
     case GaliciaLocal.Repo.one(query) do
       nil -> nil
