@@ -24,6 +24,9 @@ config :swoosh, api_client: Swoosh.ApiClient.Req
 # Disable Swoosh Local Memory Storage
 config :swoosh, local: false
 
+# Enable Spanish translation scheduler in production
+config :galicia_local, translate_scheduler_cron: "*/15 * * * *"
+
 # Do not print debug messages in production
 config :logger, level: :info
 

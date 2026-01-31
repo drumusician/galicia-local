@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang={assigns[:locale] || "en"}>
   <head>
     {Application.get_env(:live_debugger, :live_debugger_tags)}
 
@@ -51,14 +51,21 @@
 <!-- Desktop nav -->
           <div class="hidden md:flex items-center gap-1">
             <a href="/search" class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-magnifying-glass w-4 h-4"></span> Search
+              <span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}
             </a>
             <a href="/cities" class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-map w-4 h-4"></span> Cities
+              <span class="hero-map w-4 h-4"></span> {gettext("Cities")}
             </a>
             <a href="/categories" class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-squares-2x2 w-4 h-4"></span> Categories
+              <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
             </a>
+            <form method="post" action="/locale" class="flex items-center">
+              <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+              <input type="hidden" name="locale" value={if assigns[:locale] == "es", do: "en", else: "es"} />
+              <button type="submit" class="btn btn-ghost btn-xs font-bold">
+                {if assigns[:locale] == "es", do: "EN", else: "ES"}
+              </button>
+            </form>
             <div class="divider divider-horizontal mx-1 h-6"></div>
             <%= if assigns[:current_user] do %>
               <div class="dropdown dropdown-end">
@@ -80,35 +87,35 @@
                   </li>
                   <li>
                     <a href="/profile">
-                      <span class="hero-user-circle w-4 h-4"></span> My Profile
+                      <span class="hero-user-circle w-4 h-4"></span> {gettext("My Profile")}
                     </a>
                   </li>
                   <li>
                     <a href="/favorites">
-                      <span class="hero-heart w-4 h-4"></span> My Favorites
+                      <span class="hero-heart w-4 h-4"></span> {gettext("My Favorites")}
                     </a>
                   </li>
                   <li>
                     <a href="/my-businesses">
-                      <span class="hero-building-storefront w-4 h-4"></span> My Businesses
+                      <span class="hero-building-storefront w-4 h-4"></span> {gettext("My Businesses")}
                     </a>
                   </li>
                   <%= if assigns[:current_user].is_admin do %>
                     <li>
-                      <a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> Admin</a>
+                      <a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> {gettext("Admin")}</a>
                     </li>
                   <% end %>
                   <li></li>
                   <li>
                     <a href="/sign-out" class="text-base-content/60">
-                      <span class="hero-arrow-right-start-on-rectangle w-4 h-4"></span> Sign Out
+                      <span class="hero-arrow-right-start-on-rectangle w-4 h-4"></span> {gettext("Sign Out")}
                     </a>
                   </li>
                 </ul>
               </div>
             <% else %>
-              <a href="/sign-in" class="btn btn-ghost btn-sm">Sign In</a>
-              <a href="/register" class="btn btn-primary btn-sm">Join Community</a>
+              <a href="/sign-in" class="btn btn-ghost btn-sm">{gettext("Sign In")}</a>
+              <a href="/register" class="btn btn-primary btn-sm">{gettext("Join Community")}</a>
             <% end %>
           </div>
           
@@ -123,50 +130,60 @@
                 class="dropdown-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-lg border border-base-200 mt-2"
               >
                 <li>
-                  <a href="/search"><span class="hero-magnifying-glass w-4 h-4"></span> Search</a>
+                  <a href="/search"><span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}</a>
                 </li>
-                <li><a href="/cities"><span class="hero-map w-4 h-4"></span> Cities</a></li>
+                <li><a href="/cities"><span class="hero-map w-4 h-4"></span> {gettext("Cities")}</a></li>
                 <li>
                   <a href="/categories">
-                    <span class="hero-squares-2x2 w-4 h-4"></span> Categories
+                    <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
                   </a>
+                </li>
+                <li>
+                  <form method="post" action="/locale">
+                    <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+                    <input type="hidden" name="locale" value={if assigns[:locale] == "es", do: "en", else: "es"} />
+                    <button type="submit" class="flex items-center gap-2 w-full">
+                      <span class="hero-language w-4 h-4"></span>
+                      {if assigns[:locale] == "es", do: "Switch to English", else: "Cambiar a Español"}
+                    </button>
+                  </form>
                 </li>
                 <li></li>
                 <%= if assigns[:current_user] do %>
                   <li>
                     <a href="/profile">
-                      <span class="hero-user-circle w-4 h-4"></span> My Profile
+                      <span class="hero-user-circle w-4 h-4"></span> {gettext("My Profile")}
                     </a>
                   </li>
                   <li>
                     <a href="/favorites">
-                      <span class="hero-heart w-4 h-4"></span> My Favorites
+                      <span class="hero-heart w-4 h-4"></span> {gettext("My Favorites")}
                     </a>
                   </li>
                   <li>
                     <a href="/my-businesses">
-                      <span class="hero-building-storefront w-4 h-4"></span> My Businesses
+                      <span class="hero-building-storefront w-4 h-4"></span> {gettext("My Businesses")}
                     </a>
                   </li>
                   <%= if assigns[:current_user].is_admin do %>
                     <li>
-                      <a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> Admin</a>
+                      <a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> {gettext("Admin")}</a>
                     </li>
                   <% end %>
                   <li>
                     <a href="/sign-out">
-                      <span class="hero-arrow-right-start-on-rectangle w-4 h-4"></span> Sign Out
+                      <span class="hero-arrow-right-start-on-rectangle w-4 h-4"></span> {gettext("Sign Out")}
                     </a>
                   </li>
                 <% else %>
                   <li>
                     <a href="/sign-in">
-                      <span class="hero-arrow-right-end-on-rectangle w-4 h-4"></span> Sign In
+                      <span class="hero-arrow-right-end-on-rectangle w-4 h-4"></span> {gettext("Sign In")}
                     </a>
                   </li>
                   <li>
                     <a href="/register" class="text-primary font-semibold">
-                      <span class="hero-user-plus w-4 h-4"></span> Join Community
+                      <span class="hero-user-plus w-4 h-4"></span> {gettext("Join Community")}
                     </a>
                   </li>
                 <% end %>

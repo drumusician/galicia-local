@@ -26,12 +26,12 @@ defmodule GaliciaLocal.Directory.Category do
 
     create :create do
       primary? true
-      accept [:name, :name_es, :slug, :description, :icon, :priority, :parent_id]
+      accept [:name, :name_es, :slug, :description, :description_es, :icon, :priority, :parent_id]
     end
 
     update :update do
       primary? true
-      accept [:name, :name_es, :slug, :description, :icon, :priority, :parent_id]
+      accept [:name, :name_es, :slug, :description, :description_es, :icon, :priority, :parent_id]
     end
 
     read :get_by_id do
@@ -74,6 +74,11 @@ defmodule GaliciaLocal.Directory.Category do
 
     attribute :description, :string do
       public? true
+    end
+
+    attribute :description_es, :string do
+      public? true
+      description "Spanish category description"
     end
 
     attribute :icon, :string do

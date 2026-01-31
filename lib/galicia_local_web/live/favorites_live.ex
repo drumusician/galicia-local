@@ -15,7 +15,7 @@ defmodule GaliciaLocalWeb.FavoritesLive do
 
     {:ok,
      socket
-     |> assign(:page_title, "My Favorites")
+     |> assign(:page_title, gettext("My Favorites"))
      |> assign(:favorites, favorites)}
   end
 
@@ -40,9 +40,9 @@ defmodule GaliciaLocalWeb.FavoritesLive do
       <div class="container mx-auto max-w-4xl px-4 py-8">
         <h1 class="text-3xl font-bold mb-2 flex items-center gap-3">
           <span class="hero-heart-solid w-8 h-8 text-error"></span>
-          My Favorites
+          {gettext("My Favorites")}
         </h1>
-        <p class="text-base-content/60 mb-8">Businesses you've saved for later.</p>
+        <p class="text-base-content/60 mb-8">{gettext("Businesses you've saved for later.")}</p>
 
         <%= if length(@favorites) > 0 do %>
           <div class="space-y-4">
@@ -55,7 +55,7 @@ defmodule GaliciaLocalWeb.FavoritesLive do
                         {fav.business.name}
                       </.link>
                       <p class="text-sm text-base-content/60">
-                        {fav.business.category.name} · {fav.business.city.name}
+                        {localized_name(fav.business.category, @locale)} · {fav.business.city.name}
                       </p>
                       <div class="flex items-center gap-3 mt-1">
                         <%= if fav.business.rating do %>
@@ -67,7 +67,7 @@ defmodule GaliciaLocalWeb.FavoritesLive do
                         <%= if fav.business.speaks_english do %>
                           <span class="badge badge-success badge-sm gap-1">
                             <span class="hero-language w-3 h-3"></span>
-                            English
+                            {gettext("English")}
                           </span>
                         <% end %>
                       </div>
@@ -76,7 +76,7 @@ defmodule GaliciaLocalWeb.FavoritesLive do
                       phx-click="remove_favorite"
                       phx-value-id={fav.id}
                       class="btn btn-ghost btn-sm text-error"
-                      data-confirm="Remove from favorites?"
+                      data-confirm={gettext("Remove from favorites?")}
                     >
                       <span class="hero-heart-solid w-5 h-5"></span>
                     </button>
@@ -88,10 +88,10 @@ defmodule GaliciaLocalWeb.FavoritesLive do
         <% else %>
           <div class="text-center py-16">
             <span class="hero-heart w-16 h-16 text-base-content/20 mx-auto mb-4"></span>
-            <h3 class="text-xl font-semibold mb-2">No favorites yet</h3>
-            <p class="text-base-content/60 mb-6">Browse businesses and click the heart to save them here.</p>
+            <h3 class="text-xl font-semibold mb-2">{gettext("No favorites yet")}</h3>
+            <p class="text-base-content/60 mb-6">{gettext("Browse businesses and click the heart to save them here.")}</p>
             <.link navigate={~p"/categories"} class="btn btn-primary">
-              Browse Categories
+              {gettext("Browse Categories")}
             </.link>
           </div>
         <% end %>

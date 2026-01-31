@@ -15,7 +15,7 @@ defmodule GaliciaLocalWeb.Admin.ClaimsLive do
 
     {:ok,
      socket
-     |> assign(:page_title, "Business Claims")
+     |> assign(:page_title, gettext("Business Claims"))
      |> assign(:claims, claims)}
   end
 
@@ -40,7 +40,7 @@ defmodule GaliciaLocalWeb.Admin.ClaimsLive do
       {:noreply,
        socket
        |> assign(:claims, Enum.reject(socket.assigns.claims, &(&1.id == id)))
-       |> put_flash(:info, "Claim approved — #{claim.business.name} is now owned by #{claim.user.email}")}
+       |> put_flash(:info, gettext("Claim approved — %{business} is now owned by %{email}", business: claim.business.name, email: claim.user.email))}
     else
       {:noreply, socket}
     end
@@ -57,7 +57,7 @@ defmodule GaliciaLocalWeb.Admin.ClaimsLive do
       {:noreply,
        socket
        |> assign(:claims, Enum.reject(socket.assigns.claims, &(&1.id == id)))
-       |> put_flash(:info, "Claim rejected")}
+       |> put_flash(:info, gettext("Claim rejected"))}
     else
       {:noreply, socket}
     end
@@ -72,12 +72,12 @@ defmodule GaliciaLocalWeb.Admin.ClaimsLive do
           <div>
             <h1 class="text-3xl font-bold flex items-center gap-3">
               <span class="hero-shield-check w-8 h-8 text-primary"></span>
-              Business Claims
+              {gettext("Business Claims")}
             </h1>
-            <p class="text-base-content/60 mt-1">Review and approve business ownership claims.</p>
+            <p class="text-base-content/60 mt-1">{gettext("Review and approve business ownership claims.")}</p>
           </div>
           <.link navigate={~p"/admin"} class="btn btn-ghost btn-sm">
-            ← Back to Admin
+            {gettext("Back to Admin")}
           </.link>
         </div>
 
@@ -94,23 +94,23 @@ defmodule GaliciaLocalWeb.Admin.ClaimsLive do
                         </.link>
                       </h3>
                       <p class="text-sm text-base-content/60">
-                        Claimed by <span class="font-medium">{claim.user.display_name || claim.user.email}</span>
+                        {gettext("Claimed by")} <span class="font-medium">{claim.user.display_name || claim.user.email}</span>
                         · {Calendar.strftime(claim.inserted_at, "%b %d, %Y at %H:%M")}
                       </p>
                       <%= if claim.message do %>
                         <div class="mt-2 p-3 bg-base-200 rounded-lg text-sm">
-                          <span class="font-medium">Message:</span> {claim.message}
+                          <span class="font-medium">{gettext("Message:")}</span> {claim.message}
                         </div>
                       <% end %>
                     </div>
                     <div class="flex gap-2">
-                      <button phx-click="approve" phx-value-id={claim.id} class="btn btn-success btn-sm" data-confirm="Approve this claim? This will make the user the owner of this business.">
+                      <button phx-click="approve" phx-value-id={claim.id} class="btn btn-success btn-sm" data-confirm={gettext("Approve this claim? This will make the user the owner of this business.")}>
                         <span class="hero-check w-4 h-4"></span>
-                        Approve
+                        {gettext("Approve")}
                       </button>
-                      <button phx-click="reject" phx-value-id={claim.id} class="btn btn-error btn-outline btn-sm" data-confirm="Reject this claim?">
+                      <button phx-click="reject" phx-value-id={claim.id} class="btn btn-error btn-outline btn-sm" data-confirm={gettext("Reject this claim?")}>
                         <span class="hero-x-mark w-4 h-4"></span>
-                        Reject
+                        {gettext("Reject")}
                       </button>
                     </div>
                   </div>
@@ -122,7 +122,7 @@ defmodule GaliciaLocalWeb.Admin.ClaimsLive do
           <div class="card bg-base-100 shadow">
             <div class="card-body text-center py-12">
               <span class="hero-inbox w-12 h-12 text-base-content/30 mx-auto"></span>
-              <p class="text-base-content/50 mt-2">No pending claims</p>
+              <p class="text-base-content/50 mt-2">{gettext("No pending claims")}</p>
             </div>
           </div>
         <% end %>

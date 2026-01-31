@@ -39,7 +39,7 @@ defmodule GaliciaLocalWeb.CityLive do
       {:error, _} ->
         {:ok,
          socket
-         |> put_flash(:error, "City not found")
+         |> put_flash(:error, gettext("City not found"))
          |> push_navigate(to: ~p"/")}
     end
   end
@@ -107,13 +107,13 @@ defmodule GaliciaLocalWeb.CityLive do
           <div class="container mx-auto max-w-6xl">
             <nav class="text-sm breadcrumbs text-white/70 mb-2">
               <ul>
-                <li><.link navigate={~p"/"} class="hover:text-white">Home</.link></li>
-                <li><.link navigate={~p"/cities"} class="hover:text-white">Cities</.link></li>
+                <li><.link navigate={~p"/"} class="hover:text-white">{gettext("Home")}</.link></li>
+                <li><.link navigate={~p"/cities"} class="hover:text-white">{gettext("Cities")}</.link></li>
                 <li class="text-white">{@city.name}</li>
               </ul>
             </nav>
             <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">{@city.name}</h1>
-            <p class="text-white/80 text-lg">{@city.province} · {@city.business_count} listings</p>
+            <p class="text-white/80 text-lg">{@city.province} · {ngettext("1 listing", "%{count} listings", @city.business_count)}</p>
           </div>
         </div>
       </section>
@@ -121,7 +121,7 @@ defmodule GaliciaLocalWeb.CityLive do
       <div class="container mx-auto max-w-6xl px-4 py-8">
         <!-- Description -->
         <div class="prose prose-lg max-w-none mb-8">
-          <p class="text-base-content/80">{@city.description}</p>
+          <p class="text-base-content/80">{localized(@city, :description, @locale)}</p>
         </div>
 
         <!-- Filters -->
@@ -131,13 +131,13 @@ defmodule GaliciaLocalWeb.CityLive do
               class="select select-bordered"
               name="category"
             >
-              <option value="" selected={@selected_category == nil}>All Categories</option>
+              <option value="" selected={@selected_category == nil}>{gettext("All Categories")}</option>
               <%= for category <- @categories do %>
                 <option
                   value={category.slug}
                   selected={@selected_category && @selected_category.id == category.id}
                 >
-                  {category.name} ({Map.get(@businesses_by_category, category.id, []) |> length()})
+                  {localized_name(category, @locale)} ({Map.get(@businesses_by_category, category.id, []) |> length()})
                 </option>
               <% end %>
             </select>
@@ -151,13 +151,13 @@ defmodule GaliciaLocalWeb.CityLive do
               checked={@english_only}
               class="checkbox checkbox-primary"
             />
-            <span class="label-text">English speaking only</span>
+            <span class="label-text">{gettext("English speaking only")}</span>
           </label>
 
           <div class="flex-1"></div>
 
           <span class="text-sm text-base-content/60">
-            {length(@filtered_businesses)} results
+            {ngettext("1 result", "%{count} results", length(@filtered_businesses))}
           </span>
         </form>
 
@@ -165,15 +165,15 @@ defmodule GaliciaLocalWeb.CityLive do
         <%= if length(@filtered_businesses) > 0 do %>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <%= for business <- @filtered_businesses do %>
-              <.business_card business={business} />
+              <.business_card business={business} locale={@locale} />
             <% end %>
           </div>
         <% else %>
           <div class="text-center py-20">
             <div class="text-6xl mb-4">🔍</div>
-            <h3 class="text-xl font-semibold mb-2">No businesses found</h3>
+            <h3 class="text-xl font-semibold mb-2">{gettext("No businesses found")}</h3>
             <p class="text-base-content/60">
-              Try adjusting your filters or check back later.
+              {gettext("Try adjusting your filters or check back later.")}
             </p>
           </div>
         <% end %>
@@ -183,6 +183,7 @@ defmodule GaliciaLocalWeb.CityLive do
   end
 
   attr :business, :map, required: true
+  attr :locale, :string, default: "en"
   defp business_card(assigns) do
     ~H"""
     <.link navigate={~p"/businesses/#{@business.id}"} class="group">
@@ -194,18 +195,18 @@ defmodule GaliciaLocalWeb.CityLive do
                 {@business.name}
               </h3>
               <p class="text-sm text-base-content/60">
-                {@business.category.name}
+                {localized_name(@business.category, assigns[:locale] || "en")}
               </p>
             </div>
             <%= if @business.speaks_english do %>
-              <div class="tooltip" data-tip="English spoken">
-                <span class="badge badge-success">EN</span>
+              <div class="tooltip" data-tip={gettext("English spoken")}>
+                <span class="badge badge-success">{gettext("EN")}</span>
               </div>
             <% end %>
           </div>
 
           <p class="text-sm text-base-content/70 line-clamp-2 mt-2">
-            {@business.summary || @business.description}
+            {@business.summary || localized(@business, :description, assigns[:locale] || "en")}
           </p>
 
           <%= if @business.address do %>

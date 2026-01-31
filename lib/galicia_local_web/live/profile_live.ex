@@ -25,7 +25,7 @@ defmodule GaliciaLocalWeb.ProfileLive do
 
     {:ok,
      socket
-     |> assign(:page_title, "My Profile")
+     |> assign(:page_title, gettext("My Profile"))
      |> assign(:cities, cities)
      |> assign(:reviews, reviews)
      |> assign(:form, to_form(form))}
@@ -50,7 +50,7 @@ defmodule GaliciaLocalWeb.ProfileLive do
            :form,
            to_form(AshPhoenix.Form.for_update(user, :update_profile, as: "user", actor: user))
          )
-         |> put_flash(:info, "Profile updated!")}
+         |> put_flash(:info, gettext("Profile updated!"))}
 
       {:error, form} ->
         {:noreply, assign(socket, :form, to_form(form))}
@@ -62,35 +62,35 @@ defmodule GaliciaLocalWeb.ProfileLive do
     ~H"""
     <div class="min-h-screen bg-base-100">
       <div class="container mx-auto max-w-2xl px-4 py-8">
-        <h1 class="text-3xl font-bold text-base-content mb-8">My Profile</h1>
+        <h1 class="text-3xl font-bold text-base-content mb-8">{gettext("My Profile")}</h1>
 
         <div class="card bg-base-100 shadow-xl">
           <div class="card-body">
             <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-4">
               <div class="form-control">
-                <label class="label"><span class="label-text">Display Name</span></label>
+                <label class="label"><span class="label-text">{gettext("Display Name")}</span></label>
                 <input
                   type="text"
                   name={@form[:display_name].name}
                   value={@form[:display_name].value}
-                  placeholder="How you want to be known"
+                  placeholder={gettext("How you want to be known")}
                   class="input input-bordered w-full"
                 />
               </div>
 
               <div class="form-control">
-                <label class="label"><span class="label-text">About Me</span></label>
+                <label class="label"><span class="label-text">{gettext("About Me")}</span></label>
                 <textarea
                   name={@form[:bio].name}
-                  placeholder="Tell the community a bit about yourself..."
+                  placeholder={gettext("Tell the community a bit about yourself...")}
                   class="textarea textarea-bordered w-full h-24"
                 >{@form[:bio].value}</textarea>
               </div>
 
               <div class="form-control">
-                <label class="label"><span class="label-text">Where I Live</span></label>
+                <label class="label"><span class="label-text">{gettext("Where I Live")}</span></label>
                 <select name={@form[:city_id].name} class="select select-bordered w-full">
-                  <option value="">Select your area...</option>
+                  <option value="">{gettext("Select your area...")}</option>
                   <%= for {name, id} <- @cities do %>
                     <option value={id} selected={to_string(@form[:city_id].value) == to_string(id)}>
                       {name}
@@ -100,18 +100,18 @@ defmodule GaliciaLocalWeb.ProfileLive do
               </div>
 
               <div class="form-control">
-                <label class="label"><span class="label-text">Originally From</span></label>
+                <label class="label"><span class="label-text">{gettext("Originally From")}</span></label>
                 <input
                   type="text"
                   name={@form[:origin_country].name}
                   value={@form[:origin_country].value}
-                  placeholder="e.g. Netherlands, UK, Galicia..."
+                  placeholder={gettext("e.g. Netherlands, UK, Galicia...")}
                   class="input input-bordered w-full"
                 />
               </div>
 
               <div class="form-control mt-6">
-                <button type="submit" class="btn btn-primary">Save Profile</button>
+                <button type="submit" class="btn btn-primary">{gettext("Save Profile")}</button>
               </div>
             </.form>
           </div>
@@ -119,7 +119,7 @@ defmodule GaliciaLocalWeb.ProfileLive do
 
         <!-- My Reviews -->
         <%= if length(@reviews) > 0 do %>
-          <h2 class="text-2xl font-bold mt-10 mb-4">My Reviews</h2>
+          <h2 class="text-2xl font-bold mt-10 mb-4">{gettext("My Reviews")}</h2>
           <div class="space-y-4">
             <%= for review <- @reviews do %>
               <div class="card bg-base-100 shadow">

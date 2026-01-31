@@ -16,7 +16,7 @@ defmodule GaliciaLocalWeb.CategoriesLive do
 
     {:ok,
      socket
-     |> assign(:page_title, "Categories")
+     |> assign(:page_title, gettext("Categories"))
      |> assign(:categories_by_priority, categories)}
   end
 
@@ -27,10 +27,9 @@ defmodule GaliciaLocalWeb.CategoriesLive do
       <div class="container mx-auto max-w-6xl px-4 py-8">
         <!-- Header -->
         <div class="text-center mb-12">
-          <h1 class="text-4xl font-bold text-base-content mb-4">Browse Categories</h1>
+          <h1 class="text-4xl font-bold text-base-content mb-4">{gettext("Browse Categories")}</h1>
           <p class="text-base-content/70 max-w-2xl mx-auto">
-            Find exactly what you need, from essential expat services
-            to local lifestyle experiences.
+            {gettext("Find exactly what you need, from essential expat services to local lifestyle experiences.")}
           </p>
         </div>
 
@@ -40,7 +39,7 @@ defmodule GaliciaLocalWeb.CategoriesLive do
             <div class="flex items-center gap-4 mb-6">
               <h2 class="text-2xl font-bold text-base-content">{priority_label(priority)}</h2>
               <span class={"badge badge-lg #{priority_badge_class(priority)}"}>
-                Priority {priority}
+                {gettext("Priority %{number}", number: priority)}
               </span>
             </div>
             <p class="text-base-content/60 mb-6">{priority_description(priority)}</p>
@@ -55,7 +54,7 @@ defmodule GaliciaLocalWeb.CategoriesLive do
                       </div>
                       <div class="flex-1 min-w-0">
                         <h3 class="font-semibold text-lg group-hover:text-primary transition-colors">
-                          {category.name}
+                          {localized_name(category, @locale)}
                         </h3>
                         <p class="text-sm text-base-content/60">{category.name_es}</p>
                         <p class="text-xs text-base-content/50 mt-1 truncate">
@@ -64,7 +63,7 @@ defmodule GaliciaLocalWeb.CategoriesLive do
                       </div>
                       <div class="flex flex-col items-end">
                         <span class="badge badge-primary">{category.business_count || 0}</span>
-                        <span class="text-xs text-base-content/50 mt-1">listings</span>
+                        <span class="text-xs text-base-content/50 mt-1">{gettext("listings")}</span>
                       </div>
                     </div>
                   </div>
@@ -78,16 +77,16 @@ defmodule GaliciaLocalWeb.CategoriesLive do
     """
   end
 
-  defp priority_label(1), do: "Expat Essentials"
-  defp priority_label(2), do: "Daily Life"
-  defp priority_label(3), do: "Lifestyle & Culture"
-  defp priority_label(4), do: "Practical Services"
-  defp priority_label(_), do: "Other"
+  defp priority_label(1), do: gettext("Expat Essentials")
+  defp priority_label(2), do: gettext("Daily Life")
+  defp priority_label(3), do: gettext("Lifestyle & Culture")
+  defp priority_label(4), do: gettext("Practical Services")
+  defp priority_label(_), do: gettext("Other")
 
-  defp priority_description(1), do: "Essential services for expats and newcomers - lawyers, doctors, real estate, and more."
-  defp priority_description(2), do: "Everyday essentials - groceries, markets, and personal services."
-  defp priority_description(3), do: "Experience the best of Galicia - restaurants, wineries, and cultural spots."
-  defp priority_description(4), do: "Practical services for your home and car."
+  defp priority_description(1), do: gettext("Essential services for expats and newcomers - lawyers, doctors, real estate, and more.")
+  defp priority_description(2), do: gettext("Everyday essentials - groceries, markets, and personal services.")
+  defp priority_description(3), do: gettext("Experience the best of Galicia - restaurants, wineries, and cultural spots.")
+  defp priority_description(4), do: gettext("Practical services for your home and car.")
   defp priority_description(_), do: ""
 
   defp priority_badge_class(1), do: "badge-primary"

@@ -13,31 +13,38 @@ defmodule GaliciaLocalWeb.LiveUserAuth do
     {:cont, AshAuthentication.Phoenix.LiveSession.assign_new_resources(socket, session)}
   end
 
-  def on_mount(:live_user_optional, _params, _session, socket) do
+  def on_mount(:live_user_optional, _params, session, socket) do
+    set_locale(session)
+
     if socket.assigns[:current_user] do
-      {:cont, socket}
+      {:cont, assign(socket, :locale, Gettext.get_locale(GaliciaLocalWeb.Gettext))}
     else
-      {:cont, assign(socket, :current_user, nil)}
+      {:cont, socket |> assign(:current_user, nil) |> assign(:locale, Gettext.get_locale(GaliciaLocalWeb.Gettext))}
     end
   end
 
-  def on_mount(:live_user_required, _params, _session, socket) do
+  def on_mount(:live_user_required, _params, session, socket) do
+    set_locale(session)
+
     if socket.assigns[:current_user] do
-      {:cont, socket}
+      {:cont, assign(socket, :locale, Gettext.get_locale(GaliciaLocalWeb.Gettext))}
     else
       {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/sign-in")}
     end
   end
 
-  def on_mount(:live_no_user, _params, _session, socket) do
+  def on_mount(:live_no_user, _params, session, socket) do
+    set_locale(session)
+
     if socket.assigns[:current_user] do
       {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/")}
     else
-      {:cont, assign(socket, :current_user, nil)}
+      {:cont, socket |> assign(:current_user, nil) |> assign(:locale, Gettext.get_locale(GaliciaLocalWeb.Gettext))}
     end
   end
 
-  def on_mount(:live_admin_required, _params, _session, socket) do
+  def on_mount(:live_admin_required, _params, session, socket) do
+    set_locale(session)
     user = socket.assigns[:current_user]
 
     cond do
@@ -51,7 +58,12 @@ defmodule GaliciaLocalWeb.LiveUserAuth do
          |> Phoenix.LiveView.redirect(to: ~p"/")}
 
       true ->
-        {:cont, socket}
+        {:cont, assign(socket, :locale, Gettext.get_locale(GaliciaLocalWeb.Gettext))}
     end
+  end
+
+  defp set_locale(session) do
+    locale = session["locale"] || "en"
+    Gettext.put_locale(GaliciaLocalWeb.Gettext, locale)
   end
 end

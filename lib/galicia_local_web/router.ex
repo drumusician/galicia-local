@@ -14,6 +14,7 @@ defmodule GaliciaLocalWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :load_from_session
+    plug GaliciaLocalWeb.Plugs.SetLocale
   end
 
   pipeline :api do
@@ -62,6 +63,9 @@ defmodule GaliciaLocalWeb.Router do
       live "/admin/analytics", Admin.AnalyticsLive, :index
       live "/admin/claims", Admin.ClaimsLive, :index
     end
+
+    # Locale switching
+    post "/locale", PageController, :set_locale
 
     # Static pages
     get "/about", PageController, :about

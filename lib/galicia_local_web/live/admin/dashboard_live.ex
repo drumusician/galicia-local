@@ -13,7 +13,7 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
 
     {:ok,
      socket
-     |> assign(:page_title, "Admin Dashboard")
+     |> assign(:page_title, gettext("Admin Dashboard"))
      |> assign(:stats, stats)}
   end
 
@@ -46,20 +46,20 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
             <div class="flex items-center gap-4">
               <h1 class="text-2xl font-bold text-primary">
                 <span class="hero-cog-6-tooth w-7 h-7 inline-block mr-2"></span>
-                Admin Dashboard
+                {gettext("Admin Dashboard")}
               </h1>
             </div>
             <div class="flex items-center gap-4">
               <span class="text-sm text-base-content/70">
-                Logged in as <strong>{@current_user.email}</strong>
+                {gettext("Logged in as")} <strong>{@current_user.email}</strong>
               </span>
               <.link navigate={~p"/"} class="btn btn-ghost btn-sm">
                 <span class="hero-home w-4 h-4"></span>
-                View Site
+                {gettext("View Site")}
               </.link>
               <.link href={~p"/sign-out"} class="btn btn-ghost btn-sm">
                 <span class="hero-arrow-right-on-rectangle w-4 h-4"></span>
-                Sign Out
+                {gettext("Sign Out")}
               </.link>
             </div>
           </div>
@@ -73,41 +73,41 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
             <div class="stat-figure text-primary">
               <span class="hero-building-storefront w-8 h-8"></span>
             </div>
-            <div class="stat-title">Total Businesses</div>
+            <div class="stat-title">{gettext("Total Businesses")}</div>
             <div class="stat-value text-primary">{@stats.total_businesses}</div>
-            <div class="stat-desc">{@stats.enriched} enriched</div>
+            <div class="stat-desc">{ngettext("%{count} enriched", "%{count} enriched", @stats.enriched)}</div>
           </div>
 
           <div class="stat">
             <div class="stat-figure text-warning">
               <span class="hero-clock w-8 h-8"></span>
             </div>
-            <div class="stat-title">Pending Enrichment</div>
+            <div class="stat-title">{gettext("Pending Enrichment")}</div>
             <div class="stat-value text-warning">{@stats.pending_enrichment}</div>
-            <div class="stat-desc">Awaiting LLM processing</div>
+            <div class="stat-desc">{gettext("Awaiting LLM processing")}</div>
           </div>
 
           <div class="stat">
             <div class="stat-figure text-success">
               <span class="hero-language w-8 h-8"></span>
             </div>
-            <div class="stat-title">English Speaking</div>
+            <div class="stat-title">{gettext("English Speaking")}</div>
             <div class="stat-value text-success">{@stats.english_speaking}</div>
-            <div class="stat-desc">Detected from reviews</div>
+            <div class="stat-desc">{gettext("Detected from reviews")}</div>
           </div>
 
           <div class="stat">
             <div class="stat-figure text-secondary">
               <span class="hero-map-pin w-8 h-8"></span>
             </div>
-            <div class="stat-title">Cities</div>
+            <div class="stat-title">{gettext("Cities")}</div>
             <div class="stat-value text-secondary">{@stats.total_cities}</div>
-            <div class="stat-desc">{@stats.total_categories} categories</div>
+            <div class="stat-desc">{ngettext("%{count} category", "%{count} categories", @stats.total_categories)}</div>
           </div>
         </div>
 
         <!-- Admin Navigation Cards -->
-        <h2 class="text-xl font-bold mb-4">Admin Tools</h2>
+        <h2 class="text-xl font-bold mb-4">{gettext("Admin Tools")}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <!-- Scraper -->
           <.link navigate={~p"/admin/scraper"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
@@ -117,8 +117,8 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                   <span class="hero-magnifying-glass-circle w-8 h-8 text-primary"></span>
                 </div>
                 <div>
-                  <h3 class="card-title">Scraper</h3>
-                  <p class="text-sm text-base-content/70">Import businesses from Google Places</p>
+                  <h3 class="card-title">{gettext("Scraper")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Import businesses from Google Places")}</p>
                 </div>
               </div>
             </div>
@@ -132,8 +132,8 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                   <span class="hero-building-storefront w-8 h-8 text-secondary"></span>
                 </div>
                 <div>
-                  <h3 class="card-title">Businesses</h3>
-                  <p class="text-sm text-base-content/70">Manage all business listings</p>
+                  <h3 class="card-title">{gettext("Businesses")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Manage all business listings")}</p>
                 </div>
               </div>
             </div>
@@ -147,8 +147,8 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                   <span class="hero-map-pin w-8 h-8 text-accent"></span>
                 </div>
                 <div>
-                  <h3 class="card-title">Cities</h3>
-                  <p class="text-sm text-base-content/70">Manage city listings</p>
+                  <h3 class="card-title">{gettext("Cities")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Manage city listings")}</p>
                 </div>
               </div>
             </div>
@@ -162,8 +162,8 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                   <span class="hero-squares-2x2 w-8 h-8 text-info"></span>
                 </div>
                 <div>
-                  <h3 class="card-title">Categories</h3>
-                  <p class="text-sm text-base-content/70">Manage business categories</p>
+                  <h3 class="card-title">{gettext("Categories")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Manage business categories")}</p>
                 </div>
               </div>
             </div>
@@ -177,8 +177,8 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                   <span class="hero-chart-bar w-8 h-8 text-success"></span>
                 </div>
                 <div>
-                  <h3 class="card-title">Analytics</h3>
-                  <p class="text-sm text-base-content/70">Page views and traffic</p>
+                  <h3 class="card-title">{gettext("Analytics")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Page views and traffic")}</p>
                 </div>
               </div>
             </div>
@@ -192,8 +192,8 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                   <span class="hero-shield-check w-8 h-8 text-warning"></span>
                 </div>
                 <div>
-                  <h3 class="card-title">Business Claims</h3>
-                  <p class="text-sm text-base-content/70">Review ownership claims</p>
+                  <h3 class="card-title">{gettext("Business Claims")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Review ownership claims")}</p>
                 </div>
               </div>
             </div>
@@ -208,10 +208,10 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                 </div>
                 <div>
                   <h3 class="card-title">
-                    Job Queue
+                    {gettext("Job Queue")}
                     <span class="hero-arrow-top-right-on-square w-4 h-4 text-base-content/50"></span>
                   </h3>
-                  <p class="text-sm text-base-content/70">Oban job dashboard</p>
+                  <p class="text-sm text-base-content/70">{gettext("Oban job dashboard")}</p>
                 </div>
               </div>
             </div>
@@ -226,10 +226,10 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                 </div>
                 <div>
                   <h3 class="card-title">
-                    Phoenix Dashboard
+                    {gettext("Phoenix Dashboard")}
                     <span class="hero-arrow-top-right-on-square w-4 h-4 text-base-content/50"></span>
                   </h3>
-                  <p class="text-sm text-base-content/70">System metrics & performance</p>
+                  <p class="text-sm text-base-content/70">{gettext("System metrics & performance")}</p>
                 </div>
               </div>
             </div>
@@ -241,7 +241,7 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
           <div class="card-body">
             <h2 class="card-title">
               <span class="hero-clock w-6 h-6"></span>
-              Recently Added Businesses
+              {gettext("Recently Added Businesses")}
             </h2>
 
             <%= if length(@stats.recent_businesses) > 0 do %>
@@ -249,10 +249,10 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                 <table class="table table-sm">
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>Status</th>
-                      <th>Rating</th>
-                      <th>Added</th>
+                      <th>{gettext("Name")}</th>
+                      <th>{gettext("Status")}</th>
+                      <th>{gettext("Rating")}</th>
+                      <th>{gettext("Added")}</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -280,7 +280,7 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                         </td>
                         <td>
                           <.link navigate={~p"/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
-                            View
+                            {gettext("View")}
                           </.link>
                         </td>
                       </tr>
@@ -291,7 +291,7 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
             <% else %>
               <div class="text-center py-8 text-base-content/50">
                 <span class="hero-inbox w-12 h-12 mx-auto mb-2"></span>
-                <p>No businesses yet. Start by importing some from the Scraper.</p>
+                <p>{gettext("No businesses yet. Start by importing some from the Scraper.")}</p>
               </div>
             <% end %>
           </div>

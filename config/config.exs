@@ -84,6 +84,8 @@ config :spark,
     "Ash.Domain": [section_order: [:resources, :policies, :authorization, :domain, :execution]]
   ]
 
+config :gettext, default_locale: "en"
+
 config :galicia_local,
   ecto_repos: [GaliciaLocal.Repo],
   generators: [timestamp_type: :utc_datetime],

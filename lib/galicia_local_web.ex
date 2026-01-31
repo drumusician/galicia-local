@@ -87,6 +87,9 @@ defmodule GaliciaLocalWeb do
       # Core UI components
       import GaliciaLocalWeb.CoreComponents
 
+      # Locale-aware content helpers
+      import GaliciaLocalWeb.LocaleContent
+
       # Common modules used in templates
       alias Phoenix.LiveView.JS
       alias GaliciaLocalWeb.Layouts

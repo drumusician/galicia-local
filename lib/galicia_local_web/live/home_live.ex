@@ -9,27 +9,29 @@ defmodule GaliciaLocalWeb.HomeLive do
 
   alias GaliciaLocal.Directory.{City, Category, Business}
 
-  # Galician phrases - verified from omniglot.com and galegoway.com
-  @galician_phrases [
-    %{galician: "Bos días", spanish: "Buenos días", english: "Good morning", usage: "Morning greeting until ~2pm"},
-    %{galician: "Boas tardes", spanish: "Buenas tardes", english: "Good afternoon", usage: "Afternoon greeting 2pm-8pm"},
-    %{galician: "Boas noites", spanish: "Buenas noches", english: "Good evening", usage: "Evening greeting after 8pm"},
-    %{galician: "Moitas grazas", spanish: "Muchas gracias", english: "Thank you very much", usage: "Showing appreciation"},
-    %{galician: "Por favor", spanish: "Por favor", english: "Please", usage: "Being polite"},
-    %{galician: "Ata logo", spanish: "Hasta luego", english: "See you later", usage: "Casual goodbye"},
-    %{galician: "Bo proveito", spanish: "Buen provecho", english: "Enjoy your meal", usage: "Said before eating"},
-    %{galician: "Saúde!", spanish: "¡Salud!", english: "Cheers!", usage: "Toast when drinking"}
-  ]
+  defp galician_phrases do
+    [
+      %{galician: "Bos días", spanish: "Buenos días", english: gettext("Good morning"), usage: gettext("Morning greeting until ~2pm")},
+      %{galician: "Boas tardes", spanish: "Buenas tardes", english: gettext("Good afternoon"), usage: gettext("Afternoon greeting 2pm-8pm")},
+      %{galician: "Boas noites", spanish: "Buenas noches", english: gettext("Good evening"), usage: gettext("Evening greeting after 8pm")},
+      %{galician: "Moitas grazas", spanish: "Muchas gracias", english: gettext("Thank you very much"), usage: gettext("Showing appreciation")},
+      %{galician: "Por favor", spanish: "Por favor", english: gettext("Please"), usage: gettext("Being polite")},
+      %{galician: "Ata logo", spanish: "Hasta luego", english: gettext("See you later"), usage: gettext("Casual goodbye")},
+      %{galician: "Bo proveito", spanish: "Buen provecho", english: gettext("Enjoy your meal"), usage: gettext("Said before eating")},
+      %{galician: "Saúde!", spanish: "¡Salud!", english: gettext("Cheers!"), usage: gettext("Toast when drinking")}
+    ]
+  end
 
-  # Cultural tips to show
-  @cultural_tips [
-    %{title: "The Siesta is Real", tip: "Many shops close 2-5pm. Plan errands for mornings or evenings.", icon: "clock"},
-    %{title: "Lunch is the Main Meal", tip: "Galicians eat lunch 2-4pm. Restaurants are empty at noon.", icon: "sun"},
-    %{title: "Free Tapas Culture", tip: "In many bars, tapas come free with drinks. Just order a caña!", icon: "sparkles"},
-    %{title: "Cash is King", tip: "Smaller shops often prefer cash. Always have some euros handy.", icon: "banknotes"},
-    %{title: "Greet Everyone", tip: "Say 'Bos días' when entering shops. It's expected and appreciated.", icon: "hand-raised"},
-    %{title: "Thermal Springs", tip: "Ourense has free public hot springs. Bring a towel and join the locals!", icon: "fire"}
-  ]
+  defp cultural_tips do
+    [
+      %{title: gettext("The Siesta is Real"), tip: gettext("Many shops close 2-5pm. Plan errands for mornings or evenings."), icon: "clock"},
+      %{title: gettext("Lunch is the Main Meal"), tip: gettext("Galicians eat lunch 2-4pm. Restaurants are empty at noon."), icon: "sun"},
+      %{title: gettext("Free Tapas Culture"), tip: gettext("In many bars, tapas come free with drinks. Just order a caña!"), icon: "sparkles"},
+      %{title: gettext("Cash is King"), tip: gettext("Smaller shops often prefer cash. Always have some euros handy."), icon: "banknotes"},
+      %{title: gettext("Greet Everyone"), tip: gettext("Say 'Bos días' when entering shops. It's expected and appreciated."), icon: "hand-raised"},
+      %{title: gettext("Thermal Springs"), tip: gettext("Ourense has free public hot springs. Bring a towel and join the locals!"), icon: "fire"}
+    ]
+  end
 
   @impl true
   def mount(_params, _session, socket) do
@@ -57,12 +59,12 @@ defmodule GaliciaLocalWeb.HomeLive do
     cities_count = Ash.count!(City)
 
     # Pick a random phrase and tips to display
-    random_phrase = Enum.random(@galician_phrases)
-    random_tips = Enum.take_random(@cultural_tips, 3)
+    random_phrase = Enum.random(galician_phrases())
+    random_tips = Enum.take_random(cultural_tips(), 3)
 
     {:ok,
      socket
-     |> assign(:page_title, "Integrate into Galician Life")
+     |> assign(:page_title, gettext("Integrate into Galician Life"))
      |> assign(:featured_cities, featured_cities)
      |> assign(:categories_by_priority, categories_by_priority)
      |> assign(:recent_businesses, recent_businesses)
@@ -84,7 +86,7 @@ defmodule GaliciaLocalWeb.HomeLive do
   end
 
   def handle_event("new_phrase", _, socket) do
-    {:noreply, assign(socket, :galician_phrase, Enum.random(@galician_phrases))}
+    {:noreply, assign(socket, :galician_phrase, Enum.random(galician_phrases()))}
   end
 
   @impl true
@@ -101,12 +103,12 @@ defmodule GaliciaLocalWeb.HomeLive do
         <div class="absolute inset-0 bg-black/50"></div>
         <div class="hero-content text-center text-neutral-content py-20">
           <div class="max-w-3xl">
-            <p class="mb-4 text-lg opacity-90 tracking-wide uppercase">Welcome to Galicia</p>
+            <p class="mb-4 text-lg opacity-90 tracking-wide uppercase">{gettext("Welcome to Galicia")}</p>
             <h1 class="mb-6 text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-              Make Galicia<br/>Your Home
+              {gettext("Make Galicia Your Home")}
             </h1>
             <p class="mb-10 text-lg md:text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">
-              Discover local businesses, learn Galician customs, and truly integrate into your new community.
+              {gettext("Discover local businesses, learn Galician customs, and truly integrate into your new community.")}
             </p>
 
             <%!-- Search --%>
@@ -116,12 +118,12 @@ defmodule GaliciaLocalWeb.HomeLive do
                   type="text"
                   name="query"
                   value={@search_query}
-                  placeholder="Search for lawyers, restaurants, services..."
+                  placeholder={gettext("Search for lawyers, restaurants, services...")}
                   class="input input-lg join-item flex-1 bg-base-100 text-base-content focus:outline-none"
                 />
                 <button type="submit" class="btn btn-primary btn-lg join-item px-8">
                   <span class="hero-magnifying-glass w-5 h-5"></span>
-                  <span class="hidden sm:inline">Search</span>
+                  <span class="hidden sm:inline">{gettext("Search")}</span>
                 </button>
               </div>
             </form>
@@ -130,16 +132,16 @@ defmodule GaliciaLocalWeb.HomeLive do
             <div class="flex flex-wrap justify-center gap-3">
               <.link navigate={~p"/search?filter=local-gems"} class="btn btn-outline btn-sm text-white border-white/50 hover:bg-white hover:text-neutral hover:border-white">
                 <span class="hero-star w-4 h-4"></span>
-                Local Gems
+                {gettext("Local Gems")}
               </.link>
               <.link navigate={~p"/categories/restaurants"} class="btn btn-outline btn-sm text-white border-white/50 hover:bg-white hover:text-neutral hover:border-white">
-                Restaurants
+                {gettext("Restaurants")}
               </.link>
               <.link navigate={~p"/categories/lawyers"} class="btn btn-outline btn-sm text-white border-white/50 hover:bg-white hover:text-neutral hover:border-white">
-                Legal Help
+                {gettext("Legal Help")}
               </.link>
               <.link navigate={~p"/cities"} class="btn btn-ghost btn-sm text-white/80">
-                All Cities
+                {gettext("All Cities")}
                 <span class="hero-arrow-right w-4 h-4"></span>
               </.link>
             </div>
@@ -153,15 +155,15 @@ defmodule GaliciaLocalWeb.HomeLive do
           <div class="stats stats-horizontal w-full bg-transparent text-primary-content">
             <div class="stat place-items-center py-6">
               <div class="stat-value">{@total_businesses}+</div>
-              <div class="stat-desc text-primary-content/80">Local Businesses</div>
+              <div class="stat-desc text-primary-content/80">{gettext("Local Businesses")}</div>
             </div>
             <div class="stat place-items-center py-6">
               <div class="stat-value">{@local_gems_count}</div>
-              <div class="stat-desc text-primary-content/80">Authentic Local Gems</div>
+              <div class="stat-desc text-primary-content/80">{gettext("Authentic Local Gems")}</div>
             </div>
             <div class="stat place-items-center py-6">
               <div class="stat-value">{@cities_count}</div>
-              <div class="stat-desc text-primary-content/80">Galician Cities</div>
+              <div class="stat-desc text-primary-content/80">{gettext("Galician Cities")}</div>
             </div>
           </div>
         </div>
@@ -171,16 +173,16 @@ defmodule GaliciaLocalWeb.HomeLive do
       <div class="bg-base-200 border-b border-base-300">
         <div class="container mx-auto px-4 py-4">
           <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            <span class="badge badge-neutral badge-sm">Learn Galician</span>
+            <span class="badge badge-neutral badge-sm">{gettext("Learn Galician")}</span>
             <div class="flex items-center gap-3">
               <span class="text-xl font-semibold text-primary">"{@galician_phrase.galician}"</span>
               <span class="text-base-content/50">=</span>
-              <span class="text-base-content">{@galician_phrase.english}</span>
+              <span class="text-base-content">{if @locale == "es", do: @galician_phrase.spanish, else: @galician_phrase.english}</span>
             </div>
             <span class="text-sm text-base-content/60 italic">{@galician_phrase.usage}</span>
             <button phx-click="new_phrase" class="btn btn-ghost btn-xs">
               <span class="hero-arrow-path w-4 h-4"></span>
-              Another
+              {gettext("Another")}
             </button>
           </div>
         </div>
@@ -191,11 +193,11 @@ defmodule GaliciaLocalWeb.HomeLive do
         <div class="container mx-auto max-w-7xl">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
             <div>
-              <h2 class="text-3xl font-bold">Explore Galicia</h2>
-              <p class="text-base-content/70 mt-2">Each city has its own character and charm</p>
+              <h2 class="text-3xl font-bold">{gettext("Explore Galicia")}</h2>
+              <p class="text-base-content/70 mt-2">{gettext("Each city has its own character and charm")}</p>
             </div>
             <.link navigate={~p"/cities"} class="btn btn-ghost btn-sm">
-              View all cities
+              {gettext("View all cities")}
               <span class="hero-arrow-right w-4 h-4"></span>
             </.link>
           </div>
@@ -217,10 +219,10 @@ defmodule GaliciaLocalWeb.HomeLive do
                     </div>
                   </figure>
                   <div class="card-body">
-                    <p class="text-sm text-base-content/70 line-clamp-2">{city.description}</p>
+                    <p class="text-sm text-base-content/70 line-clamp-2">{localized(city, :description, @locale)}</p>
                     <div class="card-actions justify-between items-center mt-2">
-                      <div class="badge badge-ghost">{city.business_count || 0} listings</div>
-                      <span class="text-primary text-sm font-medium group-hover:underline">Explore</span>
+                      <div class="badge badge-ghost">{ngettext("%{count} listing", "%{count} listings", city.business_count || 0)}</div>
+                      <span class="text-primary text-sm font-medium group-hover:underline">{gettext("Explore")}</span>
                     </div>
                   </div>
                 </div>
@@ -234,9 +236,9 @@ defmodule GaliciaLocalWeb.HomeLive do
       <section class="py-16 px-4 bg-base-200">
         <div class="container mx-auto max-w-7xl">
           <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold">Living Like a Galician</h2>
+            <h2 class="text-3xl font-bold">{gettext("Living Like a Galician")}</h2>
             <p class="text-base-content/70 mt-2 max-w-2xl mx-auto">
-              Small things that make a big difference when integrating into local life
+              {gettext("Small things that make a big difference when integrating into local life")}
             </p>
           </div>
 
@@ -264,8 +266,8 @@ defmodule GaliciaLocalWeb.HomeLive do
       <section class="py-16 px-4">
         <div class="container mx-auto max-w-7xl">
           <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold">Browse by Category</h2>
-            <p class="text-base-content/70 mt-2">Find exactly what you need</p>
+            <h2 class="text-3xl font-bold">{gettext("Browse by Category")}</h2>
+            <p class="text-base-content/70 mt-2">{gettext("Find exactly what you need")}</p>
           </div>
 
           <%= for {priority, categories} <- @categories_by_priority do %>
@@ -283,7 +285,7 @@ defmodule GaliciaLocalWeb.HomeLive do
                       <div class={"w-12 h-12 rounded-full flex items-center justify-center mb-2 #{priority_bg_class(priority)} group-hover:scale-110 transition-transform"}>
                         <.dynamic_icon name={category.icon || "building-storefront"} class="w-6 h-6" />
                       </div>
-                      <span class="font-medium text-sm">{category.name}</span>
+                      <span class="font-medium text-sm">{localized_name(category, @locale)}</span>
                       <span class="text-xs text-base-content/60">{category.name_es}</span>
                     </div>
                   </.link>
@@ -300,14 +302,14 @@ defmodule GaliciaLocalWeb.HomeLive do
           <div class="container mx-auto max-w-7xl">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
               <div>
-                <h2 class="text-3xl font-bold">Recently Added</h2>
-                <p class="text-base-content/70 mt-2">Fresh additions to help you explore</p>
+                <h2 class="text-3xl font-bold">{gettext("Recently Added")}</h2>
+                <p class="text-base-content/70 mt-2">{gettext("Fresh additions to help you explore")}</p>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <%= for business <- @recent_businesses do %>
-                <.business_card business={business} />
+                <.business_card business={business} locale={@locale} />
               <% end %>
             </div>
           </div>
@@ -317,18 +319,17 @@ defmodule GaliciaLocalWeb.HomeLive do
       <%!-- CTA Section --%>
       <section class="py-20 px-4 bg-neutral text-neutral-content">
         <div class="container mx-auto max-w-4xl text-center">
-          <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Become Part of Galicia?</h2>
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">{gettext("Ready to Become Part of Galicia?")}</h2>
           <p class="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
-            Skip the tourist traps. Find the places locals actually go.
-            Learn the customs that earn respect. Make real connections.
+            {gettext("Skip the tourist traps. Find the places locals actually go. Learn the customs that earn respect. Make real connections.")}
           </p>
           <div class="flex flex-wrap justify-center gap-4">
             <.link navigate={~p"/search?filter=local-gems"} class="btn btn-primary btn-lg">
               <span class="hero-star w-5 h-5"></span>
-              Discover Local Gems
+              {gettext("Discover Local Gems")}
             </.link>
             <.link navigate={~p"/cities"} class="btn btn-outline btn-lg text-neutral-content border-neutral-content/50 hover:bg-neutral-content hover:text-neutral">
-              Explore Cities
+              {gettext("Explore Cities")}
             </.link>
           </div>
         </div>
@@ -338,12 +339,12 @@ defmodule GaliciaLocalWeb.HomeLive do
       <footer class="footer footer-center p-10 bg-base-200 text-base-content">
         <aside>
           <p class="font-bold text-lg">GaliciaLocal.com</p>
-          <p class="text-base-content/70">Helping newcomers integrate into Galician life</p>
+          <p class="text-base-content/70">{gettext("Helping newcomers integrate into Galician life")}</p>
         </aside>
         <nav class="grid grid-flow-col gap-6">
-          <.link navigate={~p"/about"} class="link link-hover">About</.link>
-          <.link navigate={~p"/contact"} class="link link-hover">Contact</.link>
-          <.link navigate={~p"/privacy"} class="link link-hover">Privacy</.link>
+          <.link navigate={~p"/about"} class="link link-hover">{gettext("About")}</.link>
+          <.link navigate={~p"/contact"} class="link link-hover">{gettext("Contact")}</.link>
+          <.link navigate={~p"/privacy"} class="link link-hover">{gettext("Privacy")}</.link>
         </nav>
         <aside>
           <p class="text-sm text-base-content/50">© 2026 GaliciaLocal. Made with love for Galicia.</p>
@@ -356,6 +357,7 @@ defmodule GaliciaLocalWeb.HomeLive do
   # Helper Components
 
   attr :business, :map, required: true
+  attr :locale, :string, default: "en"
   defp business_card(assigns) do
     ~H"""
     <.link navigate={~p"/businesses/#{@business.id}"} class="group">
@@ -367,7 +369,7 @@ defmodule GaliciaLocalWeb.HomeLive do
                 {@business.name}
               </h3>
               <p class="text-sm text-base-content/60 mt-1">
-                {@business.city.name} · {@business.category.name}
+                {@business.city.name} · {localized_name(@business.category, assigns[:locale] || "en")}
               </p>
             </div>
             <div class="flex gap-2">
@@ -387,7 +389,7 @@ defmodule GaliciaLocalWeb.HomeLive do
           </div>
 
           <p class="text-sm text-base-content/70 line-clamp-2 mt-3">
-            {@business.summary || @business.description}
+            {localized(@business, :summary, assigns[:locale] || "en") || localized(@business, :description, assigns[:locale] || "en")}
           </p>
 
           <div class="flex items-center justify-between mt-4 pt-4 border-t border-base-200">
@@ -395,20 +397,20 @@ defmodule GaliciaLocalWeb.HomeLive do
               <div class="flex items-center gap-1">
                 <span class="text-warning">★</span>
                 <span class="font-medium">{Decimal.round(@business.rating, 1)}</span>
-                <span class="text-xs text-base-content/50">({@business.review_count} reviews)</span>
+                <span class="text-xs text-base-content/50">({ngettext("%{count} review", "%{count} reviews", @business.review_count)})</span>
               </div>
             <% else %>
-              <span class="text-sm text-base-content/50">No reviews yet</span>
+              <span class="text-sm text-base-content/50">{gettext("No reviews yet")}</span>
             <% end %>
             <%= if @business.newcomer_friendly_score do %>
               <span class="text-xs text-base-content/60">
                 <%= cond do %>
                   <% Decimal.compare(@business.newcomer_friendly_score, Decimal.new("0.7")) == :gt -> %>
-                    Easy for newcomers
+                    {gettext("Easy for newcomers")}
                   <% Decimal.compare(@business.newcomer_friendly_score, Decimal.new("0.4")) == :gt -> %>
-                    Basic Spanish helpful
+                    {gettext("Basic Spanish helpful")}
                   <% true -> %>
-                    Bring a local friend!
+                    {gettext("Bring a local friend!")}
                 <% end %>
               </span>
             <% end %>
@@ -430,11 +432,11 @@ defmodule GaliciaLocalWeb.HomeLive do
 
   # Helper functions
 
-  defp priority_label(1), do: "Getting Started"
-  defp priority_label(2), do: "Daily Life"
-  defp priority_label(3), do: "Culture & Leisure"
-  defp priority_label(4), do: "Practical Services"
-  defp priority_label(_), do: "Other"
+  defp priority_label(1), do: gettext("Getting Started")
+  defp priority_label(2), do: gettext("Daily Life")
+  defp priority_label(3), do: gettext("Culture & Leisure")
+  defp priority_label(4), do: gettext("Practical Services")
+  defp priority_label(_), do: gettext("Other")
 
   defp priority_badge_class(1), do: "badge-primary"
   defp priority_badge_class(2), do: "badge-secondary"

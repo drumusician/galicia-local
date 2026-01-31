@@ -2,10 +2,9 @@
   <!-- Hero -->
   <div class="bg-base-100 border-b border-base-300">
     <div class="container mx-auto max-w-4xl px-4 py-16 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-base-content mb-4">About GaliciaLocal</h1>
+      <h1 class="text-4xl md:text-5xl font-bold text-base-content mb-4"><%= gettext("About GaliciaLocal") %></h1>
       <p class="text-xl text-base-content/60 max-w-2xl mx-auto">
-        Your comprehensive guide to services and businesses across Galicia, Spain —
-        built for expats, newcomers, and visitors who want to experience Galicia like a local.
+        <%= gettext("Your comprehensive guide to services and businesses across Galicia, Spain — built for expats, newcomers, and visitors who want to experience Galicia like a local.") %>
       </p>
     </div>
   </div>
@@ -16,13 +15,10 @@
       <div class="card-body">
         <h2 class="card-title text-2xl mb-4">
           <span class="hero-heart w-6 h-6 text-primary"></span>
-          Our Mission
+          <%= gettext("Our Mission") %>
         </h2>
         <p class="text-base-content/80 text-lg">
-          Moving to a new country is challenging. Finding a doctor who speaks your language,
-          a lawyer who understands immigration, or simply the best local bakery shouldn't be.
-          We're building the most comprehensive, curated directory of services in Galicia,
-          with a special focus on businesses that welcome international clients.
+          <%= gettext("Moving to a new country is challenging. Finding a doctor who speaks your language, a lawyer who understands immigration, or simply the best local bakery shouldn't be. We're building the most comprehensive, curated directory of services in Galicia, with a special focus on businesses that welcome international clients.") %>
         </p>
       </div>
     </div>
@@ -32,35 +28,35 @@
       <div class="card-body">
         <h2 class="card-title text-2xl mb-6">
           <span class="hero-sparkles w-6 h-6 text-primary"></span>
-          What Makes Us Different
+          <%= gettext("What Makes Us Different") %>
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="flex gap-4">
             <span class="hero-language w-8 h-8 text-primary shrink-0 mt-1"></span>
             <div>
-              <h3 class="font-semibold text-base-content">Language Detection</h3>
-              <p class="text-base-content/60 text-sm">We identify which businesses have English-speaking staff, so you know before you go.</p>
+              <h3 class="font-semibold text-base-content"><%= gettext("Language Detection") %></h3>
+              <p class="text-base-content/60 text-sm"><%= gettext("We identify which businesses have English-speaking staff, so you know before you go.") %></p>
             </div>
           </div>
           <div class="flex gap-4">
             <span class="hero-globe-alt w-8 h-8 text-primary shrink-0 mt-1"></span>
             <div>
-              <h3 class="font-semibold text-base-content">Expat-Focused Categories</h3>
-              <p class="text-base-content/60 text-sm">From immigration lawyers to international schools — categories that matter to you.</p>
+              <h3 class="font-semibold text-base-content"><%= gettext("Expat-Focused Categories") %></h3>
+              <p class="text-base-content/60 text-sm"><%= gettext("From immigration lawyers to international schools — categories that matter to you.") %></p>
             </div>
           </div>
           <div class="flex gap-4">
             <span class="hero-chat-bubble-bottom-center-text w-8 h-8 text-primary shrink-0 mt-1"></span>
             <div>
-              <h3 class="font-semibold text-base-content">Local Insights</h3>
-              <p class="text-base-content/60 text-sm">Real summaries and highlights distilled from local reviews and experiences.</p>
+              <h3 class="font-semibold text-base-content"><%= gettext("Local Insights") %></h3>
+              <p class="text-base-content/60 text-sm"><%= gettext("Real summaries and highlights distilled from local reviews and experiences.") %></p>
             </div>
           </div>
           <div class="flex gap-4">
             <span class="hero-check-badge w-8 h-8 text-primary shrink-0 mt-1"></span>
             <div>
-              <h3 class="font-semibold text-base-content">Verified Information</h3>
-              <p class="text-base-content/60 text-sm">We keep listings accurate and up-to-date so you can rely on what you find.</p>
+              <h3 class="font-semibold text-base-content"><%= gettext("Verified Information") %></h3>
+              <p class="text-base-content/60 text-sm"><%= gettext("We keep listings accurate and up-to-date so you can rely on what you find.") %></p>
             </div>
           </div>
         </div>
@@ -72,13 +68,10 @@
       <div class="card-body">
         <h2 class="card-title text-2xl mb-4">
           <span class="hero-user-group w-6 h-6 text-primary"></span>
-          The Team
+          <%= gettext("The Team") %>
         </h2>
         <p class="text-base-content/80 text-lg">
-          GaliciaLocal is a passion project created by people who love this beautiful region
-          of northwestern Spain and want to help others discover its charms.
-          We work with locals on the ground to verify information and ensure our listings
-          reflect what you'll actually find when you get there.
+          <%= gettext("GaliciaLocal is a passion project created by people who love this beautiful region of northwestern Spain and want to help others discover its charms. We work with locals on the ground to verify information and ensure our listings reflect what you'll actually find when you get there.") %>
         </p>
       </div>
     </div>
@@ -87,7 +80,7 @@
     <div class="text-center py-8">
       <.link navigate={~p"/search"} class="btn btn-primary btn-lg gap-2">
         <span class="hero-magnifying-glass w-5 h-5"></span>
-        Start Exploring
+        <%= gettext("Start Exploring") %>
       </.link>
     </div>
   </div>

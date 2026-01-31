@@ -54,7 +54,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
       {:error, _} ->
         {:ok,
          socket
-         |> put_flash(:error, "Business not found")
+         |> put_flash(:error, gettext("Business not found"))
          |> push_navigate(to: ~p"/")}
     end
   end
@@ -153,7 +153,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
          |> assign(:reviews, reviews)
          |> assign(:review_form, to_form(new_form))
          |> assign(:review_rating, 5)
-         |> put_flash(:info, "Review submitted!")}
+         |> put_flash(:info, gettext("Review submitted!"))}
 
       {:error, form} ->
         {:noreply, assign(socket, :review_form, to_form(form))}
@@ -175,7 +175,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
       {:noreply,
        socket
        |> assign(:reviews, reviews)
-       |> put_flash(:info, "Review deleted")}
+       |> put_flash(:info, gettext("Review deleted"))}
     else
       {:noreply, socket}
     end
@@ -189,9 +189,9 @@ defmodule GaliciaLocalWeb.BusinessLive do
         <!-- Breadcrumbs -->
         <nav class="text-sm breadcrumbs mb-6">
           <ul>
-            <li><.link navigate={~p"/"} class="hover:text-primary">Home</.link></li>
+            <li><.link navigate={~p"/"} class="hover:text-primary">{gettext("Home")}</.link></li>
             <li><.link navigate={~p"/cities/#{@business.city.slug}"} class="hover:text-primary">{@business.city.name}</.link></li>
-            <li><.link navigate={~p"/categories/#{@business.category.slug}"} class="hover:text-primary">{@business.category.name}</.link></li>
+            <li><.link navigate={~p"/categories/#{@business.category.slug}"} class="hover:text-primary">{localized_name(@business.category, @locale)}</.link></li>
             <li class="text-base-content/60">{@business.name}</li>
           </ul>
         </nav>
@@ -214,25 +214,25 @@ defmodule GaliciaLocalWeb.BusinessLive do
                     class={"btn btn-ghost btn-sm gap-1 #{if @is_favorited, do: "text-error", else: "text-base-content/40 hover:text-error"}"}
                   >
                     <span class={if @is_favorited, do: "hero-heart-solid w-5 h-5", else: "hero-heart w-5 h-5"}></span>
-                    <%= if @is_favorited, do: "Saved", else: "Save" %>
+                    <%= if @is_favorited, do: gettext("Saved"), else: gettext("Save") %>
                   </button>
                 <% end %>
                 <%= if @business.speaks_english do %>
                   <div class="badge badge-success badge-lg gap-1">
                     <span class="hero-language w-4 h-4"></span>
-                    English Spoken
+                    {gettext("English Spoken")}
                   </div>
                 <% end %>
                 <%= if @business.owner_id do %>
                   <div class="badge badge-primary badge-lg gap-1">
                     <span class="hero-shield-check w-4 h-4"></span>
-                    Claimed
+                    {gettext("Claimed")}
                   </div>
                 <% end %>
                 <%= if @business.status == :verified do %>
                   <div class="badge badge-primary badge-lg gap-1">
                     <span class="hero-check-badge w-4 h-4"></span>
-                    Verified
+                    {gettext("Verified")}
                   </div>
                 <% end %>
               </div>
@@ -248,7 +248,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                     <% end %>
                   </div>
                   <span class="text-lg font-bold">{Decimal.round(@business.rating, 1)}</span>
-                  <span class="text-base-content/50">({@business.review_count} reviews)</span>
+                  <span class="text-base-content/50">({ngettext("%{count} review", "%{count} reviews", @business.review_count)})</span>
                 </div>
               <% end %>
               <%= if @business.price_level do %>
@@ -264,17 +264,21 @@ defmodule GaliciaLocalWeb.BusinessLive do
             <%= if @business.summary do %>
               <div class="alert bg-primary/10 border-primary/20 mb-6">
                 <span class="hero-sparkles w-5 h-5 text-primary"></span>
-                <span>{@business.summary}</span>
+                <span>{localized(@business, :summary, @locale)}</span>
               </div>
             <% end %>
 
             <!-- Description -->
             <div class="prose max-w-none mb-8">
-              <p>{@business.description}</p>
+              <p>{localized(@business, :description, @locale)}</p>
               <%= if @business.description_es && @business.description_es != @business.description do %>
                 <details class="mt-4">
-                  <summary class="cursor-pointer text-sm text-base-content/60">Ver en español</summary>
-                  <p class="mt-2 text-base-content/70 italic">{@business.description_es}</p>
+                  <summary class="cursor-pointer text-sm text-base-content/60">
+                    {if @locale == "es", do: gettext("View in English"), else: gettext("Ver en español")}
+                  </summary>
+                  <p class="mt-2 text-base-content/70 italic">
+                    {if @locale == "es", do: @business.description, else: @business.description_es}
+                  </p>
                 </details>
               <% end %>
             </div>
@@ -345,10 +349,10 @@ defmodule GaliciaLocalWeb.BusinessLive do
                 <div>
                   <h3 class="font-semibold mb-3 flex items-center gap-2">
                     <span class="hero-star w-5 h-5 text-warning"></span>
-                    Highlights
+                    {gettext("Highlights")}
                   </h3>
                   <ul class="space-y-2">
-                    <%= for highlight <- @business.highlights do %>
+                    <%= for highlight <- localized(@business, :highlights, @locale) || [] do %>
                       <li class="flex items-center gap-2 text-sm">
                         <span class="hero-check w-4 h-4 text-success"></span>
                         {highlight}
@@ -362,10 +366,10 @@ defmodule GaliciaLocalWeb.BusinessLive do
                 <div>
                   <h3 class="font-semibold mb-3 flex items-center gap-2">
                     <span class="hero-exclamation-triangle w-5 h-5 text-warning"></span>
-                    Good to Know
+                    {gettext("Good to Know")}
                   </h3>
                   <ul class="space-y-2">
-                    <%= for warning <- @business.warnings do %>
+                    <%= for warning <- localized(@business, :warnings, @locale) || [] do %>
                       <li class="flex items-center gap-2 text-sm text-base-content/70">
                         <span class="hero-information-circle w-4 h-4"></span>
                         {warning}
@@ -377,13 +381,13 @@ defmodule GaliciaLocalWeb.BusinessLive do
             </div>
 
             <!-- Contact Information -->
-            <div class="divider">Contact Information</div>
+            <div class="divider">{gettext("Contact Information")}</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <%= if @business.address do %>
                 <div class="flex items-start gap-3">
                   <span class="hero-map-pin w-5 h-5 text-primary mt-0.5"></span>
                   <div>
-                    <p class="font-medium">Address</p>
+                    <p class="font-medium">{gettext("Address")}</p>
                     <p class="text-base-content/70">{@business.address}</p>
                   </div>
                 </div>
@@ -393,7 +397,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                 <div class="flex items-start gap-3">
                   <span class="hero-phone w-5 h-5 text-primary mt-0.5"></span>
                   <div>
-                    <p class="font-medium">Phone</p>
+                    <p class="font-medium">{gettext("Phone")}</p>
                     <a href={"tel:#{@business.phone}"} class="text-primary hover:underline">
                       {@business.phone}
                     </a>
@@ -405,7 +409,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                 <div class="flex items-start gap-3">
                   <span class="hero-envelope w-5 h-5 text-primary mt-0.5"></span>
                   <div>
-                    <p class="font-medium">Email</p>
+                    <p class="font-medium">{gettext("Email")}</p>
                     <a href={"mailto:#{@business.email}"} class="text-primary hover:underline">
                       {@business.email}
                     </a>
@@ -417,7 +421,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                 <div class="flex items-start gap-3">
                   <span class="hero-globe-alt w-5 h-5 text-primary mt-0.5"></span>
                   <div>
-                    <p class="font-medium">Website</p>
+                    <p class="font-medium">{gettext("Website")}</p>
                     <a href={@business.website} target="_blank" class="text-primary hover:underline">
                       {URI.parse(@business.website).host || @business.website}
                     </a>
@@ -431,7 +435,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
               <div class="mt-6">
                 <h3 class="font-semibold mb-3 flex items-center gap-2">
                   <span class="hero-clock w-5 h-5 text-primary"></span>
-                  Opening Hours
+                  {gettext("Opening Hours")}
                 </h3>
                 <div class="grid grid-cols-1 gap-1 text-sm">
                   <%= for day <- ~w(monday tuesday wednesday thursday friday saturday sunday) do %>
@@ -456,7 +460,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
               <div class="mt-6">
                 <h3 class="font-semibold mb-3 flex items-center gap-2">
                   <span class="hero-language w-5 h-5 text-primary"></span>
-                  Languages Spoken
+                  {gettext("Languages Spoken")}
                 </h3>
                 <div class="flex flex-wrap gap-2">
                   <%= for lang <- @business.languages_spoken do %>
@@ -467,7 +471,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                 </div>
                 <%= if @business.speaks_english && @business.speaks_english_confidence do %>
                   <p class="text-xs text-base-content/50 mt-2">
-                    English confidence: {trunc(Decimal.to_float(@business.speaks_english_confidence) * 100)}%
+                    {gettext("English confidence:")} {trunc(Decimal.to_float(@business.speaks_english_confidence) * 100)}%
                   </p>
                 <% end %>
               </div>
@@ -475,7 +479,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
 
             <!-- Map Placeholder -->
             <%= if @business.latitude && @business.longitude do %>
-              <div class="divider">Location</div>
+              <div class="divider">{gettext("Location")}</div>
               <div
                 id="map"
                 class="h-64 bg-base-200 rounded-lg flex items-center justify-center"
@@ -486,7 +490,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
               >
                 <div class="text-center text-base-content/50">
                   <span class="hero-map w-12 h-12 mb-2"></span>
-                  <p>Loading map...</p>
+                  <p>{gettext("Loading map...")}</p>
                 </div>
               </div>
             <% end %>
@@ -496,12 +500,12 @@ defmodule GaliciaLocalWeb.BusinessLive do
               <div class="divider"></div>
               <div class="flex items-center justify-between bg-base-200 rounded-lg p-4">
                 <div>
-                  <p class="font-medium">Is this your business?</p>
-                  <p class="text-sm text-base-content/60">Claim it to update your information and manage your listing.</p>
+                  <p class="font-medium">{gettext("Is this your business?")}</p>
+                  <p class="text-sm text-base-content/60">{gettext("Claim it to update your information and manage your listing.")}</p>
                 </div>
                 <.link navigate={~p"/businesses/#{@business.id}/claim"} class="btn btn-outline btn-sm gap-1">
                   <span class="hero-shield-check w-4 h-4"></span>
-                  Claim
+                  {gettext("Claim")}
                 </.link>
               </div>
             <% end %>
@@ -511,7 +515,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
               <%= if @business.google_maps_url do %>
                 <a href={@business.google_maps_url} target="_blank" class="btn btn-outline">
                   <span class="hero-map w-5 h-5"></span>
-                  View on Google Maps
+                  {gettext("View on Google Maps")}
                 </a>
               <% end %>
               <%= if @business.latitude && @business.longitude do %>
@@ -521,7 +525,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                   class="btn btn-primary"
                 >
                   <span class="hero-arrow-top-right-on-square w-5 h-5"></span>
-                  Get Directions
+                  {gettext("Get Directions")}
                 </a>
               <% end %>
             </div>
@@ -532,17 +536,17 @@ defmodule GaliciaLocalWeb.BusinessLive do
         <div class="mt-8">
           <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
             <span class="hero-chat-bubble-left-right w-6 h-6 text-primary"></span>
-            Community Reviews ({length(@reviews)})
+            {gettext("Community Reviews")} ({length(@reviews)})
           </h2>
 
           <!-- Review Form -->
           <%= if @review_form do %>
             <div class="card bg-base-100 shadow-xl mb-6">
               <div class="card-body">
-                <h3 class="font-semibold mb-3">Share your experience</h3>
+                <h3 class="font-semibold mb-3">{gettext("Share your experience")}</h3>
                 <.form for={@review_form} phx-change="validate_review" phx-submit="submit_review" class="space-y-4">
                   <div class="flex items-center gap-1">
-                    <span class="text-sm mr-2">Rating:</span>
+                    <span class="text-sm mr-2">{gettext("Rating:")}</span>
                     <%= for i <- 1..5 do %>
                       <button
                         type="button"
@@ -556,7 +560,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                   <div class="form-control">
                     <textarea
                       name={@review_form[:body].name}
-                      placeholder="What was your experience like? Any tips for others?"
+                      placeholder={gettext("What was your experience like? Any tips for others?")}
                       class="textarea textarea-bordered w-full h-24"
                     >{@review_form[:body].value}</textarea>
                   </div>
@@ -564,18 +568,18 @@ defmodule GaliciaLocalWeb.BusinessLive do
                   <div class="flex items-center gap-4">
                     <label class="label cursor-pointer gap-2">
                       <input type="checkbox" name={@review_form[:visited].name} value="true" class="checkbox checkbox-sm" />
-                      <span class="label-text">I have visited this place</span>
+                      <span class="label-text">{gettext("I have visited this place")}</span>
                     </label>
                   </div>
 
-                  <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+                  <button type="submit" class="btn btn-primary btn-sm">{gettext("Submit Review")}</button>
                 </.form>
               </div>
             </div>
           <% else %>
             <div class="alert mb-6">
               <span class="hero-information-circle w-5 h-5"></span>
-              <span><.link navigate={~p"/sign-in"} class="text-primary font-semibold hover:underline">Sign in</.link> to leave a review</span>
+              <span><.link navigate={~p"/sign-in"} class="text-primary font-semibold hover:underline">{gettext("Sign in")}</.link> {gettext("to leave a review")}</span>
             </div>
           <% end %>
 
@@ -596,14 +600,14 @@ defmodule GaliciaLocalWeb.BusinessLive do
                         </div>
                         <div>
                           <.link navigate={~p"/members/#{review.user_id}"} class="font-semibold hover:text-primary">
-                            {review.user.display_name || "Community Member"}
+                            {review.user.display_name || gettext("Community Member")}
                           </.link>
                           <div class="flex items-center gap-1">
                             <%= for i <- 1..5 do %>
                               <span class={"text-sm #{if i <= review.rating, do: "text-warning", else: "text-base-content/20"}"}>★</span>
                             <% end %>
                             <%= if review.visited do %>
-                              <span class="badge badge-success badge-xs ml-2">Visited</span>
+                              <span class="badge badge-success badge-xs ml-2">{gettext("Visited")}</span>
                             <% end %>
                           </div>
                         </div>
@@ -613,7 +617,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                           {Calendar.strftime(review.inserted_at, "%b %d, %Y")}
                         </span>
                         <%= if @current_user && @current_user.id == review.user_id do %>
-                          <button phx-click="delete_review" phx-value-id={review.id} data-confirm="Delete this review?" class="btn btn-ghost btn-xs text-error">
+                          <button phx-click="delete_review" phx-value-id={review.id} data-confirm={gettext("Delete this review?")} class="btn btn-ghost btn-xs text-error">
                             <span class="hero-trash w-4 h-4"></span>
                           </button>
                         <% end %>
@@ -627,14 +631,14 @@ defmodule GaliciaLocalWeb.BusinessLive do
               <% end %>
             </div>
           <% else %>
-            <p class="text-base-content/50 text-center py-8">No reviews yet. Be the first to share your experience!</p>
+            <p class="text-base-content/50 text-center py-8">{gettext("No reviews yet. Be the first to share your experience!")}</p>
           <% end %>
         </div>
 
         <!-- Back link -->
         <div class="mt-8 text-center">
           <.link navigate={~p"/cities/#{@business.city.slug}"} class="btn btn-ghost">
-            ← Back to {@business.city.name}
+            {gettext("Back to %{city}", city: @business.city.name)}
           </.link>
         </div>
       </div>
@@ -654,12 +658,12 @@ defmodule GaliciaLocalWeb.BusinessLive do
     end
   end
 
-  defp language_name(:es), do: "Spanish"
-  defp language_name(:en), do: "English"
-  defp language_name(:gl), do: "Galician"
-  defp language_name(:pt), do: "Portuguese"
-  defp language_name(:de), do: "German"
-  defp language_name(:fr), do: "French"
-  defp language_name(:nl), do: "Dutch"
+  defp language_name(:es), do: gettext("Spanish")
+  defp language_name(:en), do: gettext("English")
+  defp language_name(:gl), do: gettext("Galician")
+  defp language_name(:pt), do: gettext("Portuguese")
+  defp language_name(:de), do: gettext("German")
+  defp language_name(:fr), do: gettext("French")
+  defp language_name(:nl), do: gettext("Dutch")
   defp language_name(lang), do: to_string(lang)
 end

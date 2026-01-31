@@ -15,7 +15,7 @@ defmodule GaliciaLocalWeb.CitiesLive do
 
     {:ok,
      socket
-     |> assign(:page_title, "Cities")
+     |> assign(:page_title, gettext("Cities"))
      |> assign(:cities, cities)}
   end
 
@@ -26,10 +26,9 @@ defmodule GaliciaLocalWeb.CitiesLive do
       <div class="container mx-auto max-w-6xl px-4 py-8">
         <!-- Header -->
         <div class="text-center mb-12">
-          <h1 class="text-4xl font-bold text-base-content mb-4">Explore Galicia</h1>
+          <h1 class="text-4xl font-bold text-base-content mb-4">{gettext("Explore Galicia")}</h1>
           <p class="text-base-content/70 max-w-2xl mx-auto">
-            Discover the beautiful cities and towns of Galicia.
-            From thermal springs to historic pilgrimage routes, each place has its own charm.
+            {gettext("Discover the beautiful cities and towns of Galicia. From thermal springs to historic pilgrimage routes, each place has its own charm.")}
           </p>
         </div>
 
@@ -51,7 +50,7 @@ defmodule GaliciaLocalWeb.CitiesLive do
         >
           <div class="flex items-center justify-center h-full text-base-content/50">
             <span class="hero-map w-12 h-12 mr-3"></span>
-            <p>Loading map...</p>
+            <p>{gettext("Loading map...")}</p>
           </div>
         </div>
 
@@ -68,7 +67,7 @@ defmodule GaliciaLocalWeb.CitiesLive do
                   />
                   <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                   <%= if city.featured do %>
-                    <span class="absolute top-4 right-4 badge badge-primary">Featured</span>
+                    <span class="absolute top-4 right-4 badge badge-primary">{gettext("Featured")}</span>
                   <% end %>
                   <div class="absolute bottom-4 left-4 right-4">
                     <h2 class="text-2xl font-bold text-white">{city.name}</h2>
@@ -77,17 +76,17 @@ defmodule GaliciaLocalWeb.CitiesLive do
                 </figure>
                 <div class="card-body">
                   <p class="text-base-content/70 line-clamp-3">
-                    {city.description}
+                    {localized(city, :description, @locale)}
                   </p>
                   <div class="flex justify-between items-center mt-4">
                     <div class="flex gap-2">
-                      <span class="badge badge-outline">{city.business_count || 0} listings</span>
+                      <span class="badge badge-outline">{ngettext("1 listing", "%{count} listings", city.business_count || 0)}</span>
                       <%= if city.population do %>
-                        <span class="badge badge-ghost">{format_population(city.population)} pop.</span>
+                        <span class="badge badge-ghost">{gettext("%{population} pop.", population: format_population(city.population))}</span>
                       <% end %>
                     </div>
                     <span class="text-primary group-hover:translate-x-1 transition-transform">
-                      Explore →
+                      {gettext("Explore →")}
                     </span>
                   </div>
                 </div>

@@ -1,19 +1,18 @@
 <div class="min-h-screen bg-base-100">
   <div class="container mx-auto max-w-2xl px-4 py-12">
-    <h1 class="text-4xl font-bold text-base-content mb-8">Contact Us</h1>
+    <h1 class="text-4xl font-bold text-base-content mb-8"><%= gettext("Contact Us") %></h1>
 
     <div class="card bg-base-200">
       <div class="card-body">
         <p class="text-base-content/70 mb-6">
-          Have a question, suggestion, or want to add your business?
-          We'd love to hear from you!
+          <%= gettext("Have a question, suggestion, or want to add your business? We'd love to hear from you!") %>
         </p>
 
         <div class="space-y-4">
           <div class="flex items-center gap-4">
             <span class="hero-envelope w-6 h-6 text-primary"></span>
             <div>
-              <p class="font-medium">Email</p>
+              <p class="font-medium"><%= gettext("Email") %></p>
               <a href="mailto:hello@galicialocal.com" class="text-primary hover:underline">
                 hello@galicialocal.com
               </a>
@@ -23,21 +22,20 @@
           <div class="flex items-center gap-4">
             <span class="hero-map-pin w-6 h-6 text-primary"></span>
             <div>
-              <p class="font-medium">Location</p>
-              <p class="text-base-content/70">Galicia, Spain</p>
+              <p class="font-medium"><%= gettext("Location") %></p>
+              <p class="text-base-content/70"><%= gettext("Galicia, Spain") %></p>
             </div>
           </div>
         </div>
 
-        <div class="divider">Or</div>
+        <div class="divider"><%= gettext("Or") %></div>
 
-        <h3 class="font-semibold mb-4">Add Your Business</h3>
+        <h3 class="font-semibold mb-4"><%= gettext("Add Your Business") %></h3>
         <p class="text-base-content/70 mb-4">
-          Want to list your business on GaliciaLocal?
-          Send us an email with your business details and we'll get back to you.
+          <%= gettext("Want to list your business on GaliciaLocal? Send us an email with your business details and we'll get back to you.") %>
         </p>
         <a href="mailto:hello@galicialocal.com?subject=Add My Business" class="btn btn-primary">
-          Submit Your Business
+          <%= gettext("Submit Your Business") %>
         </a>
       </div>
     </div>

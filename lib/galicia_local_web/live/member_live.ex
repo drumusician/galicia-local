@@ -18,14 +18,14 @@ defmodule GaliciaLocalWeb.MemberLive do
 
         {:ok,
          socket
-         |> assign(:page_title, member.display_name || "Member")
+         |> assign(:page_title, member.display_name || gettext("Member"))
          |> assign(:member, member)
          |> assign(:reviews, reviews)}
 
       {:error, _} ->
         {:ok,
          socket
-         |> put_flash(:error, "Member not found")
+         |> put_flash(:error, gettext("Member not found"))
          |> push_navigate(to: ~p"/")}
     end
   end
@@ -45,7 +45,7 @@ defmodule GaliciaLocalWeb.MemberLive do
                 </span>
               </div>
             </div>
-            <h1 class="text-2xl font-bold">{@member.display_name || "Community Member"}</h1>
+            <h1 class="text-2xl font-bold">{@member.display_name || gettext("Community Member")}</h1>
             <%= if @member.city do %>
               <p class="text-base-content/70">
                 <span class="hero-map-pin-mini w-4 h-4 inline-block"></span>
@@ -53,10 +53,10 @@ defmodule GaliciaLocalWeb.MemberLive do
               </p>
             <% end %>
             <%= if @member.origin_country do %>
-              <p class="text-base-content/50 text-sm">Originally from {@member.origin_country}</p>
+              <p class="text-base-content/50 text-sm">{gettext("Originally from %{country}", country: @member.origin_country)}</p>
             <% end %>
             <p class="text-base-content/50 text-sm">
-              Member since {Calendar.strftime(@member.inserted_at, "%B %Y")}
+              {gettext("Member since %{date}", date: Calendar.strftime(@member.inserted_at, "%B %Y"))}
             </p>
             <%= if @member.bio do %>
               <p class="text-base-content/80 mt-4 max-w-md">{@member.bio}</p>
@@ -67,7 +67,7 @@ defmodule GaliciaLocalWeb.MemberLive do
         <!-- Reviews -->
         <%= if length(@reviews) > 0 do %>
           <h2 class="text-xl font-bold mt-8 mb-4">
-            Reviews ({length(@reviews)})
+            {ngettext("1 Review", "%{count} Reviews", length(@reviews))}
           </h2>
           <div class="space-y-4">
             <%= for review <- @reviews do %>
@@ -92,7 +92,7 @@ defmodule GaliciaLocalWeb.MemberLive do
                     <p class="text-base-content/80 mt-2">{review.body}</p>
                   <% end %>
                   <%= if review.visited do %>
-                    <span class="badge badge-success badge-sm mt-2">Visited</span>
+                    <span class="badge badge-success badge-sm mt-2">{gettext("Visited")}</span>
                   <% end %>
                 </div>
               </div>
