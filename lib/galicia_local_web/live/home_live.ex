@@ -98,7 +98,7 @@ defmodule GaliciaLocalWeb.HomeLive do
       <section class="hero min-h-[80vh] relative">
         <div
           class="absolute inset-0 bg-cover bg-center"
-          style="background-image: url('https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1920&q=80');"
+          style="background-image: url('https://images.unsplash.com/photo-1684931772184-75c6fb13c1f9?w=1920&q=80');"
         >
         </div>
         <div class="absolute inset-0 bg-black/50"></div>
