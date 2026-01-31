@@ -16,7 +16,8 @@ defmodule GaliciaLocalWeb.CategoriesLive do
 
     {:ok,
      socket
-     |> assign(:page_title, gettext("Categories"))
+     |> assign(:page_title, gettext("Browse by Category"))
+     |> assign(:meta_description, gettext("Browse local businesses in Galicia by category. From restaurants and legal help to healthcare and education – find what you need."))
      |> assign(:categories_by_priority, categories)}
   end
 

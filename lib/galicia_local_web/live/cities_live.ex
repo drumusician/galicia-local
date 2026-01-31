@@ -15,7 +15,8 @@ defmodule GaliciaLocalWeb.CitiesLive do
 
     {:ok,
      socket
-     |> assign(:page_title, gettext("Cities"))
+     |> assign(:page_title, gettext("Cities in Galicia"))
+     |> assign(:meta_description, gettext("Explore all cities in Galicia, Spain. From Vigo and A Coruña to Santiago de Compostela – find local businesses and integrate into Galician life."))
      |> assign(:cities, cities)}
   end
 

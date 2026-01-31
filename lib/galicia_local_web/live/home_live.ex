@@ -65,6 +65,7 @@ defmodule GaliciaLocalWeb.HomeLive do
     {:ok,
      socket
      |> assign(:page_title, gettext("Integrate into Galician Life"))
+     |> assign(:meta_description, gettext("Discover %{count}+ local businesses across %{cities} Galician cities. Find restaurants, legal help, services and learn local customs to truly integrate into Galician life.", count: total_businesses, cities: cities_count))
      |> assign(:featured_cities, featured_cities)
      |> assign(:categories_by_priority, categories_by_priority)
      |> assign(:recent_businesses, recent_businesses)

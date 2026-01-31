@@ -25,6 +25,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
         {:ok,
          socket
          |> assign(:page_title, category.name)
+         |> assign(:meta_description, category.description || gettext("Find the best %{category} in Galicia. Browse local listings with reviews, ratings, and insider tips.", category: category.name))
          |> assign(:category, category)
          |> assign(:businesses, businesses)
          |> assign(:cities, cities)

@@ -25,27 +25,27 @@ msgid_plural "%{count} enriched"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/galicia_local_web/live/home_live.ex:224
+#: lib/galicia_local_web/live/home_live.ex:225
 #, elixir-autogen, elixir-format
 msgid "%{count} listing"
 msgid_plural "%{count} listings"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/galicia_local_web/live/business_live.ex:251
-#: lib/galicia_local_web/live/home_live.ex:400
+#: lib/galicia_local_web/live/business_live.ex:252
+#: lib/galicia_local_web/live/home_live.ex:401
 #, elixir-autogen, elixir-format
 msgid "%{count} review"
 msgid_plural "%{count} reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/galicia_local_web/live/cities_live.ex:85
+#: lib/galicia_local_web/live/cities_live.ex:86
 #, elixir-autogen, elixir-format
 msgid "%{population} pop."
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:305
+#: lib/galicia_local_web/live/category_live.ex:306
 #, elixir-autogen, elixir-format
 msgid "(map area)"
 msgstr ""
@@ -57,16 +57,16 @@ msgid_plural "%{count} Reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/galicia_local_web/live/cities_live.ex:83
-#: lib/galicia_local_web/live/city_live.ex:116
+#: lib/galicia_local_web/live/cities_live.ex:84
+#: lib/galicia_local_web/live/city_live.ex:117
 #, elixir-autogen, elixir-format
 msgid "1 listing"
 msgid_plural "%{count} listings"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/galicia_local_web/live/category_live.ex:303
-#: lib/galicia_local_web/live/city_live.ex:160
+#: lib/galicia_local_web/live/category_live.ex:304
+#: lib/galicia_local_web/live/city_live.ex:161
 #: lib/galicia_local_web/live/search_live.ex:234
 #, elixir-autogen, elixir-format
 msgid "1 result"
@@ -79,7 +79,7 @@ msgstr[1] ""
 msgid "A brief one-liner about your business"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:345
+#: lib/galicia_local_web/live/home_live.ex:346
 #, elixir-autogen, elixir-format
 msgid "About"
 msgstr ""
@@ -114,14 +114,14 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:390
+#: lib/galicia_local_web/live/business_live.ex:391
 #: lib/galicia_local_web/live/edit_business_live.ex:108
 #, elixir-autogen, elixir-format
 msgid "Address"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:105
-#: lib/galicia_local_web/components/layouts/root.html.heex:170
+#: lib/galicia_local_web/components/layouts/root.html.heex:144
+#: lib/galicia_local_web/components/layouts/root.html.heex:209
 #, elixir-autogen, elixir-format
 msgid "Admin"
 msgstr ""
@@ -137,14 +137,14 @@ msgstr ""
 msgid "Admin Tools"
 msgstr ""
 
-#: lib/galicia_local_web/live/city_live.ex:134
+#: lib/galicia_local_web/live/city_live.ex:135
 #: lib/galicia_local_web/live/search_live.ex:204
 #, elixir-autogen, elixir-format
 msgid "All Categories"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:260
-#: lib/galicia_local_web/live/home_live.ex:144
+#: lib/galicia_local_web/live/category_live.ex:261
+#: lib/galicia_local_web/live/home_live.ex:145
 #: lib/galicia_local_web/live/search_live.ex:190
 #, elixir-autogen, elixir-format
 msgid "All Cities"
@@ -155,7 +155,7 @@ msgstr ""
 msgid "Analytics"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:185
+#: lib/galicia_local_web/live/home_live.ex:186
 #, elixir-autogen, elixir-format
 msgid "Another"
 msgstr ""
@@ -181,7 +181,7 @@ msgstr ""
 msgid "Attempting to reconnect"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:162
+#: lib/galicia_local_web/live/home_live.ex:163
 #, elixir-autogen, elixir-format
 msgid "Authentic Local Gems"
 msgstr ""
@@ -196,7 +196,7 @@ msgstr ""
 msgid "Awaiting LLM processing"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:641
+#: lib/galicia_local_web/live/business_live.ex:642
 #, elixir-autogen, elixir-format
 msgid "Back to %{city}"
 msgstr ""
@@ -217,17 +217,17 @@ msgstr ""
 msgid "Back to business"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:411
+#: lib/galicia_local_web/live/home_live.ex:412
 #, elixir-autogen, elixir-format
 msgid "Basic Spanish helpful"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:413
+#: lib/galicia_local_web/live/home_live.ex:414
 #, elixir-autogen, elixir-format
 msgid "Bring a local friend!"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:30
+#: lib/galicia_local_web/live/categories_live.ex:31
 #: lib/galicia_local_web/live/favorites_live.ex:94
 #, elixir-autogen, elixir-format
 msgid "Browse Categories"
@@ -238,7 +238,8 @@ msgstr ""
 msgid "Browse businesses and click the heart to save them here."
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:269
+#: lib/galicia_local_web/live/categories_live.ex:19
+#: lib/galicia_local_web/live/home_live.ex:270
 #, elixir-autogen, elixir-format
 msgid "Browse by Category"
 msgstr ""
@@ -255,7 +256,7 @@ msgstr ""
 msgid "Business Name"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:57
+#: lib/galicia_local_web/live/business_live.ex:58
 #: lib/galicia_local_web/live/claim_business_live.ex:31
 #: lib/galicia_local_web/live/edit_business_live.ex:36
 #, elixir-autogen, elixir-format
@@ -283,36 +284,34 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:60
-#: lib/galicia_local_web/components/layouts/root.html.heex:138
+#: lib/galicia_local_web/components/layouts/root.html.heex:99
+#: lib/galicia_local_web/components/layouts/root.html.heex:177
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:165
-#: lib/galicia_local_web/live/categories_live.ex:19
-#: lib/galicia_local_web/live/category_live.ex:232
+#: lib/galicia_local_web/live/category_live.ex:233
 #, elixir-autogen, elixir-format
 msgid "Categories"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:40
+#: lib/galicia_local_web/live/category_live.ex:41
 #, elixir-autogen, elixir-format
 msgid "Category not found"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:57
-#: lib/galicia_local_web/components/layouts/root.html.heex:135
+#: lib/galicia_local_web/components/layouts/root.html.heex:96
+#: lib/galicia_local_web/components/layouts/root.html.heex:174
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:103
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:150
-#: lib/galicia_local_web/live/cities_live.ex:18
-#: lib/galicia_local_web/live/city_live.ex:111
+#: lib/galicia_local_web/live/city_live.ex:112
 #, elixir-autogen, elixir-format
 msgid "Cities"
 msgstr ""
 
-#: lib/galicia_local_web/live/city_live.ex:42
+#: lib/galicia_local_web/live/city_live.ex:43
 #, elixir-autogen, elixir-format
 msgid "City not found"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:508
+#: lib/galicia_local_web/live/business_live.ex:509
 #: lib/galicia_local_web/live/claim_business_live.ex:71
 #, elixir-autogen, elixir-format
 msgid "Claim"
@@ -329,7 +328,7 @@ msgstr ""
 msgid "Claim approved — %{business} is now owned by %{email}"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:504
+#: lib/galicia_local_web/live/business_live.ex:505
 #, elixir-autogen, elixir-format
 msgid "Claim it to update your information and manage your listing."
 msgstr ""
@@ -344,7 +343,7 @@ msgstr ""
 msgid "Claim submitted!"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:229
+#: lib/galicia_local_web/live/business_live.ex:230
 #, elixir-autogen, elixir-format
 msgid "Claimed"
 msgstr ""
@@ -354,23 +353,23 @@ msgstr ""
 msgid "Claimed by"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:603
+#: lib/galicia_local_web/live/business_live.ex:604
 #: lib/galicia_local_web/live/member_live.ex:48
 #, elixir-autogen, elixir-format
 msgid "Community Member"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:539
+#: lib/galicia_local_web/live/business_live.ex:540
 #, elixir-autogen, elixir-format
 msgid "Community Reviews"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:346
+#: lib/galicia_local_web/live/home_live.ex:347
 #, elixir-autogen, elixir-format
 msgid "Contact"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:384
+#: lib/galicia_local_web/live/business_live.ex:385
 #: lib/galicia_local_web/live/edit_business_live.ex:104
 #, elixir-autogen, elixir-format
 msgid "Contact Information"
@@ -397,13 +396,13 @@ msgstr ""
 msgid "Could not submit claim. You may have already claimed this business."
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:437
+#: lib/galicia_local_web/live/home_live.ex:438
 #, elixir-autogen, elixir-format
 msgid "Culture & Leisure"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:81
-#: lib/galicia_local_web/live/home_live.ex:436
+#: lib/galicia_local_web/live/categories_live.ex:82
+#: lib/galicia_local_web/live/home_live.ex:437
 #, elixir-autogen, elixir-format
 msgid "Daily Life"
 msgstr ""
@@ -413,7 +412,7 @@ msgstr ""
 msgid "Data Security"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:620
+#: lib/galicia_local_web/live/business_live.ex:621
 #, elixir-autogen, elixir-format
 msgid "Delete this review?"
 msgstr ""
@@ -433,17 +432,17 @@ msgstr ""
 msgid "Detected from reviews"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:329
+#: lib/galicia_local_web/live/home_live.ex:330
 #, elixir-autogen, elixir-format
 msgid "Discover Local Gems"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:111
+#: lib/galicia_local_web/live/home_live.ex:112
 #, elixir-autogen, elixir-format
 msgid "Discover local businesses, learn Galician customs, and truly integrate into your new community."
 msgstr ""
 
-#: lib/galicia_local_web/live/cities_live.ex:31
+#: lib/galicia_local_web/live/cities_live.ex:32
 #, elixir-autogen, elixir-format
 msgid "Discover the beautiful cities and towns of Galicia. From thermal springs to historic pilgrimage routes, each place has its own charm."
 msgstr ""
@@ -453,24 +452,24 @@ msgstr ""
 msgid "Display Name"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:667
+#: lib/galicia_local_web/live/business_live.ex:668
 #, elixir-autogen, elixir-format
 msgid "Dutch"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:370
-#: lib/galicia_local_web/live/city_live.ex:203
+#: lib/galicia_local_web/live/category_live.ex:371
+#: lib/galicia_local_web/live/city_live.ex:204
 #: lib/galicia_local_web/live/search_live.ex:293
 #, elixir-autogen, elixir-format
 msgid "EN"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:197
+#: lib/galicia_local_web/live/home_live.ex:198
 #, elixir-autogen, elixir-format
 msgid "Each city has its own character and charm"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:409
+#: lib/galicia_local_web/live/home_live.ex:410
 #, elixir-autogen, elixir-format
 msgid "Easy for newcomers"
 msgstr ""
@@ -487,13 +486,13 @@ msgid "Edit %{name}"
 msgstr ""
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:15
-#: lib/galicia_local_web/live/business_live.ex:412
+#: lib/galicia_local_web/live/business_live.ex:413
 #: lib/galicia_local_web/live/edit_business_live.ex:118
 #, elixir-autogen, elixir-format
 msgid "Email"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:662
+#: lib/galicia_local_web/live/business_live.ex:663
 #: lib/galicia_local_web/live/favorites_live.ex:70
 #, elixir-autogen, elixir-format
 msgid "English"
@@ -504,12 +503,12 @@ msgstr ""
 msgid "English Speaking"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:223
+#: lib/galicia_local_web/live/business_live.ex:224
 #, elixir-autogen, elixir-format
 msgid "English Spoken"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:474
+#: lib/galicia_local_web/live/business_live.ex:475
 #, elixir-autogen, elixir-format
 msgid "English confidence:"
 msgstr ""
@@ -519,31 +518,31 @@ msgstr ""
 msgid "English speaking"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:280
-#: lib/galicia_local_web/live/city_live.ex:154
+#: lib/galicia_local_web/live/category_live.ex:281
+#: lib/galicia_local_web/live/city_live.ex:155
 #: lib/galicia_local_web/live/search_live.ex:224
 #, elixir-autogen, elixir-format
 msgid "English speaking only"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:369
-#: lib/galicia_local_web/live/city_live.ex:202
+#: lib/galicia_local_web/live/category_live.ex:370
+#: lib/galicia_local_web/live/city_live.ex:203
 #: lib/galicia_local_web/live/search_live.ex:292
 #, elixir-autogen, elixir-format
 msgid "English spoken"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:86
+#: lib/galicia_local_web/live/categories_live.ex:87
 #, elixir-autogen, elixir-format
 msgid "Essential services for expats and newcomers - lawyers, doctors, real estate, and more."
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:87
+#: lib/galicia_local_web/live/categories_live.ex:88
 #, elixir-autogen, elixir-format
 msgid "Everyday essentials - groceries, markets, and personal services."
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:80
+#: lib/galicia_local_web/live/categories_live.ex:81
 #, elixir-autogen, elixir-format
 msgid "Expat Essentials"
 msgstr ""
@@ -553,43 +552,43 @@ msgstr ""
 msgid "Expat-Focused Categories"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:88
+#: lib/galicia_local_web/live/categories_live.ex:89
 #, elixir-autogen, elixir-format
 msgid "Experience the best of Galicia - restaurants, wineries, and cultural spots."
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:225
+#: lib/galicia_local_web/live/home_live.ex:226
 #, elixir-autogen, elixir-format
 msgid "Explore"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:332
+#: lib/galicia_local_web/live/home_live.ex:333
 #, elixir-autogen, elixir-format
 msgid "Explore Cities"
 msgstr ""
 
-#: lib/galicia_local_web/live/cities_live.ex:29
-#: lib/galicia_local_web/live/home_live.ex:196
+#: lib/galicia_local_web/live/cities_live.ex:30
+#: lib/galicia_local_web/live/home_live.ex:197
 #, elixir-autogen, elixir-format
 msgid "Explore Galicia"
 msgstr ""
 
-#: lib/galicia_local_web/live/cities_live.ex:89
+#: lib/galicia_local_web/live/cities_live.ex:90
 #, elixir-autogen, elixir-format
 msgid "Explore →"
 msgstr ""
 
-#: lib/galicia_local_web/live/cities_live.ex:70
+#: lib/galicia_local_web/live/cities_live.ex:71
 #, elixir-autogen, elixir-format
 msgid "Featured"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:270
+#: lib/galicia_local_web/live/home_live.ex:271
 #, elixir-autogen, elixir-format
 msgid "Find exactly what you need"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:32
+#: lib/galicia_local_web/live/categories_live.ex:33
 #, elixir-autogen, elixir-format
 msgid "Find exactly what you need, from essential expat services to local lifestyle experiences."
 msgstr ""
@@ -604,12 +603,12 @@ msgstr ""
 msgid "Find your business and claim it to start managing your listing."
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:666
+#: lib/galicia_local_web/live/business_live.ex:667
 #, elixir-autogen, elixir-format
 msgid "French"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:306
+#: lib/galicia_local_web/live/home_live.ex:307
 #, elixir-autogen, elixir-format
 msgid "Fresh additions to help you explore"
 msgstr ""
@@ -634,32 +633,32 @@ msgstr ""
 msgid "GaliciaLocal is a passion project created by people who love this beautiful region of northwestern Spain and want to help others discover its charms. We work with locals on the ground to verify information and ensure our listings reflect what you'll actually find when you get there."
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:663
+#: lib/galicia_local_web/live/business_live.ex:664
 #, elixir-autogen, elixir-format
 msgid "Galician"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:166
+#: lib/galicia_local_web/live/home_live.ex:167
 #, elixir-autogen, elixir-format
 msgid "Galician Cities"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:665
+#: lib/galicia_local_web/live/business_live.ex:666
 #, elixir-autogen, elixir-format
 msgid "German"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:528
+#: lib/galicia_local_web/live/business_live.ex:529
 #, elixir-autogen, elixir-format
 msgid "Get Directions"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:435
+#: lib/galicia_local_web/live/home_live.ex:436
 #, elixir-autogen, elixir-format
 msgid "Getting Started"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:369
+#: lib/galicia_local_web/live/business_live.ex:370
 #, elixir-autogen, elixir-format
 msgid "Good to Know"
 msgstr ""
@@ -669,19 +668,19 @@ msgstr ""
 msgid "Have a question, suggestion, or want to add your business? We'd love to hear from you!"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:342
+#: lib/galicia_local_web/live/home_live.ex:343
 #, elixir-autogen, elixir-format
 msgid "Helping newcomers integrate into Galician life"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:352
+#: lib/galicia_local_web/live/business_live.ex:353
 #, elixir-autogen, elixir-format
 msgid "Highlights"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:192
-#: lib/galicia_local_web/live/category_live.ex:231
-#: lib/galicia_local_web/live/city_live.ex:110
+#: lib/galicia_local_web/live/business_live.ex:193
+#: lib/galicia_local_web/live/category_live.ex:232
+#: lib/galicia_local_web/live/city_live.ex:111
 #: lib/galicia_local_web/live/claim_business_live.ex:69
 #, elixir-autogen, elixir-format
 msgid "Home"
@@ -697,7 +696,7 @@ msgstr ""
 msgid "How you want to be known"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:571
+#: lib/galicia_local_web/live/business_live.ex:572
 #, elixir-autogen, elixir-format
 msgid "I have visited this place"
 msgstr ""
@@ -737,7 +736,7 @@ msgstr ""
 msgid "Introduction"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:503
+#: lib/galicia_local_web/live/business_live.ex:504
 #, elixir-autogen, elixir-format
 msgid "Is this your business?"
 msgstr ""
@@ -747,8 +746,8 @@ msgstr ""
 msgid "Job Queue"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:118
-#: lib/galicia_local_web/components/layouts/root.html.heex:186
+#: lib/galicia_local_web/components/layouts/root.html.heex:157
+#: lib/galicia_local_web/components/layouts/root.html.heex:225
 #, elixir-autogen, elixir-format
 msgid "Join Community"
 msgstr ""
@@ -758,7 +757,7 @@ msgstr ""
 msgid "Language Detection"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:463
+#: lib/galicia_local_web/live/business_live.ex:464
 #, elixir-autogen, elixir-format
 msgid "Languages Spoken"
 msgstr ""
@@ -768,39 +767,39 @@ msgstr ""
 msgid "Last updated: January 28, 2026"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:176
+#: lib/galicia_local_web/live/home_live.ex:177
 #, elixir-autogen, elixir-format
 msgid "Learn Galician"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:141
+#: lib/galicia_local_web/live/home_live.ex:142
 #, elixir-autogen, elixir-format
 msgid "Legal Help"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:82
+#: lib/galicia_local_web/live/categories_live.ex:83
 #, elixir-autogen, elixir-format
 msgid "Lifestyle & Culture"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:239
+#: lib/galicia_local_web/live/home_live.ex:240
 #, elixir-autogen, elixir-format
 msgid "Living Like a Galician"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:493
-#: lib/galicia_local_web/live/category_live.ex:322
-#: lib/galicia_local_web/live/cities_live.ex:53
+#: lib/galicia_local_web/live/business_live.ex:494
+#: lib/galicia_local_web/live/category_live.ex:323
+#: lib/galicia_local_web/live/cities_live.ex:54
 #, elixir-autogen, elixir-format
 msgid "Loading map..."
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:158
+#: lib/galicia_local_web/live/home_live.ex:159
 #, elixir-autogen, elixir-format
 msgid "Local Businesses"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:135
+#: lib/galicia_local_web/live/home_live.ex:136
 #: lib/galicia_local_web/live/search_live.ex:239
 #, elixir-autogen, elixir-format
 msgid "Local Gems"
@@ -812,7 +811,7 @@ msgid "Local Insights"
 msgstr ""
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:25
-#: lib/galicia_local_web/live/business_live.ex:482
+#: lib/galicia_local_web/live/business_live.ex:483
 #, elixir-autogen, elixir-format
 msgid "Location"
 msgstr ""
@@ -822,7 +821,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:108
+#: lib/galicia_local_web/live/home_live.ex:109
 #, elixir-autogen, elixir-format
 msgid "Make Galicia Your Home"
 msgstr ""
@@ -872,8 +871,8 @@ msgstr ""
 msgid "Moving to a new country is challenging. Finding a doctor who speaks your language, a lawyer who understands immigration, or simply the best local bakery shouldn't be. We're building the most comprehensive, curated directory of services in Galicia, with a special focus on businesses that welcome international clients."
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:100
-#: lib/galicia_local_web/components/layouts/root.html.heex:165
+#: lib/galicia_local_web/components/layouts/root.html.heex:139
+#: lib/galicia_local_web/components/layouts/root.html.heex:204
 #: lib/galicia_local_web/live/edit_business_live.ex:70
 #: lib/galicia_local_web/live/my_businesses_live.ex:26
 #: lib/galicia_local_web/live/my_businesses_live.ex:38
@@ -881,16 +880,16 @@ msgstr ""
 msgid "My Businesses"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:95
-#: lib/galicia_local_web/components/layouts/root.html.heex:160
+#: lib/galicia_local_web/components/layouts/root.html.heex:134
+#: lib/galicia_local_web/components/layouts/root.html.heex:199
 #: lib/galicia_local_web/live/favorites_live.ex:18
 #: lib/galicia_local_web/live/favorites_live.ex:43
 #, elixir-autogen, elixir-format
 msgid "My Favorites"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:90
-#: lib/galicia_local_web/components/layouts/root.html.heex:155
+#: lib/galicia_local_web/components/layouts/root.html.heex:129
+#: lib/galicia_local_web/components/layouts/root.html.heex:194
 #: lib/galicia_local_web/live/profile_live.ex:28
 #: lib/galicia_local_web/live/profile_live.ex:65
 #, elixir-autogen, elixir-format
@@ -907,18 +906,18 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:290
+#: lib/galicia_local_web/live/category_live.ex:291
 #, elixir-autogen, elixir-format
 msgid "Near me"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:290
+#: lib/galicia_local_web/live/category_live.ex:291
 #, elixir-autogen, elixir-format
 msgid "Near me ✓"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:337
-#: lib/galicia_local_web/live/city_live.ex:174
+#: lib/galicia_local_web/live/category_live.ex:338
+#: lib/galicia_local_web/live/city_live.ex:175
 #, elixir-autogen, elixir-format
 msgid "No businesses found"
 msgstr ""
@@ -943,12 +942,12 @@ msgstr ""
 msgid "No results found"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:403
+#: lib/galicia_local_web/live/home_live.ex:404
 #, elixir-autogen, elixir-format
 msgid "No reviews yet"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:634
+#: lib/galicia_local_web/live/business_live.ex:635
 #, elixir-autogen, elixir-format
 msgid "No reviews yet. Be the first to share your experience!"
 msgstr ""
@@ -963,7 +962,7 @@ msgstr ""
 msgid "Object to processing of your data"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:438
+#: lib/galicia_local_web/live/business_live.ex:439
 #, elixir-autogen, elixir-format
 msgid "Opening Hours"
 msgstr ""
@@ -988,8 +987,8 @@ msgstr ""
 msgid "Originally from %{country}"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:84
-#: lib/galicia_local_web/live/home_live.ex:439
+#: lib/galicia_local_web/live/categories_live.ex:85
+#: lib/galicia_local_web/live/home_live.ex:440
 #, elixir-autogen, elixir-format
 msgid "Other"
 msgstr ""
@@ -1014,34 +1013,34 @@ msgstr ""
 msgid "Phoenix Dashboard"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:400
+#: lib/galicia_local_web/live/business_live.ex:401
 #: lib/galicia_local_web/live/edit_business_live.ex:113
 #, elixir-autogen, elixir-format
 msgid "Phone"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:664
+#: lib/galicia_local_web/live/business_live.ex:665
 #, elixir-autogen, elixir-format
 msgid "Portuguese"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:83
-#: lib/galicia_local_web/live/home_live.ex:438
+#: lib/galicia_local_web/live/categories_live.ex:84
+#: lib/galicia_local_web/live/home_live.ex:439
 #, elixir-autogen, elixir-format
 msgid "Practical Services"
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:89
+#: lib/galicia_local_web/live/categories_live.ex:90
 #, elixir-autogen, elixir-format
 msgid "Practical services for your home and car."
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:42
+#: lib/galicia_local_web/live/categories_live.ex:43
 #, elixir-autogen, elixir-format
 msgid "Priority %{number}"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:347
+#: lib/galicia_local_web/live/home_live.ex:348
 #, elixir-autogen, elixir-format
 msgid "Privacy"
 msgstr ""
@@ -1066,12 +1065,12 @@ msgstr ""
 msgid "Rating"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:549
+#: lib/galicia_local_web/live/business_live.ex:550
 #, elixir-autogen, elixir-format
 msgid "Rating:"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:322
+#: lib/galicia_local_web/live/home_live.ex:323
 #, elixir-autogen, elixir-format
 msgid "Ready to Become Part of Galicia?"
 msgstr ""
@@ -1081,7 +1080,7 @@ msgstr ""
 msgid "Real summaries and highlights distilled from local reviews and experiences."
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:305
+#: lib/galicia_local_web/live/home_live.ex:306
 #, elixir-autogen, elixir-format
 msgid "Recently Added"
 msgstr ""
@@ -1121,7 +1120,7 @@ msgstr ""
 msgid "Respond to your inquiries"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:138
+#: lib/galicia_local_web/live/home_live.ex:139
 #, elixir-autogen, elixir-format
 msgid "Restaurants"
 msgstr ""
@@ -1131,7 +1130,7 @@ msgstr ""
 msgid "Review and approve business ownership claims."
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:178
+#: lib/galicia_local_web/live/business_live.ex:179
 #, elixir-autogen, elixir-format
 msgid "Review deleted"
 msgstr ""
@@ -1141,12 +1140,12 @@ msgstr ""
 msgid "Review ownership claims"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:156
+#: lib/galicia_local_web/live/business_live.ex:157
 #, elixir-autogen, elixir-format
 msgid "Review submitted!"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:217
+#: lib/galicia_local_web/live/business_live.ex:218
 #, elixir-autogen, elixir-format
 msgid "Save"
 msgstr ""
@@ -1161,7 +1160,7 @@ msgstr ""
 msgid "Save Profile"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:217
+#: lib/galicia_local_web/live/business_live.ex:218
 #, elixir-autogen, elixir-format
 msgid "Saved"
 msgstr ""
@@ -1171,9 +1170,9 @@ msgstr ""
 msgid "Scraper"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:54
-#: lib/galicia_local_web/components/layouts/root.html.heex:133
-#: lib/galicia_local_web/live/home_live.ex:126
+#: lib/galicia_local_web/components/layouts/root.html.heex:93
+#: lib/galicia_local_web/components/layouts/root.html.heex:172
+#: lib/galicia_local_web/live/home_live.ex:127
 #: lib/galicia_local_web/live/search_live.ex:18
 #: lib/galicia_local_web/live/search_live.ex:182
 #, elixir-autogen, elixir-format
@@ -1191,7 +1190,7 @@ msgstr ""
 msgid "Search for businesses, services..."
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:121
+#: lib/galicia_local_web/live/home_live.ex:122
 #, elixir-autogen, elixir-format
 msgid "Search for lawyers, restaurants, services..."
 msgstr ""
@@ -1201,7 +1200,7 @@ msgstr ""
 msgid "Select your area..."
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:546
+#: lib/galicia_local_web/live/business_live.ex:547
 #, elixir-autogen, elixir-format
 msgid "Share your experience"
 msgstr ""
@@ -1211,35 +1210,35 @@ msgstr ""
 msgid "Short Summary"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:298
+#: lib/galicia_local_web/live/category_live.ex:299
 #, elixir-autogen, elixir-format
 msgid "Show all"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:117
-#: lib/galicia_local_web/components/layouts/root.html.heex:181
+#: lib/galicia_local_web/components/layouts/root.html.heex:156
+#: lib/galicia_local_web/components/layouts/root.html.heex:220
 #, elixir-autogen, elixir-format
 msgid "Sign In"
 msgstr ""
 
-#: lib/galicia_local_web/components/layouts/root.html.heex:111
-#: lib/galicia_local_web/components/layouts/root.html.heex:175
+#: lib/galicia_local_web/components/layouts/root.html.heex:150
+#: lib/galicia_local_web/components/layouts/root.html.heex:214
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:62
 #, elixir-autogen, elixir-format
 msgid "Sign Out"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:582
+#: lib/galicia_local_web/live/business_live.ex:583
 #, elixir-autogen, elixir-format
 msgid "Sign in"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:324
+#: lib/galicia_local_web/live/home_live.ex:325
 #, elixir-autogen, elixir-format
 msgid "Skip the tourist traps. Find the places locals actually go. Learn the customs that earn respect. Make real connections."
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:241
+#: lib/galicia_local_web/live/home_live.ex:242
 #, elixir-autogen, elixir-format
 msgid "Small things that make a big difference when integrating into local life"
 msgstr ""
@@ -1249,7 +1248,7 @@ msgstr ""
 msgid "Something went wrong!"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:661
+#: lib/galicia_local_web/live/business_live.ex:662
 #, elixir-autogen, elixir-format
 msgid "Spanish"
 msgstr ""
@@ -1274,7 +1273,7 @@ msgstr ""
 msgid "Submit Claim"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:575
+#: lib/galicia_local_web/live/business_live.ex:576
 #, elixir-autogen, elixir-format
 msgid "Submit Review"
 msgstr ""
@@ -1324,8 +1323,8 @@ msgstr ""
 msgid "Total Businesses"
 msgstr ""
 
-#: lib/galicia_local_web/live/category_live.ex:339
-#: lib/galicia_local_web/live/city_live.ex:176
+#: lib/galicia_local_web/live/category_live.ex:340
+#: lib/galicia_local_web/live/city_live.ex:177
 #, elixir-autogen, elixir-format
 msgid "Try adjusting your filters or check back later."
 msgstr ""
@@ -1340,12 +1339,12 @@ msgstr ""
 msgid "Under GDPR, you have the right to:"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:277
+#: lib/galicia_local_web/live/business_live.ex:278
 #, elixir-autogen, elixir-format
 msgid "Ver en español"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:235
+#: lib/galicia_local_web/live/business_live.ex:236
 #, elixir-autogen, elixir-format
 msgid "Verified"
 msgstr ""
@@ -1365,17 +1364,17 @@ msgstr ""
 msgid "View Site"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:200
+#: lib/galicia_local_web/live/home_live.ex:201
 #, elixir-autogen, elixir-format
 msgid "View all cities"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:518
+#: lib/galicia_local_web/live/business_live.ex:519
 #, elixir-autogen, elixir-format
 msgid "View on Google Maps"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:610
+#: lib/galicia_local_web/live/business_live.ex:611
 #: lib/galicia_local_web/live/member_live.ex:95
 #, elixir-autogen, elixir-format
 msgid "Visited"
@@ -1436,13 +1435,13 @@ msgstr ""
 msgid "We'll review your claim and get back to you. Once approved, you'll be able to manage your business listing."
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:424
+#: lib/galicia_local_web/live/business_live.ex:425
 #: lib/galicia_local_web/live/edit_business_live.ex:123
 #, elixir-autogen, elixir-format
 msgid "Website"
 msgstr ""
 
-#: lib/galicia_local_web/live/home_live.ex:106
+#: lib/galicia_local_web/live/home_live.ex:107
 #, elixir-autogen, elixir-format
 msgid "Welcome to Galicia"
 msgstr ""
@@ -1452,7 +1451,7 @@ msgstr ""
 msgid "What Makes Us Different"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:563
+#: lib/galicia_local_web/live/business_live.ex:564
 #, elixir-autogen, elixir-format
 msgid "What was your experience like? Any tips for others?"
 msgstr ""
@@ -1512,12 +1511,12 @@ msgstr ""
 msgid "e.g. Netherlands, UK, Galicia..."
 msgstr ""
 
-#: lib/galicia_local_web/live/categories_live.ex:66
+#: lib/galicia_local_web/live/categories_live.ex:67
 #, elixir-autogen, elixir-format
 msgid "listings"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:582
+#: lib/galicia_local_web/live/business_live.ex:583
 #, elixir-autogen, elixir-format
 msgid "to leave a review"
 msgstr ""
@@ -1662,7 +1661,44 @@ msgstr ""
 msgid "Toast when drinking"
 msgstr ""
 
-#: lib/galicia_local_web/live/business_live.ex:277
+#: lib/galicia_local_web/live/business_live.ex:278
 #, elixir-autogen, elixir-format
 msgid "View in English"
+msgstr ""
+
+#: lib/galicia_local_web/live/categories_live.ex:20
+#, elixir-autogen, elixir-format
+msgid "Browse local businesses in Galicia by category. From restaurants and legal help to healthcare and education – find what you need."
+msgstr ""
+
+#: lib/galicia_local_web/live/cities_live.ex:18
+#, elixir-autogen, elixir-format
+msgid "Cities in Galicia"
+msgstr ""
+
+#: lib/galicia_local_web/live/home_live.ex:68
+#, elixir-autogen, elixir-format
+msgid "Discover %{count}+ local businesses across %{cities} Galician cities. Find restaurants, legal help, services and learn local customs to truly integrate into Galician life."
+msgstr ""
+
+#: lib/galicia_local_web/components/layouts/root.html.heex:14
+#: lib/galicia_local_web/components/layouts/root.html.heex:22
+#: lib/galicia_local_web/components/layouts/root.html.heex:31
+#, elixir-autogen, elixir-format
+msgid "Discover local businesses, learn Galician customs, and truly integrate into your new community. Your guide to making Galicia home."
+msgstr ""
+
+#: lib/galicia_local_web/live/cities_live.ex:19
+#, elixir-autogen, elixir-format
+msgid "Explore all cities in Galicia, Spain. From Vigo and A Coruña to Santiago de Compostela – find local businesses and integrate into Galician life."
+msgstr ""
+
+#: lib/galicia_local_web/live/city_live.ex:32
+#, elixir-autogen, elixir-format
+msgid "Explore local businesses in %{city}, Galicia. Find restaurants, services, and more to help you integrate into local life."
+msgstr ""
+
+#: lib/galicia_local_web/live/category_live.ex:28
+#, elixir-autogen, elixir-format
+msgid "Find the best %{category} in Galicia. Browse local listings with reviews, ratings, and insider tips."
 msgstr ""

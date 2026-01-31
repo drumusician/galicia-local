@@ -28,7 +28,8 @@ defmodule GaliciaLocalWeb.CityLive do
 
         {:ok,
          socket
-         |> assign(:page_title, city.name)
+         |> assign(:page_title, "#{city.name}, #{city.province}")
+         |> assign(:meta_description, city.description || gettext("Explore local businesses in %{city}, Galicia. Find restaurants, services, and more to help you integrate into local life.", city: city.name))
          |> assign(:city, city)
          |> assign(:businesses, businesses)
          |> assign(:categories, categories)

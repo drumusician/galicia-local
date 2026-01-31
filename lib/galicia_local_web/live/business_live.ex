@@ -44,6 +44,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
         {:ok,
          socket
          |> assign(:page_title, business.name)
+         |> assign(:meta_description, business.summary || String.slice(business.description || "", 0, 160))
          |> assign(:business, business)
          |> assign(:reviews, reviews)
          |> assign(:review_form, review_form && to_form(review_form))
