@@ -16,6 +16,7 @@ defmodule GaliciaLocal.Application do
          Application.fetch_env!(:galicia_local, :ash_domains),
          Application.fetch_env!(:galicia_local, Oban)
        )},
+      GaliciaLocal.Scraper.ApiCache,
       {Phoenix.PubSub, name: GaliciaLocal.PubSub},
       # Start a worker by calling: GaliciaLocal.Worker.start_link(arg)
       # {GaliciaLocal.Worker, arg},

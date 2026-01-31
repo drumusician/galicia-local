@@ -8,6 +8,8 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
 
   require Logger
 
+  alias GaliciaLocal.Scraper.ApiCache
+
   @base_url "https://places.googleapis.com/v1"
 
   @doc """
@@ -29,7 +31,7 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
         {:ok, mock_search_results(query, opts)}
 
       key ->
-        do_search(query, key, opts)
+        ApiCache.get_or_fetch({:search, query, opts}, fn -> do_search(query, key, opts) end)
     end
   end
 
@@ -43,7 +45,7 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
         {:error, :no_api_key}
 
       key ->
-        do_get_place_details(place_id, key)
+        ApiCache.get_or_fetch({:details, place_id}, fn -> do_get_place_details(place_id, key) end)
     end
   end
 
@@ -296,7 +298,7 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
         {:ok, mock_city_result(city_name)}
 
       key ->
-        do_lookup_city(city_name, key)
+        ApiCache.get_or_fetch({:city_lookup, city_name}, fn -> do_lookup_city(city_name, key) end)
     end
   end
 
