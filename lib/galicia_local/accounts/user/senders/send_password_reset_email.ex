@@ -9,23 +9,28 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendPasswordResetEmail do
   import Swoosh.Email
 
   alias GaliciaLocal.Mailer
+  alias GaliciaLocal.Mailer.EmailLayout
 
   @impl true
   def send(user, token, _) do
     new()
     |> from({"GaliciaLocal", "support@galicialocal.com"})
     |> to(to_string(user.email))
-    |> subject("Reset your password")
+    |> subject("Reset your GaliciaLocal password")
     |> html_body(body(token: token))
     |> Mailer.deliver!()
   end
 
   defp body(params) do
-    url = url(~p"/password-reset/#{params[:token]}")
+    link_url = url(~p"/password-reset/#{params[:token]}")
 
-    """
-    <p>Click this link to reset your password:</p>
-    <p><a href="#{url}">#{url}</a></p>
-    """
+    content =
+      EmailLayout.paragraph("We received a request to reset your password.") <>
+        EmailLayout.paragraph("Click the button below to choose a new password.") <>
+        EmailLayout.button(link_url, "Reset Password") <>
+        EmailLayout.paragraph("If you didn't request a password reset, you can safely ignore this email. Your password won't change.") <>
+        EmailLayout.fallback_link(link_url)
+
+    EmailLayout.wrap(content)
   end
 end

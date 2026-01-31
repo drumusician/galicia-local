@@ -8,12 +8,10 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendMagicLinkEmail do
 
   import Swoosh.Email
   alias GaliciaLocal.Mailer
+  alias GaliciaLocal.Mailer.EmailLayout
 
   @impl true
   def send(user_or_email, token, _) do
-    # if you get a user, its for a user that already exists.
-    # if you get an email, then the user does not yet exist.
-
     email =
       case user_or_email do
         %{email: email} -> email
@@ -23,17 +21,20 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendMagicLinkEmail do
     new()
     |> from({"GaliciaLocal", "support@galicialocal.com"})
     |> to(to_string(email))
-    |> subject("Your login link")
+    |> subject("Your sign-in link for GaliciaLocal")
     |> html_body(body(token: token, email: email))
     |> Mailer.deliver!()
   end
 
   defp body(params) do
-    # NOTE: You may have to change this to match your magic link acceptance URL.
+    link_url = url(~p"/magic_link/#{params[:token]}")
 
-    """
-    <p>Hello, #{params[:email]}! Click this link to sign in:</p>
-    <p><a href="#{url(~p"/magic_link/#{params[:token]}")}">#{url(~p"/magic_link/#{params[:token]}")}</a></p>
-    """
+    content =
+      EmailLayout.paragraph("Hello! Click the button below to sign in to GaliciaLocal.") <>
+        EmailLayout.button(link_url, "Sign In") <>
+        EmailLayout.paragraph("This link will expire in 10 minutes. If you didn't request this, you can safely ignore this email.") <>
+        EmailLayout.fallback_link(link_url)
+
+    EmailLayout.wrap(content)
   end
 end
