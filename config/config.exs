@@ -87,7 +87,7 @@ config :spark,
 config :galicia_local,
   ecto_repos: [GaliciaLocal.Repo],
   generators: [timestamp_type: :utc_datetime],
-  ash_domains: [GaliciaLocal.Accounts, GaliciaLocal.Directory, GaliciaLocal.Community],
+  ash_domains: [GaliciaLocal.Accounts, GaliciaLocal.Directory, GaliciaLocal.Community, GaliciaLocal.Analytics],
   ash_authentication: [return_error_on_invalid_magic_link_token?: true]
 
 # Configure the endpoint

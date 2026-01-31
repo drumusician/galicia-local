@@ -5,13 +5,17 @@ defmodule GaliciaLocalWeb.BusinessLive do
   use GaliciaLocalWeb, :live_view
 
   alias GaliciaLocal.Directory.Business
-  alias GaliciaLocal.Community.Review
+  alias GaliciaLocal.Community.{Review, Favorite}
+  alias GaliciaLocal.Analytics.Tracker
+
+  require Ash.Query
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     case Business.get_by_id(id) do
       {:ok, business} ->
         business = Ash.load!(business, [:city, :category])
+        if connected?(socket), do: Tracker.track_async("business", business.id)
         current_user = socket.assigns[:current_user]
 
         reviews =
@@ -28,6 +32,15 @@ defmodule GaliciaLocalWeb.BusinessLive do
             )
           end
 
+        is_favorited =
+          if current_user do
+            Favorite
+            |> Ash.Query.filter(user_id == ^current_user.id and business_id == ^business.id)
+            |> Ash.exists?()
+          else
+            false
+          end
+
         {:ok,
          socket
          |> assign(:page_title, business.name)
@@ -35,7 +48,8 @@ defmodule GaliciaLocalWeb.BusinessLive do
          |> assign(:reviews, reviews)
          |> assign(:review_form, review_form && to_form(review_form))
          |> assign(:review_rating, 5)
-         |> assign(:lightbox_index, nil)}
+         |> assign(:lightbox_index, nil)
+         |> assign(:is_favorited, is_favorited)}
 
       {:error, _} ->
         {:ok,
@@ -80,6 +94,28 @@ defmodule GaliciaLocalWeb.BusinessLive do
     count = length(socket.assigns.business.photo_urls || [])
     idx = rem(socket.assigns.lightbox_index + 1, count)
     {:noreply, assign(socket, :lightbox_index, idx)}
+  end
+
+  def handle_event("toggle_favorite", _params, socket) do
+    current_user = socket.assigns.current_user
+    business = socket.assigns.business
+
+    if socket.assigns.is_favorited do
+      # Remove favorite
+      Favorite
+      |> Ash.Query.filter(user_id == ^current_user.id and business_id == ^business.id)
+      |> Ash.read_one!()
+      |> Ash.destroy!(actor: current_user)
+
+      {:noreply, assign(socket, :is_favorited, false)}
+    else
+      # Add favorite
+      Favorite
+      |> Ash.Changeset.for_create(:create, %{business_id: business.id}, actor: current_user)
+      |> Ash.create!()
+
+      {:noreply, assign(socket, :is_favorited, true)}
+    end
   end
 
   def handle_event("set_rating", %{"rating" => rating}, socket) do
@@ -171,7 +207,16 @@ defmodule GaliciaLocalWeb.BusinessLive do
                   {@business.category.name} · {@business.city.name}
                 </p>
               </div>
-              <div class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2 items-center">
+                <%= if @current_user do %>
+                  <button
+                    phx-click="toggle_favorite"
+                    class={"btn btn-ghost btn-sm gap-1 #{if @is_favorited, do: "text-error", else: "text-base-content/40 hover:text-error"}"}
+                  >
+                    <span class={if @is_favorited, do: "hero-heart-solid w-5 h-5", else: "hero-heart w-5 h-5"}></span>
+                    <%= if @is_favorited, do: "Saved", else: "Save" %>
+                  </button>
+                <% end %>
                 <%= if @business.speaks_english do %>
                   <div class="badge badge-success badge-lg gap-1">
                     <span class="hero-language w-4 h-4"></span>

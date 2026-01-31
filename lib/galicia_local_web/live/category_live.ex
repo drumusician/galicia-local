@@ -5,12 +5,14 @@ defmodule GaliciaLocalWeb.CategoryLive do
   use GaliciaLocalWeb, :live_view
 
   alias GaliciaLocal.Directory.{Category, Business, City}
+  alias GaliciaLocal.Analytics.Tracker
 
   @impl true
   def mount(%{"slug" => slug}, _session, socket) do
     case Category.get_by_slug(slug) do
       {:ok, category} ->
         category = Ash.load!(category, [:business_count])
+        if connected?(socket), do: Tracker.track_async("category", category.id)
 
         businesses =
           Business.by_category!(category.id)

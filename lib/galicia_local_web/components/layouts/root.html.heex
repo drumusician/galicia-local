@@ -83,6 +83,11 @@
                       <span class="hero-user-circle w-4 h-4"></span> My Profile
                     </a>
                   </li>
+                  <li>
+                    <a href="/favorites">
+                      <span class="hero-heart w-4 h-4"></span> My Favorites
+                    </a>
+                  </li>
                   <%= if assigns[:current_user].is_admin do %>
                     <li>
                       <a href="/admin"><span class="hero-cog-6-tooth w-4 h-4"></span> Admin</a>
@@ -126,6 +131,11 @@
                   <li>
                     <a href="/profile">
                       <span class="hero-user-circle w-4 h-4"></span> My Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/favorites">
+                      <span class="hero-heart w-4 h-4"></span> My Favorites
                     </a>
                   </li>
                   <%= if assigns[:current_user].is_admin do %>

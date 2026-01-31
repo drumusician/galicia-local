@@ -169,6 +169,21 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
             </div>
           </.link>
 
+          <!-- Analytics -->
+          <.link navigate={~p"/admin/analytics"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <div class="card-body">
+              <div class="flex items-center gap-4">
+                <div class="bg-success/10 rounded-xl p-3">
+                  <span class="hero-chart-bar w-8 h-8 text-success"></span>
+                </div>
+                <div>
+                  <h3 class="card-title">Analytics</h3>
+                  <p class="text-sm text-base-content/70">Page views and traffic</p>
+                </div>
+              </div>
+            </div>
+          </.link>
+
           <!-- Oban Dashboard -->
           <a href="/admin/oban" target="_blank" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
             <div class="card-body">

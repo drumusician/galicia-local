@@ -4,5 +4,6 @@ defmodule GaliciaLocal.Community do
 
   resources do
     resource GaliciaLocal.Community.Review
+    resource GaliciaLocal.Community.Favorite
   end
 end
