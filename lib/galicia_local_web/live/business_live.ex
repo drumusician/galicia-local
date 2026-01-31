@@ -223,6 +223,12 @@ defmodule GaliciaLocalWeb.BusinessLive do
                     English Spoken
                   </div>
                 <% end %>
+                <%= if @business.owner_id do %>
+                  <div class="badge badge-primary badge-lg gap-1">
+                    <span class="hero-shield-check w-4 h-4"></span>
+                    Claimed
+                  </div>
+                <% end %>
                 <%= if @business.status == :verified do %>
                   <div class="badge badge-primary badge-lg gap-1">
                     <span class="hero-check-badge w-4 h-4"></span>
@@ -482,6 +488,21 @@ defmodule GaliciaLocalWeb.BusinessLive do
                   <span class="hero-map w-12 h-12 mb-2"></span>
                   <p>Loading map...</p>
                 </div>
+              </div>
+            <% end %>
+
+            <!-- Claim Business -->
+            <%= if is_nil(@business.owner_id) and @current_user do %>
+              <div class="divider"></div>
+              <div class="flex items-center justify-between bg-base-200 rounded-lg p-4">
+                <div>
+                  <p class="font-medium">Is this your business?</p>
+                  <p class="text-sm text-base-content/60">Claim it to update your information and manage your listing.</p>
+                </div>
+                <.link navigate={~p"/businesses/#{@business.id}/claim"} class="btn btn-outline btn-sm gap-1">
+                  <span class="hero-shield-check w-4 h-4"></span>
+                  Claim
+                </.link>
               </div>
             <% end %>
 

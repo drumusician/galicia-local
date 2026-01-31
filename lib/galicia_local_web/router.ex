@@ -46,6 +46,9 @@ defmodule GaliciaLocalWeb.Router do
       on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_required}] do
       live "/profile", ProfileLive, :edit
       live "/favorites", FavoritesLive, :index
+      live "/businesses/:id/claim", ClaimBusinessLive, :new
+      live "/my-businesses", MyBusinessesLive, :index
+      live "/my-businesses/:id/edit", EditBusinessLive, :edit
     end
 
     ash_authentication_live_session :admin_routes,
@@ -57,6 +60,7 @@ defmodule GaliciaLocalWeb.Router do
       live "/admin/cities", Admin.CitiesLive, :index
       live "/admin/categories", Admin.CategoriesLive, :index
       live "/admin/analytics", Admin.AnalyticsLive, :index
+      live "/admin/claims", Admin.ClaimsLive, :index
     end
 
     # Static pages

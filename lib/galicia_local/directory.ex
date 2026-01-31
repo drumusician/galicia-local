@@ -7,5 +7,6 @@ defmodule GaliciaLocal.Directory do
     resource GaliciaLocal.Directory.Category
     resource GaliciaLocal.Directory.Business
     resource GaliciaLocal.Directory.ScrapeJob
+    resource GaliciaLocal.Directory.BusinessClaim
   end
 end

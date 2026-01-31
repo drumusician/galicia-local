@@ -134,6 +134,24 @@ defmodule GaliciaLocal.Directory.Business do
       filter expr(status in [:enriched, :verified])
       prepare build(sort: [inserted_at: :desc], limit: 6)
     end
+
+    update :owner_update do
+      accept [
+        :name, :description, :description_es, :summary,
+        :address, :phone, :email, :website,
+        :opening_hours, :photo_urls
+      ]
+    end
+
+    update :set_owner do
+      accept [:owner_id, :claimed_at]
+    end
+
+    read :owned_by do
+      argument :owner_id, :uuid, allow_nil?: false
+      filter expr(owner_id == ^arg(:owner_id))
+      prepare build(sort: [name: :asc])
+    end
   end
 
   attributes do
@@ -334,6 +352,10 @@ defmodule GaliciaLocal.Directory.Business do
       public? true
     end
 
+    attribute :claimed_at, :utc_datetime do
+      public? true
+    end
+
     create_timestamp :inserted_at
     update_timestamp :updated_at
   end
@@ -345,6 +367,10 @@ defmodule GaliciaLocal.Directory.Business do
 
     belongs_to :category, GaliciaLocal.Directory.Category do
       allow_nil? false
+    end
+
+    belongs_to :owner, GaliciaLocal.Accounts.User do
+      attribute_writable? true
     end
   end
 
