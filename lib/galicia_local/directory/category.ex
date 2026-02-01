@@ -26,12 +26,14 @@ defmodule GaliciaLocal.Directory.Category do
 
     create :create do
       primary? true
-      accept [:name, :name_es, :slug, :description, :description_es, :icon, :priority, :parent_id]
+      accept [:name, :name_es, :slug, :description, :description_es, :icon, :priority, :parent_id,
+              :search_translation, :search_queries, :enrichment_hints]
     end
 
     update :update do
       primary? true
-      accept [:name, :name_es, :slug, :description, :description_es, :icon, :priority, :parent_id]
+      accept [:name, :name_es, :slug, :description, :description_es, :icon, :priority, :parent_id,
+              :search_translation, :search_queries, :enrichment_hints]
     end
 
     read :get_by_id do
@@ -91,6 +93,22 @@ defmodule GaliciaLocal.Directory.Category do
       default 4
       public? true
       description "1=Expat Essentials, 2=Daily Life, 3=Lifestyle, 4=Practical"
+    end
+
+    attribute :search_translation, :string do
+      public? true
+      description "Base Spanish search term for Google Places (e.g. 'abogados')"
+    end
+
+    attribute :search_queries, {:array, :string} do
+      public? true
+      default []
+      description "Google Places search queries. Each is searched separately with city name appended."
+    end
+
+    attribute :enrichment_hints, :string do
+      public? true
+      description "Extra instructions for AI when analyzing businesses in this category"
     end
 
     create_timestamp :inserted_at

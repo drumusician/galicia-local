@@ -89,6 +89,7 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
     reviews_text = extract_reviews_text(business)
     category_name = get_category_name(business)
     city_name = get_city_name(business)
+    enrichment_hints = get_enrichment_hints(business)
     website_content = format_website_research(research_data.website)
     search_content = format_search_research(research_data.search)
 
@@ -119,6 +120,7 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
     #{reviews_text}
     #{website_content}
     #{search_content}
+    #{enrichment_hints}
 
     ## ANALYSIS - Provide JSON with these fields:
 
@@ -316,6 +318,20 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
     case business.city do
       %{name: name} -> name
       _ -> "Unknown"
+    end
+  end
+
+  defp get_enrichment_hints(business) do
+    case business.category do
+      %{enrichment_hints: hints} when is_binary(hints) and hints != "" ->
+        """
+
+        ## CATEGORY-SPECIFIC ANALYSIS INSTRUCTIONS
+        #{hints}
+        """
+
+      _ ->
+        ""
     end
   end
 

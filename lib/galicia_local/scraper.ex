@@ -217,15 +217,21 @@ defmodule GaliciaLocal.Scraper do
       {:ok, job} = Scraper.search_google_places(city, category)
   """
   def search_google_places(%City{} = city, %Category{} = category) do
-    sub_queries = Map.get(@category_sub_queries, category.slug, [])
-
+    # Prefer DB-configured queries, fall back to hardcoded, then single translation
     queries =
-      if sub_queries == [] do
-        # Fallback: single query with Spanish translation
-        category_es = Map.get(@category_translations, category.slug, category.name_es || category.slug)
-        ["#{category_es} #{city.name}"]
-      else
-        Enum.map(sub_queries, fn sq -> "#{sq} #{city.name}" end)
+      cond do
+        category.search_queries != nil and category.search_queries != [] ->
+          Enum.map(category.search_queries, fn sq -> "#{sq} #{city.name}" end)
+
+        Map.has_key?(@category_sub_queries, category.slug) ->
+          Enum.map(@category_sub_queries[category.slug], fn sq -> "#{sq} #{city.name}" end)
+
+        true ->
+          category_es =
+            category.search_translation ||
+              Map.get(@category_translations, category.slug, category.name_es || category.slug)
+
+          ["#{category_es} #{city.name}"]
       end
 
     Logger.info("Queuing #{length(queries)} Google Places searches for #{category.name} in #{city.name}")
