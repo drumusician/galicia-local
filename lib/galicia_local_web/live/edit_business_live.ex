@@ -85,17 +85,11 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
       hours ->
         parsed =
           Enum.reduce(@days, %{}, fn day, acc ->
-            day_data = hours[day] || %{}
-            if day_data["closed"] == "true" do
-              Map.put(acc, day, %{"closed" => true})
-            else
-              open = day_data["open"]
-              close = day_data["close"]
-              if open in [nil, ""] and close in [nil, ""] do
-                acc
-              else
-                Map.put(acc, day, %{"open" => open || "", "close" => close || ""})
-              end
+            case hours[day] do
+              nil -> acc
+              "" -> acc
+              val when is_binary(val) -> Map.put(acc, day, String.trim(val))
+              _ -> acc
             end
           end)
         Map.put(params, "opening_hours", parsed)
@@ -106,17 +100,12 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
   defp format_array(list) when is_list(list), do: Enum.join(list, "\n")
   defp format_array(_), do: ""
 
-  defp get_hours(business, day, field) do
+  defp get_day_hours(business, day) do
     case business.opening_hours do
-      %{^day => %{^field => val}} -> val
+      %{^day => val} when is_binary(val) -> val
+      %{^day => %{"closed" => true}} -> "Closed"
+      %{^day => %{"open" => open, "close" => close}} -> "#{open} - #{close}"
       _ -> ""
-    end
-  end
-
-  defp day_closed?(business, day) do
-    case business.opening_hours do
-      %{^day => %{"closed" => true}} -> true
-      _ -> false
     end
   end
 
@@ -222,28 +211,12 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
                   <div class="flex items-center gap-3">
                     <span class="w-24 text-sm font-medium">{day_label(day)}</span>
                     <input
-                      type="time"
-                      name={"business[opening_hours][#{day}][open]"}
-                      value={get_hours(@business, day, "open")}
-                      class="input input-bordered input-sm w-32"
+                      type="text"
+                      name={"business[opening_hours][#{day}]"}
+                      value={get_day_hours(@business, day)}
+                      class="input input-bordered input-sm flex-1"
+                      placeholder={gettext("e.g. 9:00 AM – 1:30 PM")}
                     />
-                    <span class="text-base-content/50">—</span>
-                    <input
-                      type="time"
-                      name={"business[opening_hours][#{day}][close]"}
-                      value={get_hours(@business, day, "close")}
-                      class="input input-bordered input-sm w-32"
-                    />
-                    <label class="label cursor-pointer gap-2">
-                      <input
-                        type="checkbox"
-                        name={"business[opening_hours][#{day}][closed]"}
-                        value="true"
-                        checked={day_closed?(@business, day)}
-                        class="checkbox checkbox-sm"
-                      />
-                      <span class="label-text text-sm">{gettext("Closed")}</span>
-                    </label>
                   </div>
                 <% end %>
               </div>
