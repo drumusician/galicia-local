@@ -71,6 +71,11 @@
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
+    <script async src="https://plausible.io/js/pa-OLTbFTeLXvDDzlhKCLpdM.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
   </head>
   <body>
     <%= unless String.starts_with?(@conn.request_path, "/admin") do %>
