@@ -67,6 +67,8 @@ defmodule GaliciaLocal.Directory.Business do
     define :create
     define :enrich_with_llm
     define :translate_to_spanish
+    define :update
+    define :destroy
     define :english_speaking
     define :recent
   end

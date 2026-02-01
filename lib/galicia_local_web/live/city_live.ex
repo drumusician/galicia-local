@@ -235,9 +235,9 @@ defmodule GaliciaLocalWeb.CityLive do
           </div>
 
           <%= if length(@business.highlights || []) > 0 do %>
-            <div class="flex flex-wrap gap-1 mt-2">
+            <div class="bg-base-200 rounded-lg px-3 py-2 mt-3 space-y-0.5">
               <%= for highlight <- Enum.take(@business.highlights, 2) do %>
-                <span class="badge badge-ghost badge-xs">{highlight}</span>
+                <p class="text-xs text-base-content/60">{highlight}</p>
               <% end %>
             </div>
           <% end %>

@@ -1,28 +1,209 @@
 defmodule GaliciaLocalWeb.Admin.BusinessesLive do
   @moduledoc """
   Admin interface for managing business listings.
+  Supports pagination, filtering, search, and CRUD operations.
   """
   use GaliciaLocalWeb, :live_view
 
-  alias GaliciaLocal.Directory.Business
-  alias GaliciaLocalWeb.Layouts
+  alias GaliciaLocal.Directory.{Business, City, Category}
+
+  require Ash.Query
+
+  @per_page 25
 
   @impl true
   def mount(_params, _session, socket) do
-    businesses = Business.list!()
-                 |> Ash.load!([:city, :category])
-                 |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
+    cities = City.list!() |> Enum.sort_by(& &1.name)
+    categories = Category.list!() |> Enum.sort_by(& &1.name)
 
     {:ok,
      socket
      |> assign(:page_title, "Manage Businesses")
-     |> assign(:businesses, businesses)
-     |> assign(:filter, "all")}
+     |> assign(:cities, cities)
+     |> assign(:categories, categories)
+     |> assign(:filter_status, "all")
+     |> assign(:filter_city, nil)
+     |> assign(:filter_category, nil)
+     |> assign(:search_query, "")
+     |> assign(:current_page, 1)
+     |> assign(:creating, false)
+     |> assign(:editing, nil)
+     |> load_page()}
+  end
+
+  defp load_page(socket) do
+    offset = (socket.assigns.current_page - 1) * @per_page
+
+    page =
+      Business
+      |> Ash.Query.sort(inserted_at: :desc)
+      |> maybe_filter_status(socket.assigns.filter_status)
+      |> maybe_filter_city(socket.assigns.filter_city)
+      |> maybe_filter_category(socket.assigns.filter_category)
+      |> maybe_search(socket.assigns.search_query)
+      |> Ash.Query.load([:city, :category])
+      |> Ash.read!(page: [limit: @per_page, offset: offset, count: true])
+
+    assign(socket, :page, page)
+  end
+
+  defp maybe_filter_status(query, "all"), do: query
+  defp maybe_filter_status(query, "pending"), do: Ash.Query.filter(query, status == :pending)
+  defp maybe_filter_status(query, "researching"), do: Ash.Query.filter(query, status == :researching)
+  defp maybe_filter_status(query, "researched"), do: Ash.Query.filter(query, status == :researched)
+  defp maybe_filter_status(query, "enriched"), do: Ash.Query.filter(query, status == :enriched)
+  defp maybe_filter_status(query, "verified"), do: Ash.Query.filter(query, status == :verified)
+  defp maybe_filter_status(query, "rejected"), do: Ash.Query.filter(query, status == :rejected)
+  defp maybe_filter_status(query, _), do: query
+
+  defp maybe_filter_city(query, nil), do: query
+  defp maybe_filter_city(query, ""), do: query
+
+  defp maybe_filter_city(query, city_id) do
+    Ash.Query.filter(query, city_id == ^city_id)
+  end
+
+  defp maybe_filter_category(query, nil), do: query
+  defp maybe_filter_category(query, ""), do: query
+
+  defp maybe_filter_category(query, category_id) do
+    Ash.Query.filter(query, category_id == ^category_id)
+  end
+
+  defp maybe_search(query, ""), do: query
+  defp maybe_search(query, nil), do: query
+
+  defp maybe_search(query, search) do
+    Ash.Query.filter(query, contains(name, ^search))
+  end
+
+  # Events
+
+  @impl true
+  def handle_event("search", %{"search" => query}, socket) do
+    {:noreply,
+     socket
+     |> assign(:search_query, query)
+     |> assign(:current_page, 1)
+     |> load_page()}
   end
 
   @impl true
   def handle_event("filter", %{"status" => status}, socket) do
-    {:noreply, assign(socket, :filter, status)}
+    {:noreply,
+     socket
+     |> assign(:filter_status, status)
+     |> assign(:current_page, 1)
+     |> load_page()}
+  end
+
+  @impl true
+  def handle_event("filter_city", %{"city" => city_id}, socket) do
+    {:noreply,
+     socket
+     |> assign(:filter_city, city_id)
+     |> assign(:current_page, 1)
+     |> load_page()}
+  end
+
+  @impl true
+  def handle_event("filter_category", %{"category" => category_id}, socket) do
+    {:noreply,
+     socket
+     |> assign(:filter_category, category_id)
+     |> assign(:current_page, 1)
+     |> load_page()}
+  end
+
+  @impl true
+  def handle_event("page", %{"page" => page}, socket) do
+    {:noreply,
+     socket
+     |> assign(:current_page, String.to_integer(page))
+     |> load_page()}
+  end
+
+  @impl true
+  def handle_event("new", _params, socket) do
+    {:noreply, assign(socket, :creating, true)}
+  end
+
+  @impl true
+  def handle_event("edit", %{"id" => id}, socket) do
+    case Business.get_by_id(id) do
+      {:ok, business} ->
+        business = Ash.load!(business, [:city, :category])
+        {:noreply, assign(socket, :editing, business)}
+
+      _ ->
+        {:noreply, put_flash(socket, :error, "Business not found")}
+    end
+  end
+
+  @impl true
+  def handle_event("cancel", _params, socket) do
+    {:noreply, socket |> assign(:creating, false) |> assign(:editing, nil)}
+  end
+
+  @impl true
+  def handle_event("create_business", %{"business" => params}, socket) do
+    params = Map.put(params, "status", "pending")
+
+    params =
+      if params["slug"] in [nil, ""] do
+        Map.put(params, "slug", Slug.slugify(params["name"] || ""))
+      else
+        params
+      end
+
+    case Business.create(params) do
+      {:ok, business} ->
+        {:noreply,
+         socket
+         |> assign(:creating, false)
+         |> put_flash(:info, "#{business.name} created successfully")
+         |> load_page()}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Failed to create business")}
+    end
+  end
+
+  @impl true
+  def handle_event("save_business", %{"business" => params}, socket) do
+    business = socket.assigns.editing
+
+    case Ash.update(business, params) do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> assign(:editing, nil)
+         |> put_flash(:info, "Business updated successfully")
+         |> load_page()}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Failed to update business")}
+    end
+  end
+
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    case Business.get_by_id(id) do
+      {:ok, business} ->
+        case Ash.destroy(business) do
+          :ok ->
+            {:noreply,
+             socket
+             |> put_flash(:info, "#{business.name} deleted")
+             |> load_page()}
+
+          {:error, _} ->
+            {:noreply, put_flash(socket, :error, "Failed to delete business")}
+        end
+
+      _ ->
+        {:noreply, put_flash(socket, :error, "Business not found")}
+    end
   end
 
   @impl true
@@ -34,10 +215,10 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
             {:noreply,
              socket
              |> put_flash(:info, "#{business.name} enriched successfully")
-             |> reload_businesses()}
+             |> load_page()}
 
           {:error, _} ->
-            {:noreply, put_flash(socket, :error, "Failed to start enrichment")}
+            {:noreply, put_flash(socket, :error, "Failed to enrich business")}
         end
 
       _ ->
@@ -45,24 +226,35 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
     end
   end
 
-  defp reload_businesses(socket) do
-    businesses = Business.list!()
-                 |> Ash.load!([:city, :category])
-                 |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
+  # Helpers
 
-    assign(socket, :businesses, businesses)
+  defp total_pages(page) do
+    case page.count do
+      nil -> 1
+      0 -> 1
+      count -> ceil(count / @per_page)
+    end
   end
 
-  defp filtered_businesses(businesses, "all"), do: businesses
-  defp filtered_businesses(businesses, status) do
-    status_atom = String.to_existing_atom(status)
-    Enum.filter(businesses, &(&1.status == status_atom))
+  defp page_range(current, total) do
+    cond do
+      total <= 7 -> 1..total
+      current <= 4 -> 1..min(7, total)
+      current >= total - 3 -> max(1, total - 6)..total
+      true -> (current - 3)..(current + 3)
+    end
+    |> Enum.to_list()
+  end
+
+  defp showing_range(page, current_page) do
+    start = (current_page - 1) * @per_page + 1
+    finish = start + length(page.results) - 1
+    {start, finish}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.flash_group flash={@flash} />
     <div class="min-h-screen bg-base-200">
       <header class="bg-base-100 border-b border-base-300 sticky top-0 z-50">
         <div class="container mx-auto px-6 py-4">
@@ -73,40 +265,85 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
               </.link>
               <h1 class="text-2xl font-bold">Manage Businesses</h1>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm text-base-content/70">{length(@businesses)} total</span>
-            </div>
+            <button type="button" phx-click="new" class="btn btn-primary btn-sm">
+              <span class="hero-plus w-4 h-4"></span>
+              Add Business
+            </button>
           </div>
         </div>
       </header>
 
       <main class="container mx-auto px-6 py-8">
+        <!-- Search -->
+        <div class="mb-4">
+          <form phx-change="search" phx-submit="search">
+            <input
+              type="text"
+              name="search"
+              value={@search_query}
+              placeholder="Search businesses by name..."
+              class="input input-bordered w-full max-w-md"
+              phx-debounce="300"
+            />
+          </form>
+        </div>
+
         <!-- Filters -->
-        <div class="flex gap-2 mb-6">
-          <button
-            type="button"
-            phx-click="filter"
-            phx-value-status="all"
-            class={["btn btn-sm", if(@filter == "all", do: "btn-primary", else: "btn-ghost")]}
-          >
-            All ({length(@businesses)})
-          </button>
-          <button
-            type="button"
-            phx-click="filter"
-            phx-value-status="pending"
-            class={["btn btn-sm", if(@filter == "pending", do: "btn-warning", else: "btn-ghost")]}
-          >
-            Pending ({Enum.count(@businesses, &(&1.status == :pending))})
-          </button>
-          <button
-            type="button"
-            phx-click="filter"
-            phx-value-status="enriched"
-            class={["btn btn-sm", if(@filter == "enriched", do: "btn-success", else: "btn-ghost")]}
-          >
-            Enriched ({Enum.count(@businesses, &(&1.status == :enriched))})
-          </button>
+        <div class="flex flex-wrap items-center gap-4 mb-6">
+          <div class="flex gap-1">
+            <button
+              type="button" phx-click="filter" phx-value-status="all"
+              class={["btn btn-sm", if(@filter_status == "all", do: "btn-primary", else: "btn-ghost")]}
+            >
+              All
+            </button>
+            <button
+              type="button" phx-click="filter" phx-value-status="pending"
+              class={["btn btn-sm", if(@filter_status == "pending", do: "btn-warning", else: "btn-ghost")]}
+            >
+              Pending
+            </button>
+            <button
+              type="button" phx-click="filter" phx-value-status="enriched"
+              class={["btn btn-sm", if(@filter_status == "enriched", do: "btn-success", else: "btn-ghost")]}
+            >
+              Enriched
+            </button>
+            <button
+              type="button" phx-click="filter" phx-value-status="verified"
+              class={["btn btn-sm", if(@filter_status == "verified", do: "btn-info", else: "btn-ghost")]}
+            >
+              Verified
+            </button>
+            <button
+              type="button" phx-click="filter" phx-value-status="rejected"
+              class={["btn btn-sm", if(@filter_status == "rejected", do: "btn-error", else: "btn-ghost")]}
+            >
+              Rejected
+            </button>
+          </div>
+
+          <form phx-change="filter_city">
+            <select name="city" class="select select-bordered select-sm">
+              <option value="">All cities</option>
+              <%= for city <- @cities do %>
+                <option value={city.id} selected={@filter_city == city.id}>{city.name}</option>
+              <% end %>
+            </select>
+          </form>
+
+          <form phx-change="filter_category">
+            <select name="category" class="select select-bordered select-sm">
+              <option value="">All categories</option>
+              <%= for cat <- @categories do %>
+                <option value={cat.id} selected={@filter_category == cat.id}>{cat.name}</option>
+              <% end %>
+            </select>
+          </form>
+
+          <%= if @page.count do %>
+            <span class="text-sm text-base-content/60 ml-auto">{@page.count} results</span>
+          <% end %>
         </div>
 
         <!-- Business Table -->
@@ -127,11 +364,11 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                   </tr>
                 </thead>
                 <tbody>
-                  <%= for business <- filtered_businesses(@businesses, @filter) do %>
+                  <%= for business <- @page.results do %>
                     <tr>
                       <td class="font-medium max-w-48 truncate">{business.name}</td>
-                      <td>{business.city && business.city.name}</td>
-                      <td>{business.category && business.category.name}</td>
+                      <td class="text-sm">{business.city && business.city.name}</td>
+                      <td class="text-sm">{business.category && business.category.name}</td>
                       <td>
                         <span class={["badge badge-sm", status_class(business.status)]}>
                           {business.status}
@@ -141,7 +378,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                         <%= if business.rating do %>
                           <span class="text-warning">★</span> {Decimal.round(business.rating, 1)}
                         <% else %>
-                          -
+                          <span class="text-base-content/30">-</span>
                         <% end %>
                       </td>
                       <td>
@@ -159,18 +396,38 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                           <.link navigate={~p"/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
                             View
                           </.link>
+                          <button type="button" phx-click="edit" phx-value-id={business.id} class="btn btn-ghost btn-xs">
+                            Edit
+                          </button>
                           <%= if business.status == :pending do %>
                             <button
                               type="button"
                               phx-click="enrich"
                               phx-value-id={business.id}
-                              phx-disable-with="Enriching..."
+                              phx-disable-with="..."
                               class="btn btn-primary btn-xs"
                             >
                               Enrich
                             </button>
                           <% end %>
+                          <button
+                            type="button"
+                            phx-click="delete"
+                            phx-value-id={business.id}
+                            data-confirm="Delete this business? This cannot be undone."
+                            class="btn btn-ghost btn-xs text-error"
+                          >
+                            <span class="hero-trash w-3.5 h-3.5"></span>
+                          </button>
                         </div>
+                      </td>
+                    </tr>
+                  <% end %>
+
+                  <%= if @page.results == [] do %>
+                    <tr>
+                      <td colspan="8" class="text-center py-12 text-base-content/50">
+                        No businesses found matching your filters.
                       </td>
                     </tr>
                   <% end %>
@@ -179,6 +436,179 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
             </div>
           </div>
         </div>
+
+        <!-- Pagination -->
+        <% total = total_pages(@page) %>
+        <%= if total > 1 do %>
+          <% {range_start, range_end} = showing_range(@page, @current_page) %>
+          <div class="flex items-center justify-between mt-6">
+            <span class="text-sm text-base-content/60">
+              Showing {range_start}-{range_end} of {@page.count}
+            </span>
+            <div class="join">
+              <button
+                type="button"
+                phx-click="page"
+                phx-value-page={@current_page - 1}
+                class="join-item btn btn-sm"
+                disabled={@current_page == 1}
+              >
+                «
+              </button>
+              <%= for p <- page_range(@current_page, total) do %>
+                <button
+                  type="button"
+                  phx-click="page"
+                  phx-value-page={p}
+                  class={["join-item btn btn-sm", if(p == @current_page, do: "btn-active")]}
+                >
+                  {p}
+                </button>
+              <% end %>
+              <button
+                type="button"
+                phx-click="page"
+                phx-value-page={@current_page + 1}
+                class="join-item btn btn-sm"
+                disabled={@current_page == total}
+              >
+                »
+              </button>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Create Modal -->
+        <%= if @creating do %>
+          <div class="modal modal-open">
+            <div class="modal-box max-w-2xl">
+              <button type="button" phx-click="cancel" class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+              <h3 class="font-bold text-lg mb-6">Add Business</h3>
+              <form phx-submit="create_business" class="space-y-4">
+                <div class="form-control">
+                  <label class="label"><span class="label-text font-medium">Name <span class="text-error">*</span></span></label>
+                  <input type="text" name="business[name]" class="input input-bordered w-full" required />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">City <span class="text-error">*</span></span></label>
+                    <select name="business[city_id]" class="select select-bordered w-full" required>
+                      <option value="">Select city...</option>
+                      <%= for city <- @cities do %>
+                        <option value={city.id}>{city.name}</option>
+                      <% end %>
+                    </select>
+                  </div>
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">Category <span class="text-error">*</span></span></label>
+                    <select name="business[category_id]" class="select select-bordered w-full" required>
+                      <option value="">Select category...</option>
+                      <%= for cat <- @categories do %>
+                        <option value={cat.id}>{cat.name}</option>
+                      <% end %>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-control">
+                  <label class="label"><span class="label-text font-medium">Address</span></label>
+                  <input type="text" name="business[address]" class="input input-bordered w-full" />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">Phone</span></label>
+                    <input type="text" name="business[phone]" class="input input-bordered w-full" placeholder="+34 ..." />
+                  </div>
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">Website</span></label>
+                    <input type="url" name="business[website]" class="input input-bordered w-full" placeholder="https://..." />
+                  </div>
+                </div>
+
+                <p class="text-sm text-base-content/50">
+                  The business will be created with "pending" status. You can then enrich it with AI.
+                </p>
+
+                <div class="modal-action">
+                  <button type="button" phx-click="cancel" class="btn btn-ghost">Cancel</button>
+                  <button type="submit" class="btn btn-primary">Create Business</button>
+                </div>
+              </form>
+            </div>
+            <div class="modal-backdrop" phx-click="cancel"></div>
+          </div>
+        <% end %>
+
+        <!-- Edit Modal -->
+        <%= if @editing do %>
+          <div class="modal modal-open">
+            <div class="modal-box max-w-2xl">
+              <button type="button" phx-click="cancel" class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
+              <h3 class="font-bold text-lg mb-6">Edit {@editing.name}</h3>
+              <form phx-submit="save_business" class="space-y-4">
+                <div class="form-control">
+                  <label class="label"><span class="label-text font-medium">Name</span></label>
+                  <input type="text" name="business[name]" value={@editing.name} class="input input-bordered w-full" />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">City</span></label>
+                    <select name="business[city_id]" class="select select-bordered w-full">
+                      <%= for city <- @cities do %>
+                        <option value={city.id} selected={@editing.city_id == city.id}>{city.name}</option>
+                      <% end %>
+                    </select>
+                  </div>
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">Category</span></label>
+                    <select name="business[category_id]" class="select select-bordered w-full">
+                      <%= for cat <- @categories do %>
+                        <option value={cat.id} selected={@editing.category_id == cat.id}>{cat.name}</option>
+                      <% end %>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-control">
+                  <label class="label"><span class="label-text font-medium">Address</span></label>
+                  <input type="text" name="business[address]" value={@editing.address} class="input input-bordered w-full" />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">Phone</span></label>
+                    <input type="text" name="business[phone]" value={@editing.phone} class="input input-bordered w-full" />
+                  </div>
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">Website</span></label>
+                    <input type="url" name="business[website]" value={@editing.website} class="input input-bordered w-full" />
+                  </div>
+                </div>
+
+                <div class="form-control">
+                  <label class="label"><span class="label-text font-medium">Status</span></label>
+                  <select name="business[status]" class="select select-bordered w-full">
+                    <option value="pending" selected={@editing.status == :pending}>Pending</option>
+                    <option value="researching" selected={@editing.status == :researching}>Researching</option>
+                    <option value="researched" selected={@editing.status == :researched}>Researched</option>
+                    <option value="enriched" selected={@editing.status == :enriched}>Enriched</option>
+                    <option value="verified" selected={@editing.status == :verified}>Verified</option>
+                    <option value="rejected" selected={@editing.status == :rejected}>Rejected</option>
+                  </select>
+                </div>
+
+                <div class="modal-action">
+                  <button type="button" phx-click="cancel" class="btn btn-ghost">Cancel</button>
+                  <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+              </form>
+            </div>
+            <div class="modal-backdrop" phx-click="cancel"></div>
+          </div>
+        <% end %>
       </main>
     </div>
     """
