@@ -396,9 +396,9 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                           <.link navigate={~p"/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
                             View
                           </.link>
-                          <button type="button" phx-click="edit" phx-value-id={business.id} class="btn btn-ghost btn-xs">
+                          <.link navigate={~p"/admin/businesses/#{business.id}/edit"} class="btn btn-ghost btn-xs">
                             Edit
-                          </button>
+                          </.link>
                           <%= if business.status == :pending do %>
                             <button
                               type="button"

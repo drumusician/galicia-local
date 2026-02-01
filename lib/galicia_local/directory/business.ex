@@ -163,9 +163,10 @@ defmodule GaliciaLocal.Directory.Business do
 
     update :owner_update do
       accept [
-        :name, :description, :description_es, :summary,
+        :name, :description, :description_es, :summary, :summary_es,
         :address, :phone, :email, :website,
-        :opening_hours, :photo_urls
+        :opening_hours, :photo_urls,
+        :highlights, :highlights_es, :service_specialties
       ]
     end
 

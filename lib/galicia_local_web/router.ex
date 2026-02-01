@@ -59,6 +59,7 @@ defmodule GaliciaLocalWeb.Router do
       live "/admin", Admin.DashboardLive, :index
       live "/admin/scraper", Admin.ScraperLive, :index
       live "/admin/businesses", Admin.BusinessesLive, :index
+      live "/admin/businesses/:id/edit", Admin.EditBusinessLive
       live "/admin/cities", Admin.CitiesLive, :index
       live "/admin/categories", Admin.CategoriesLive, :index
       live "/admin/analytics", Admin.AnalyticsLive, :index

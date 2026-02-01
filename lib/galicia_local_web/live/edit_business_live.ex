@@ -48,6 +48,9 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
   end
 
   def handle_event("save", %{"business" => params}, socket) do
+    params = parse_array_fields(params)
+    params = parse_opening_hours(params)
+
     case AshPhoenix.Form.submit(socket.assigns.form.source, params: params) do
       {:ok, business} ->
         {:noreply,
@@ -60,8 +63,68 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
     end
   end
 
+  @days ~w(monday tuesday wednesday thursday friday saturday sunday)
+
+  defp parse_array_fields(params) do
+    ~w(highlights highlights_es service_specialties photo_urls)
+    |> Enum.reduce(params, fn key, acc ->
+      case acc[key] do
+        nil -> acc
+        "" -> Map.put(acc, key, [])
+        text when is_binary(text) ->
+          items = text |> String.split("\n") |> Enum.map(&String.trim/1) |> Enum.reject(&(&1 == ""))
+          Map.put(acc, key, items)
+        _ -> acc
+      end
+    end)
+  end
+
+  defp parse_opening_hours(params) do
+    case params["opening_hours"] do
+      nil -> params
+      hours ->
+        parsed =
+          Enum.reduce(@days, %{}, fn day, acc ->
+            day_data = hours[day] || %{}
+            if day_data["closed"] == "true" do
+              Map.put(acc, day, %{"closed" => true})
+            else
+              open = day_data["open"]
+              close = day_data["close"]
+              if open in [nil, ""] and close in [nil, ""] do
+                acc
+              else
+                Map.put(acc, day, %{"open" => open || "", "close" => close || ""})
+              end
+            end
+          end)
+        Map.put(params, "opening_hours", parsed)
+    end
+  end
+
+  defp format_array(nil), do: ""
+  defp format_array(list) when is_list(list), do: Enum.join(list, "\n")
+  defp format_array(_), do: ""
+
+  defp get_hours(business, day, field) do
+    case business.opening_hours do
+      %{^day => %{^field => val}} -> val
+      _ -> ""
+    end
+  end
+
+  defp day_closed?(business, day) do
+    case business.opening_hours do
+      %{^day => %{"closed" => true}} -> true
+      _ -> false
+    end
+  end
+
+  defp day_label(day), do: String.capitalize(day)
+
   @impl true
   def render(assigns) do
+    assigns = assign(assigns, :days, @days)
     ~H"""
     <div class="min-h-screen bg-base-200">
       <div class="container mx-auto max-w-3xl px-4 py-8">
@@ -124,6 +187,82 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
                   <input type="url" name={@form[:website].name} value={@form[:website].value} class="input input-bordered w-full" />
                 </fieldset>
               </div>
+
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">{gettext("Short Summary (Spanish)")}</legend>
+                <input type="text" name={@form[:summary_es].name} value={@form[:summary_es].value} class="input input-bordered w-full" />
+              </fieldset>
+
+              <div class="divider">{gettext("Highlights & Specialties")}</div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">{gettext("Highlights (English)")}</legend>
+                  <textarea name="business[highlights]" class="textarea textarea-bordered w-full font-mono text-sm" rows="4">{format_array(@business.highlights)}</textarea>
+                  <p class="fieldset-label">{gettext("One per line")}</p>
+                </fieldset>
+
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">{gettext("Highlights (Spanish)")}</legend>
+                  <textarea name="business[highlights_es]" class="textarea textarea-bordered w-full font-mono text-sm" rows="4">{format_array(@business.highlights_es)}</textarea>
+                  <p class="fieldset-label">{gettext("One per line")}</p>
+                </fieldset>
+              </div>
+
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">{gettext("Service Specialties")}</legend>
+                <textarea name="business[service_specialties]" class="textarea textarea-bordered w-full font-mono text-sm" rows="3">{format_array(@business.service_specialties)}</textarea>
+                <p class="fieldset-label">{gettext("One per line")}</p>
+              </fieldset>
+
+              <div class="divider">{gettext("Opening Hours")}</div>
+
+              <div class="space-y-2">
+                <%= for day <- @days do %>
+                  <div class="flex items-center gap-3">
+                    <span class="w-24 text-sm font-medium">{day_label(day)}</span>
+                    <input
+                      type="time"
+                      name={"business[opening_hours][#{day}][open]"}
+                      value={get_hours(@business, day, "open")}
+                      class="input input-bordered input-sm w-32"
+                    />
+                    <span class="text-base-content/50">—</span>
+                    <input
+                      type="time"
+                      name={"business[opening_hours][#{day}][close]"}
+                      value={get_hours(@business, day, "close")}
+                      class="input input-bordered input-sm w-32"
+                    />
+                    <label class="label cursor-pointer gap-2">
+                      <input
+                        type="checkbox"
+                        name={"business[opening_hours][#{day}][closed]"}
+                        value="true"
+                        checked={day_closed?(@business, day)}
+                        class="checkbox checkbox-sm"
+                      />
+                      <span class="label-text text-sm">{gettext("Closed")}</span>
+                    </label>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="divider">{gettext("Photos")}</div>
+
+              <%= if @business.photo_urls && @business.photo_urls != [] do %>
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <%= for url <- Enum.take(@business.photo_urls, 6) do %>
+                    <img src={url} class="w-20 h-20 object-cover rounded-lg" />
+                  <% end %>
+                </div>
+              <% end %>
+
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">{gettext("Photo URLs")}</legend>
+                <textarea name="business[photo_urls]" class="textarea textarea-bordered w-full font-mono text-xs" rows="4">{format_array(@business.photo_urls)}</textarea>
+                <p class="fieldset-label">{gettext("One URL per line")}</p>
+              </fieldset>
 
               <div class="card-actions justify-end mt-6">
                 <.link navigate={~p"/my-businesses"} class="btn btn-ghost">{gettext("Cancel")}</.link>
