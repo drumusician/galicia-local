@@ -202,6 +202,21 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
             </div>
           </.link>
 
+          <!-- Users -->
+          <.link navigate={~p"/admin/users"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <div class="card-body">
+              <div class="flex items-center gap-4">
+                <div class="bg-error/10 rounded-xl p-3">
+                  <span class="hero-users w-8 h-8 text-error"></span>
+                </div>
+                <div>
+                  <h3 class="card-title">{gettext("Users")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("View and manage users")}</p>
+                </div>
+              </div>
+            </div>
+          </.link>
+
           <!-- Oban Dashboard -->
           <a href="/admin/oban" target="_blank" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
             <div class="card-body">

@@ -64,6 +64,7 @@ defmodule GaliciaLocalWeb.Router do
       live "/admin/categories", Admin.CategoriesLive, :index
       live "/admin/analytics", Admin.AnalyticsLive, :index
       live "/admin/claims", Admin.ClaimsLive, :index
+      live "/admin/users", Admin.UsersLive, :index
     end
 
     # Locale switching

@@ -63,10 +63,16 @@ defmodule GaliciaLocal.Accounts.User do
 
   code_interface do
     define :get_by_id, args: [:id]
+    define :list, action: :read
+    define :admin_update
   end
 
   actions do
     defaults [:read]
+
+    update :admin_update do
+      accept [:is_admin]
+    end
 
     read :get_by_id do
       argument :id, :uuid, allow_nil?: false
