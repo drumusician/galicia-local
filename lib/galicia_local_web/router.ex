@@ -50,6 +50,7 @@ defmodule GaliciaLocalWeb.Router do
       live "/businesses/:id/claim", ClaimBusinessLive, :new
       live "/my-businesses", MyBusinessesLive, :index
       live "/my-businesses/:id/edit", EditBusinessLive, :edit
+      live "/recommend", RecommendBusinessLive, :new
     end
 
     ash_authentication_live_session :admin_routes,

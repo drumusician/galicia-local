@@ -98,6 +98,9 @@
             <a href="/categories" class="btn btn-ghost btn-sm gap-1">
               <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
             </a>
+            <a href="/recommend" class="btn btn-ghost btn-sm gap-1">
+              <span class="hero-plus-circle w-4 h-4"></span> {gettext("Recommend")}
+            </a>
             <form method="post" action="/locale" class="flex items-center">
               <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
               <input type="hidden" name="locale" value={if assigns[:locale] == "es", do: "en", else: "es"} />
@@ -175,6 +178,11 @@
                 <li>
                   <a href="/categories">
                     <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
+                  </a>
+                </li>
+                <li>
+                  <a href="/recommend">
+                    <span class="hero-plus-circle w-4 h-4"></span> {gettext("Recommend a Place")}
                   </a>
                 </li>
                 <li>

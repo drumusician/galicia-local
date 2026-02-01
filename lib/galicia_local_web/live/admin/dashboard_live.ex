@@ -6,10 +6,11 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
   use GaliciaLocalWeb, :live_view
 
   alias GaliciaLocal.Directory.{City, Category, Business}
+  alias GaliciaLocal.Community.Suggestion
 
   @impl true
   def mount(_params, _session, socket) do
-    stats = load_stats()
+    stats = load_stats(socket.assigns.current_user)
 
     {:ok,
      socket
@@ -17,10 +18,11 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
      |> assign(:stats, stats)}
   end
 
-  defp load_stats do
+  defp load_stats(actor) do
     businesses = Business.list!()
     cities = City.list!()
     categories = Category.list!()
+    pending_suggestions = Suggestion.list_pending!(actor: actor)
 
     %{
       total_businesses: length(businesses),
@@ -31,7 +33,8 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
       total_categories: length(categories),
       recent_businesses: businesses
                          |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
-                         |> Enum.take(5)
+                         |> Enum.take(5),
+      pending_suggestions: pending_suggestions
     }
   end
 
@@ -292,6 +295,49 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
               <div class="text-center py-8 text-base-content/50">
                 <span class="hero-inbox w-12 h-12 mx-auto mb-2"></span>
                 <p>{gettext("No businesses yet. Start by importing some from the Scraper.")}</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <!-- Pending Suggestions -->
+        <div class="card bg-base-100 shadow-xl mt-6">
+          <div class="card-body">
+            <h2 class="card-title">
+              <span class="hero-light-bulb w-6 h-6"></span>
+              {gettext("Pending Suggestions")}
+              <%= if length(@stats.pending_suggestions) > 0 do %>
+                <span class="badge badge-warning">{length(@stats.pending_suggestions)}</span>
+              <% end %>
+            </h2>
+
+            <%= if length(@stats.pending_suggestions) > 0 do %>
+              <div class="overflow-x-auto">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>{gettext("Business Name")}</th>
+                      <th>{gettext("City")}</th>
+                      <th>{gettext("Reason")}</th>
+                      <th>{gettext("Submitted")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <%= for suggestion <- @stats.pending_suggestions do %>
+                      <tr>
+                        <td class="font-medium">{suggestion.business_name}</td>
+                        <td class="text-sm">{suggestion.city_name}</td>
+                        <td class="text-sm max-w-xs truncate">{suggestion.reason || "-"}</td>
+                        <td class="text-sm text-base-content/60">
+                          {Calendar.strftime(suggestion.inserted_at, "%b %d, %H:%M")}
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="text-center py-8 text-base-content/50">
+                <p>{gettext("No pending suggestions.")}</p>
               </div>
             <% end %>
           </div>
