@@ -72,12 +72,14 @@ defmodule GaliciaLocalWeb.Admin.AnalyticsLive do
           </div>
           <div class="flex items-center gap-2">
             <span class="text-sm text-base-content/60">Period:</span>
-            <select phx-change="change_period" name="days" class="select select-bordered select-sm">
-              <option value="7" selected={@days == 7}>Last 7 days</option>
-              <option value="30" selected={@days == 30}>Last 30 days</option>
-              <option value="90" selected={@days == 90}>Last 90 days</option>
-              <option value="365" selected={@days == 365}>Last year</option>
-            </select>
+            <form phx-change="change_period">
+              <select name="days" class="select select-bordered select-sm">
+                <option value="7" selected={@days == 7}>Last 7 days</option>
+                <option value="30" selected={@days == 30}>Last 30 days</option>
+                <option value="90" selected={@days == 90}>Last 90 days</option>
+                <option value="365" selected={@days == 365}>Last year</option>
+              </select>
+            </form>
           </div>
         </div>
 
