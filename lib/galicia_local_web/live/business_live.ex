@@ -478,6 +478,21 @@ defmodule GaliciaLocalWeb.BusinessLive do
               </div>
             <% end %>
 
+            <!-- Languages Taught (for language schools) -->
+            <%= if length(@business.languages_taught || []) > 0 do %>
+              <div class="mt-6">
+                <h3 class="font-semibold mb-3 flex items-center gap-2">
+                  <span class="hero-academic-cap w-5 h-5 text-primary"></span>
+                  {gettext("Languages Taught")}
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                  <%= for lang <- @business.languages_taught do %>
+                    <span class="badge badge-primary badge-outline">{lang}</span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+
             <!-- Map Placeholder -->
             <%= if @business.latitude && @business.longitude do %>
               <div class="divider">{gettext("Location")}</div>

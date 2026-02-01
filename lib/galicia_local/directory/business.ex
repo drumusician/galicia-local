@@ -84,7 +84,7 @@ defmodule GaliciaLocal.Directory.Business do
         :opening_hours, :highlights, :highlights_es, :warnings, :warnings_es,
         :newcomer_friendly_score, :local_gem_score, :integration_tips, :integration_tips_es,
         :cultural_notes, :cultural_notes_es,
-        :expat_friendly_score, :expat_tips, :service_specialties, :sentiment_summary, :review_insights,
+        :expat_friendly_score, :expat_tips, :service_specialties, :languages_taught, :sentiment_summary, :review_insights,
         :status, :source, :raw_data, :quality_score, :photo_urls,
         :city_id, :category_id
       ]
@@ -100,7 +100,7 @@ defmodule GaliciaLocal.Directory.Business do
         :opening_hours, :highlights, :highlights_es, :warnings, :warnings_es,
         :newcomer_friendly_score, :local_gem_score, :integration_tips, :integration_tips_es,
         :cultural_notes, :cultural_notes_es,
-        :expat_friendly_score, :expat_tips, :service_specialties, :sentiment_summary, :review_insights,
+        :expat_friendly_score, :expat_tips, :service_specialties, :languages_taught, :sentiment_summary, :review_insights,
         :status, :source, :raw_data, :quality_score, :photo_urls,
         :city_id, :category_id, :last_enriched_at
       ]
@@ -350,6 +350,12 @@ defmodule GaliciaLocal.Directory.Business do
       public? true
       default []
       description "Specific services mentioned in reviews"
+    end
+
+    attribute :languages_taught, {:array, :string} do
+      public? true
+      default []
+      description "Languages taught (for language schools only)"
     end
 
     attribute :sentiment_summary, :string do

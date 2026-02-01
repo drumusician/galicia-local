@@ -57,7 +57,7 @@ defmodule GaliciaLocal.Scraper do
     "bakeries" => "panaderias",
     "butchers" => "carnicerias",
     "markets" => "mercados",
-    "language-schools" => "academias idiomas"
+    "language-schools" => "escuela español para extranjeros"
   }
 
   # Sub-queries per category to get more comprehensive results
@@ -80,7 +80,7 @@ defmodule GaliciaLocal.Scraper do
     "bakeries" => ["panaderías", "panadería", "horno de pan"],
     "butchers" => ["carnicerías", "carnicería"],
     "markets" => ["mercados", "mercado municipal", "mercado de abastos"],
-    "language-schools" => ["academias idiomas", "escuela idiomas", "clases inglés"],
+    "language-schools" => ["academia español extranjeros", "clases español", "escuela gallego", "cursos idiomas español", "escuela oficial idiomas"],
     "cider-houses" => ["sidrerías", "sidrería"]
   }
 

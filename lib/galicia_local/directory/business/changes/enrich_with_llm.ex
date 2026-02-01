@@ -138,6 +138,10 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
       "speaks_english_confidence": 0.0-1.0,
       "languages_spoken": ["es", "gl", "en", etc.],
 
+      "languages_taught": ["Spanish", "Galician", "English", etc.],
+      // ONLY for language schools/academies. What languages does this school TEACH?
+      // For non-language-school businesses, return an empty array [].
+
       "integration_tips": [
         "Tip to help newcomers connect with locals (e.g., 'Ask about the local pulpo - owners love sharing')",
         "Practical tip that respects local customs (e.g., 'Lunch is 2-4pm, don't arrive at noon')"
@@ -349,6 +353,7 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
           expat_tips: data["integration_tips"] || [],
           # Standard fields
           service_specialties: data["service_specialties"] || [],
+          languages_taught: data["languages_taught"] || [],
           highlights: data["highlights"] || [],
           warnings: data["warnings"] || [],
           sentiment_summary: data["sentiment_summary"],
