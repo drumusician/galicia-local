@@ -18,7 +18,7 @@ defmodule GaliciaLocalWeb.Admin.UsersLive do
 
   defp load_users do
     User.list!()
-    |> Ash.load!([:city])
+    |> Ash.load!([:city, :favorite_count])
     |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
   end
 
@@ -75,8 +75,9 @@ defmodule GaliciaLocalWeb.Admin.UsersLive do
                   <tr>
                     <th>User</th>
                     <th>Location</th>
+                    <th>Favorites</th>
                     <th>Joined</th>
-                    <th>Admin</th>
+                    <th>Status</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -95,13 +96,27 @@ defmodule GaliciaLocalWeb.Admin.UsersLive do
                           <span class="text-base-content/50">· {user.origin_country}</span>
                         <% end %>
                       </td>
+                      <td>
+                        <%= if user.favorite_count > 0 do %>
+                          <span class="badge badge-ghost badge-sm">{user.favorite_count}</span>
+                        <% else %>
+                          <span class="text-base-content/30">—</span>
+                        <% end %>
+                      </td>
                       <td class="text-sm text-base-content/60">
                         {Calendar.strftime(user.inserted_at, "%b %d, %Y")}
                       </td>
                       <td>
-                        <%= if user.is_admin do %>
-                          <span class="badge badge-primary badge-sm">Admin</span>
-                        <% end %>
+                        <div class="flex gap-1">
+                          <%= if user.is_admin do %>
+                            <span class="badge badge-primary badge-sm">Admin</span>
+                          <% end %>
+                          <%= if user.confirmed_at do %>
+                            <span class="badge badge-success badge-sm">Confirmed</span>
+                          <% else %>
+                            <span class="badge badge-warning badge-sm">Unconfirmed</span>
+                          <% end %>
+                        </div>
                       </td>
                       <td>
                         <%= if user.id != @current_user.id do %>

@@ -10,12 +10,12 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    stats = load_stats(socket.assigns.current_user)
+    actor = socket.assigns.current_user
 
     {:ok,
      socket
      |> assign(:page_title, gettext("Admin Dashboard"))
-     |> assign(:stats, stats)}
+     |> assign_async(:stats, fn -> {:ok, %{stats: load_stats(actor)}} end)}
   end
 
   defp load_stats(actor) do
@@ -71,43 +71,57 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
 
       <main class="container mx-auto px-6 py-8">
         <!-- Stats Overview -->
-        <div class="stats stats-vertical lg:stats-horizontal shadow w-full mb-8">
-          <div class="stat">
-            <div class="stat-figure text-primary">
-              <span class="hero-building-storefront w-8 h-8"></span>
+        <.async_result :let={stats} assign={@stats}>
+          <:loading>
+            <div class="stats stats-vertical lg:stats-horizontal shadow w-full mb-8 animate-pulse">
+              <div class="stat"><div class="stat-title">Loading...</div></div>
+              <div class="stat"><div class="stat-title">Loading...</div></div>
+              <div class="stat"><div class="stat-title">Loading...</div></div>
+              <div class="stat"><div class="stat-title">Loading...</div></div>
             </div>
-            <div class="stat-title">{gettext("Total Businesses")}</div>
-            <div class="stat-value text-primary">{@stats.total_businesses}</div>
-            <div class="stat-desc">{ngettext("%{count} enriched", "%{count} enriched", @stats.enriched)}</div>
-          </div>
+          </:loading>
+          <:failed :let={_reason}>
+            <div class="alert alert-error mb-8">Failed to load dashboard stats.</div>
+          </:failed>
 
-          <div class="stat">
-            <div class="stat-figure text-warning">
-              <span class="hero-clock w-8 h-8"></span>
+          <div class="stats stats-vertical lg:stats-horizontal shadow w-full mb-8">
+            <div class="stat">
+              <div class="stat-figure text-primary">
+                <span class="hero-building-storefront w-8 h-8"></span>
+              </div>
+              <div class="stat-title">{gettext("Total Businesses")}</div>
+              <div class="stat-value text-primary">{stats.total_businesses}</div>
+              <div class="stat-desc">{ngettext("%{count} enriched", "%{count} enriched", stats.enriched)}</div>
             </div>
-            <div class="stat-title">{gettext("Pending Enrichment")}</div>
-            <div class="stat-value text-warning">{@stats.pending_enrichment}</div>
-            <div class="stat-desc">{gettext("Awaiting LLM processing")}</div>
-          </div>
 
-          <div class="stat">
-            <div class="stat-figure text-success">
-              <span class="hero-language w-8 h-8"></span>
+            <div class="stat">
+              <div class="stat-figure text-warning">
+                <span class="hero-clock w-8 h-8"></span>
+              </div>
+              <div class="stat-title">{gettext("Pending Enrichment")}</div>
+              <div class="stat-value text-warning">{stats.pending_enrichment}</div>
+              <div class="stat-desc">{gettext("Awaiting LLM processing")}</div>
             </div>
-            <div class="stat-title">{gettext("English Speaking")}</div>
-            <div class="stat-value text-success">{@stats.english_speaking}</div>
-            <div class="stat-desc">{gettext("Detected from reviews")}</div>
-          </div>
 
-          <div class="stat">
-            <div class="stat-figure text-secondary">
-              <span class="hero-map-pin w-8 h-8"></span>
+            <div class="stat">
+              <div class="stat-figure text-success">
+                <span class="hero-language w-8 h-8"></span>
+              </div>
+              <div class="stat-title">{gettext("English Speaking")}</div>
+              <div class="stat-value text-success">{stats.english_speaking}</div>
+              <div class="stat-desc">{gettext("Detected from reviews")}</div>
             </div>
-            <div class="stat-title">{gettext("Cities")}</div>
-            <div class="stat-value text-secondary">{@stats.total_cities}</div>
-            <div class="stat-desc">{ngettext("%{count} category", "%{count} categories", @stats.total_categories)}</div>
+
+            <div class="stat">
+              <div class="stat-figure text-secondary">
+                <span class="hero-map-pin w-8 h-8"></span>
+              </div>
+              <div class="stat-title">{gettext("Cities")}</div>
+              <div class="stat-value text-secondary">{stats.total_cities}</div>
+              <div class="stat-desc">{ngettext("%{count} category", "%{count} categories", stats.total_categories)}</div>
+            </div>
           </div>
-        </div>
+        </.async_result>
 
         <!-- Admin Navigation Cards -->
         <h2 class="text-xl font-bold mb-4">{gettext("Admin Tools")}</h2>
@@ -254,109 +268,118 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
           </a>
         </div>
 
-        <!-- Recent Businesses -->
-        <div class="card bg-base-100 shadow-xl">
-          <div class="card-body">
-            <h2 class="card-title">
-              <span class="hero-clock w-6 h-6"></span>
-              {gettext("Recently Added Businesses")}
-            </h2>
+        <.async_result :let={stats} assign={@stats}>
+          <:loading>
+            <div class="card bg-base-100 shadow-xl animate-pulse">
+              <div class="card-body"><div class="h-32"></div></div>
+            </div>
+          </:loading>
+          <:failed :let={_reason}></:failed>
 
-            <%= if length(@stats.recent_businesses) > 0 do %>
-              <div class="overflow-x-auto">
-                <table class="table table-sm">
-                  <thead>
-                    <tr>
-                      <th>{gettext("Name")}</th>
-                      <th>{gettext("Status")}</th>
-                      <th>{gettext("Rating")}</th>
-                      <th>{gettext("Added")}</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <%= for business <- @stats.recent_businesses do %>
+          <!-- Recent Businesses -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title">
+                <span class="hero-clock w-6 h-6"></span>
+                {gettext("Recently Added Businesses")}
+              </h2>
+
+              <%= if length(stats.recent_businesses) > 0 do %>
+                <div class="overflow-x-auto">
+                  <table class="table table-sm">
+                    <thead>
                       <tr>
-                        <td class="font-medium">{business.name}</td>
-                        <td>
-                          <span class={["badge badge-sm", status_badge_class(business.status)]}>
-                            {business.status}
-                          </span>
-                        </td>
-                        <td>
-                          <%= if business.rating do %>
-                            <div class="flex items-center gap-1">
-                              <span class="text-warning">★</span>
-                              {Decimal.round(business.rating, 1)}
-                            </div>
-                          <% else %>
-                            <span class="text-base-content/50">-</span>
-                          <% end %>
-                        </td>
-                        <td class="text-sm text-base-content/60">
-                          {Calendar.strftime(business.inserted_at, "%b %d, %H:%M")}
-                        </td>
-                        <td>
-                          <.link navigate={~p"/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
-                            {gettext("View")}
-                          </.link>
-                        </td>
+                        <th>{gettext("Name")}</th>
+                        <th>{gettext("Status")}</th>
+                        <th>{gettext("Rating")}</th>
+                        <th>{gettext("Added")}</th>
+                        <th></th>
                       </tr>
-                    <% end %>
-                  </tbody>
-                </table>
-              </div>
-            <% else %>
-              <div class="text-center py-8 text-base-content/50">
-                <span class="hero-inbox w-12 h-12 mx-auto mb-2"></span>
-                <p>{gettext("No businesses yet. Start by importing some from the Scraper.")}</p>
-              </div>
-            <% end %>
-          </div>
-        </div>
-        <!-- Pending Suggestions -->
-        <div class="card bg-base-100 shadow-xl mt-6">
-          <div class="card-body">
-            <h2 class="card-title">
-              <span class="hero-light-bulb w-6 h-6"></span>
-              {gettext("Pending Suggestions")}
-              <%= if length(@stats.pending_suggestions) > 0 do %>
-                <span class="badge badge-warning">{length(@stats.pending_suggestions)}</span>
+                    </thead>
+                    <tbody>
+                      <%= for business <- stats.recent_businesses do %>
+                        <tr>
+                          <td class="font-medium">{business.name}</td>
+                          <td>
+                            <span class={["badge badge-sm", status_badge_class(business.status)]}>
+                              {business.status}
+                            </span>
+                          </td>
+                          <td>
+                            <%= if business.rating do %>
+                              <div class="flex items-center gap-1">
+                                <span class="text-warning">★</span>
+                                {Decimal.round(business.rating, 1)}
+                              </div>
+                            <% else %>
+                              <span class="text-base-content/50">-</span>
+                            <% end %>
+                          </td>
+                          <td class="text-sm text-base-content/60">
+                            {Calendar.strftime(business.inserted_at, "%b %d, %H:%M")}
+                          </td>
+                          <td>
+                            <.link navigate={~p"/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
+                              {gettext("View")}
+                            </.link>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <div class="text-center py-8 text-base-content/50">
+                  <span class="hero-inbox w-12 h-12 mx-auto mb-2"></span>
+                  <p>{gettext("No businesses yet. Start by importing some from the Scraper.")}</p>
+                </div>
               <% end %>
-            </h2>
-
-            <%= if length(@stats.pending_suggestions) > 0 do %>
-              <div class="overflow-x-auto">
-                <table class="table table-sm">
-                  <thead>
-                    <tr>
-                      <th>{gettext("Business Name")}</th>
-                      <th>{gettext("City")}</th>
-                      <th>{gettext("Reason")}</th>
-                      <th>{gettext("Submitted")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <%= for suggestion <- @stats.pending_suggestions do %>
-                      <tr>
-                        <td class="font-medium">{suggestion.business_name}</td>
-                        <td class="text-sm">{suggestion.city_name}</td>
-                        <td class="text-sm max-w-xs truncate">{suggestion.reason || "-"}</td>
-                        <td class="text-sm text-base-content/60">
-                          {Calendar.strftime(suggestion.inserted_at, "%b %d, %H:%M")}
-                        </td>
-                      </tr>
-                    <% end %>
-                  </tbody>
-                </table>
-              </div>
-            <% else %>
-              <div class="text-center py-8 text-base-content/50">
-                <p>{gettext("No pending suggestions.")}</p>
-              </div>
-            <% end %>
+            </div>
           </div>
-        </div>
+          <!-- Pending Suggestions -->
+          <div class="card bg-base-100 shadow-xl mt-6">
+            <div class="card-body">
+              <h2 class="card-title">
+                <span class="hero-light-bulb w-6 h-6"></span>
+                {gettext("Pending Suggestions")}
+                <%= if length(stats.pending_suggestions) > 0 do %>
+                  <span class="badge badge-warning">{length(stats.pending_suggestions)}</span>
+                <% end %>
+              </h2>
+
+              <%= if length(stats.pending_suggestions) > 0 do %>
+                <div class="overflow-x-auto">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>{gettext("Business Name")}</th>
+                        <th>{gettext("City")}</th>
+                        <th>{gettext("Reason")}</th>
+                        <th>{gettext("Submitted")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <%= for suggestion <- stats.pending_suggestions do %>
+                        <tr>
+                          <td class="font-medium">{suggestion.business_name}</td>
+                          <td class="text-sm">{suggestion.city_name}</td>
+                          <td class="text-sm max-w-xs truncate">{suggestion.reason || "-"}</td>
+                          <td class="text-sm text-base-content/60">
+                            {Calendar.strftime(suggestion.inserted_at, "%b %d, %H:%M")}
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <div class="text-center py-8 text-base-content/50">
+                  <p>{gettext("No pending suggestions.")}</p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </.async_result>
       </main>
     </div>
     """

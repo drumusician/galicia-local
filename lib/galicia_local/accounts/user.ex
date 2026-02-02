@@ -354,6 +354,12 @@ defmodule GaliciaLocal.Accounts.User do
       public? true
       attribute_writable? true
     end
+
+    has_many :favorites, GaliciaLocal.Community.Favorite
+  end
+
+  aggregates do
+    count :favorite_count, :favorites
   end
 
   identities do
