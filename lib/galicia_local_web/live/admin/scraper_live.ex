@@ -16,37 +16,27 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
 
     cities = City.list!() |> Enum.sort_by(& &1.name)
     categories = Category.list!() |> Enum.sort_by(& &1.priority)
-    recent_jobs = load_recent_jobs()
-    spider_status = Scraper.status()
-    oban_jobs = Scraper.job_status()
 
     {:ok,
      socket
      |> assign(:page_title, "Scraper Admin")
      |> assign(:cities, cities)
      |> assign(:categories, categories)
-     |> assign(:recent_jobs, recent_jobs)
-     |> assign(:spider_status, spider_status)
-     |> assign(:oban_jobs, oban_jobs)
+     |> assign(:recent_jobs, [])
+     |> assign(:spider_status, %{})
+     |> assign(:oban_jobs, [])
+     |> assign(:db_stats, %{total: 0, pending: 0, english: 0})
      |> assign(:selected_city, nil)
      |> assign(:selected_category, nil)
      |> assign(:scrape_source, "google_places")
      |> assign(:scraping, false)
-     |> assign(:message, nil)}
+     |> assign(:message, nil)
+     |> load_scraper_data()}
   end
 
   @impl true
   def handle_info(:refresh_status, socket) do
-    spider_status = Scraper.status()
-    recent_jobs = load_recent_jobs()
-    oban_jobs = Scraper.job_status()
-
-    {:noreply,
-     socket
-     |> assign(:spider_status, spider_status)
-     |> assign(:recent_jobs, recent_jobs)
-     |> assign(:oban_jobs, oban_jobs)
-     |> assign(:scraping, map_size(spider_status) > 0 || length(oban_jobs) > 0)}
+    {:noreply, load_scraper_data(socket)}
   end
 
   @impl true
@@ -134,11 +124,39 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
     {:noreply, assign(socket, :message, nil)}
   end
 
+  defp load_scraper_data(socket) do
+    spider_status = Scraper.status()
+    oban_jobs = Scraper.job_status()
+    recent_jobs = load_recent_jobs()
+    db_stats = load_db_stats()
+
+    socket
+    |> assign(:spider_status, spider_status)
+    |> assign(:oban_jobs, oban_jobs)
+    |> assign(:recent_jobs, recent_jobs)
+    |> assign(:db_stats, db_stats)
+    |> assign(:scraping, map_size(spider_status) > 0 || length(oban_jobs) > 0)
+  end
+
   defp load_recent_jobs do
-    ScrapeJob.list!()
-    |> Ash.load!([:city, :category])
-    |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
-    |> Enum.take(10)
+    ScrapeJob
+    |> Ash.Query.sort(inserted_at: :desc)
+    |> Ash.Query.limit(10)
+    |> Ash.Query.load([:city, :category])
+    |> Ash.read!()
+  end
+
+  defp load_db_stats do
+    %{rows: [[total, pending, english]]} =
+      GaliciaLocal.Repo.query!("""
+      SELECT
+        COUNT(*),
+        COUNT(*) FILTER (WHERE status = 'pending'),
+        COUNT(*) FILTER (WHERE speaks_english = true)
+      FROM businesses
+      """)
+
+    %{total: total, pending: pending, english: english}
   end
 
   @impl true
@@ -345,15 +363,15 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
               <div class="stats stats-vertical shadow">
                 <div class="stat">
                   <div class="stat-title">Total Businesses</div>
-                  <div class="stat-value text-primary">{business_count()}</div>
+                  <div class="stat-value text-primary">{@db_stats.total}</div>
                 </div>
                 <div class="stat">
                   <div class="stat-title">Pending Enrichment</div>
-                  <div class="stat-value text-warning">{pending_count()}</div>
+                  <div class="stat-value text-warning">{@db_stats.pending}</div>
                 </div>
                 <div class="stat">
                   <div class="stat-title">English Speaking</div>
-                  <div class="stat-value text-success">{english_count()}</div>
+                  <div class="stat-value text-success">{@db_stats.english}</div>
                 </div>
               </div>
             </div>
@@ -461,19 +479,6 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
   defp format_source(:paginas_amarillas), do: "P. Amarillas"
   defp format_source(other), do: to_string(other)
 
-  defp business_count do
-    Business.list!() |> length()
-  end
-
-  defp pending_count do
-    Business.list!()
-    |> Enum.count(& &1.status == :pending)
-  end
-
-  defp english_count do
-    Business.list!()
-    |> Enum.count(& &1.speaks_english == true)
-  end
 
   defp format_time(nil), do: "-"
   defp format_time(dt) do

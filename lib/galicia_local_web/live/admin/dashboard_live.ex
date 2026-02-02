@@ -19,21 +19,35 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
   end
 
   defp load_stats(actor) do
-    businesses = Business.list!()
-    cities = City.list!()
-    categories = Category.list!()
+    %{rows: [[total_biz, pending, enriched, english]]} =
+      GaliciaLocal.Repo.query!("""
+      SELECT
+        COUNT(*),
+        COUNT(*) FILTER (WHERE status = 'pending'),
+        COUNT(*) FILTER (WHERE status = 'enriched'),
+        COUNT(*) FILTER (WHERE speaks_english = true)
+      FROM businesses
+      """)
+
+    %{rows: [[total_cities]]} = GaliciaLocal.Repo.query!("SELECT COUNT(*) FROM cities")
+    %{rows: [[total_categories]]} = GaliciaLocal.Repo.query!("SELECT COUNT(*) FROM categories")
+
+    recent_businesses =
+      Business
+      |> Ash.Query.sort(inserted_at: :desc)
+      |> Ash.Query.limit(5)
+      |> Ash.read!()
+
     pending_suggestions = Suggestion.list_pending!(actor: actor)
 
     %{
-      total_businesses: length(businesses),
-      pending_enrichment: Enum.count(businesses, &(&1.status == :pending)),
-      enriched: Enum.count(businesses, &(&1.status == :enriched)),
-      english_speaking: Enum.count(businesses, &(&1.speaks_english == true)),
-      total_cities: length(cities),
-      total_categories: length(categories),
-      recent_businesses: businesses
-                         |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
-                         |> Enum.take(5),
+      total_businesses: total_biz,
+      pending_enrichment: pending,
+      enriched: enriched,
+      english_speaking: english,
+      total_cities: total_cities,
+      total_categories: total_categories,
+      recent_businesses: recent_businesses,
       pending_suggestions: pending_suggestions
     }
   end
