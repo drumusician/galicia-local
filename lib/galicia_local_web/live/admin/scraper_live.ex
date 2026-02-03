@@ -26,12 +26,13 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
      |> assign(:spider_status, %{})
      |> assign(:oban_jobs, [])
      |> assign(:db_stats, %{total: 0, pending: 0, english: 0})
+     |> assign(:monthly_costs, %{google: %{search_calls: 0, detail_calls: 0, cost: 0}, claude: %{enriched: 0, translated: 0, cost: 0}, tavily: %{researched: 0, cost: 0}, total: 0})
      |> assign(:selected_city, nil)
      |> assign(:selected_category, nil)
      |> assign(:scrape_source, "google_places")
      |> assign(:scraping, false)
      |> assign(:message, nil)
-     |> load_scraper_data()}
+     |> load_scraper_data(costs: true)}
   end
 
   @impl true
@@ -124,18 +125,25 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
     {:noreply, assign(socket, :message, nil)}
   end
 
-  defp load_scraper_data(socket) do
+  defp load_scraper_data(socket, opts \\ []) do
     spider_status = Scraper.status()
     oban_jobs = Scraper.job_status()
     recent_jobs = load_recent_jobs()
     db_stats = load_db_stats()
 
-    socket
-    |> assign(:spider_status, spider_status)
-    |> assign(:oban_jobs, oban_jobs)
-    |> assign(:recent_jobs, recent_jobs)
-    |> assign(:db_stats, db_stats)
-    |> assign(:scraping, map_size(spider_status) > 0 || length(oban_jobs) > 0)
+    socket =
+      socket
+      |> assign(:spider_status, spider_status)
+      |> assign(:oban_jobs, oban_jobs)
+      |> assign(:recent_jobs, recent_jobs)
+      |> assign(:db_stats, db_stats)
+      |> assign(:scraping, map_size(spider_status) > 0 || length(oban_jobs) > 0)
+
+    if Keyword.get(opts, :costs, false) do
+      assign(socket, :monthly_costs, load_monthly_costs())
+    else
+      socket
+    end
   end
 
   defp load_recent_jobs do
@@ -157,6 +165,69 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
       """)
 
     %{total: total, pending: pending, english: english}
+  end
+
+  # Google Places API pricing (per call)
+  @google_search_cost 0.032
+  @google_details_cost 0.035
+  # Anthropic Claude Sonnet pricing (estimated per enrichment/translation call)
+  # ~1500 input tokens ($3/M) + ~1500 output tokens ($15/M) ≈ $0.027 per call
+  @claude_enrichment_cost 0.027
+  @claude_translation_cost 0.027
+  # Tavily: 2 searches per business researched
+  @tavily_cost_per_search 0.001
+
+  defp load_monthly_costs do
+    month_start =
+      Date.utc_today()
+      |> Date.beginning_of_month()
+      |> DateTime.new!(~T[00:00:00], "Etc/UTC")
+
+    # Scrape jobs this month: each job = 1 search call, businesses_found = detail calls
+    %{rows: [[search_calls, detail_calls]]} =
+      GaliciaLocal.Repo.query!(
+        """
+        SELECT
+          COUNT(*),
+          COALESCE(SUM(businesses_found), 0)
+        FROM scrape_jobs
+        WHERE started_at >= $1
+        """,
+        [month_start]
+      )
+
+    # Businesses that went through enrichment pipeline this month
+    %{rows: [[enriched, translated, researched]]} =
+      GaliciaLocal.Repo.query!(
+        """
+        SELECT
+          COUNT(*) FILTER (WHERE status IN ('enriched', 'verified')),
+          COUNT(*) FILTER (WHERE summary_es IS NOT NULL AND summary_es != ''),
+          COUNT(*) FILTER (WHERE status NOT IN ('pending'))
+        FROM businesses
+        WHERE updated_at >= $1
+        """,
+        [month_start]
+      )
+
+    # Ensure all values are integers (SQL may return Decimal for SUM)
+    search_calls = to_int(search_calls)
+    detail_calls = to_int(detail_calls)
+    enriched = to_int(enriched)
+    translated = to_int(translated)
+    researched = to_int(researched)
+
+    google_cost = search_calls * @google_search_cost + detail_calls * @google_details_cost
+    claude_cost = enriched * @claude_enrichment_cost + translated * @claude_translation_cost
+    tavily_cost = researched * 2 * @tavily_cost_per_search
+    total = google_cost + claude_cost + tavily_cost
+
+    %{
+      google: %{search_calls: search_calls, detail_calls: detail_calls, cost: google_cost},
+      claude: %{enriched: enriched, translated: translated, cost: claude_cost},
+      tavily: %{researched: researched, cost: tavily_cost},
+      total: total
+    }
   end
 
   @impl true
@@ -378,6 +449,61 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
           </div>
         </div>
 
+        <!-- Monthly Cost Estimate -->
+        <div class="card bg-base-200 mt-6">
+          <div class="card-body">
+            <h2 class="card-title">
+              <span class="hero-currency-dollar w-6 h-6"></span>
+              Estimated API Costs
+              <span class="badge badge-ghost badge-sm">{Calendar.strftime(Date.utc_today(), "%B %Y")}</span>
+            </h2>
+
+            <div class="overflow-x-auto">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Usage</th>
+                    <th class="text-right">Est. Cost</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="font-medium">Google Places</td>
+                    <td class="text-sm text-base-content/70">
+                      {@monthly_costs.google.search_calls} searches, {@monthly_costs.google.detail_calls} detail lookups
+                    </td>
+                    <td class="text-right font-mono">${:erlang.float_to_binary(@monthly_costs.google.cost, decimals: 2)}</td>
+                  </tr>
+                  <tr>
+                    <td class="font-medium">Anthropic Claude</td>
+                    <td class="text-sm text-base-content/70">
+                      {@monthly_costs.claude.enriched} enrichments, {@monthly_costs.claude.translated} translations
+                    </td>
+                    <td class="text-right font-mono">${:erlang.float_to_binary(@monthly_costs.claude.cost, decimals: 2)}</td>
+                  </tr>
+                  <tr>
+                    <td class="font-medium">Tavily Search</td>
+                    <td class="text-sm text-base-content/70">
+                      ~{@monthly_costs.tavily.researched * 2} web searches
+                    </td>
+                    <td class="text-right font-mono">${:erlang.float_to_binary(@monthly_costs.tavily.cost, decimals: 2)}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="font-bold">
+                    <td colspan="2">Total Estimated</td>
+                    <td class="text-right font-mono text-lg">${:erlang.float_to_binary(@monthly_costs.total, decimals: 2)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <p class="text-xs text-base-content/40 mt-2">
+              Estimates based on API list prices. Actual costs may differ due to caching, free tiers, and billing discounts.
+            </p>
+          </div>
+        </div>
+
         <!-- Recent Jobs -->
         <div class="card bg-base-200 mt-6">
           <div class="card-body">
@@ -479,6 +605,10 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
   defp format_source(:paginas_amarillas), do: "P. Amarillas"
   defp format_source(other), do: to_string(other)
 
+
+  defp to_int(nil), do: 0
+  defp to_int(%Decimal{} = d), do: Decimal.to_integer(d)
+  defp to_int(n) when is_integer(n), do: n
 
   defp format_time(nil), do: "-"
   defp format_time(dt) do
