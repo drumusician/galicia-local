@@ -6,20 +6,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="GaliciaLocal – Integrate into Galician Life" suffix=" · GaliciaLocal">
+    <.live_title default="StartLocal – Your Guide to Settling In" suffix=" · StartLocal">
       {assigns[:page_title]}
     </.live_title>
 
     <%!-- SEO Meta Tags --%>
-    <meta name="description" content={assigns[:meta_description] || gettext("Discover local businesses, learn Galician customs, and truly integrate into your new community. Your guide to making Galicia home.")} />
+    <meta name="description" content={assigns[:meta_description] || gettext("Discover local businesses, services, and insider tips from the community. Your guide to settling into a new community.")} />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href={"#{Application.get_env(:galicia_local, :base_url)}#{@conn.request_path}"} />
 
     <%!-- Open Graph --%>
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="GaliciaLocal" />
-    <meta property="og:title" content={assigns[:page_title] || "GaliciaLocal – Integrate into Galician Life"} />
-    <meta property="og:description" content={assigns[:meta_description] || gettext("Discover local businesses, learn Galician customs, and truly integrate into your new community. Your guide to making Galicia home.")} />
+    <meta property="og:site_name" content="StartLocal" />
+    <meta property="og:title" content={assigns[:page_title] || "StartLocal – Your Guide to Settling In"} />
+    <meta property="og:description" content={assigns[:meta_description] || gettext("Discover local businesses, services, and insider tips from the community. Your guide to settling into a new community.")} />
     <meta property="og:image" content={assigns[:meta_image] || "#{Application.get_env(:galicia_local, :base_url)}/images/og-default.jpg"} />
     <meta property="og:url" content={"#{Application.get_env(:galicia_local, :base_url)}#{@conn.request_path}"} />
     <meta property="og:locale" content={if assigns[:locale] == "es", do: "es_ES", else: "en_US"} />
@@ -27,8 +27,8 @@
 
     <%!-- Twitter Card --%>
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={assigns[:page_title] || "GaliciaLocal – Integrate into Galician Life"} />
-    <meta name="twitter:description" content={assigns[:meta_description] || gettext("Discover local businesses, learn Galician customs, and truly integrate into your new community. Your guide to making Galicia home.")} />
+    <meta name="twitter:title" content={assigns[:page_title] || "StartLocal – Your Guide to Settling In"} />
+    <meta name="twitter:description" content={assigns[:meta_description] || gettext("Discover local businesses, services, and insider tips from the community. Your guide to settling into a new community.")} />
     <meta name="twitter:image" content={assigns[:meta_image] || "#{Application.get_env(:galicia_local, :base_url)}/images/og-default.jpg"} />
 
     <%!-- Structured Data --%>
@@ -36,10 +36,10 @@
       <%= raw(Jason.encode!(%{
         "@context" => "https://schema.org",
         "@type" => "WebSite",
-        "name" => "GaliciaLocal",
+        "name" => "StartLocal",
         "url" => "#{Application.get_env(:galicia_local, :base_url)}",
-        "description" => "Helping newcomers integrate into Galician life",
-        "inLanguage" => [%{"@type" => "Language", "name" => "English", "alternateName" => "en"}, %{"@type" => "Language", "name" => "Spanish", "alternateName" => "es"}],
+        "description" => "Your guide to settling into a new community",
+        "inLanguage" => [%{"@type" => "Language", "name" => "English", "alternateName" => "en"}, %{"@type" => "Language", "name" => "Spanish", "alternateName" => "es"}, %{"@type" => "Language", "name" => "Dutch", "alternateName" => "nl"}],
         "potentialAction" => %{
           "@type" => "SearchAction",
           "target" => %{"@type" => "EntryPoint", "urlTemplate" => "#{Application.get_env(:galicia_local, :base_url)}/search?q={search_term_string}"},
@@ -78,35 +78,44 @@
     </script>
   </head>
   <body>
+    <% is_home_page = @conn.request_path == "/" %>
     <%= unless String.starts_with?(@conn.request_path, "/admin") do %>
       <nav class="bg-base-100/95 backdrop-blur-md shadow-sm border-b border-base-200 sticky top-0 z-40">
         <div class="container mx-auto max-w-6xl px-4 flex items-center h-14">
           <!-- Brand -->
-          <div class="flex-1">
+          <div class="flex-1 flex items-center gap-2">
             <a
               href="/"
               class="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity"
+              title={gettext("Change region")}
             >
-              <span class="text-2xl">🐚</span>
-              <span class="text-xl font-bold tracking-tight">GaliciaLocal</span>
+              <span class="text-2xl">🌍</span>
+              <span class="text-xl font-bold tracking-tight">StartLocal</span>
             </a>
+            <%= if !is_home_page && assigns[:current_region] do %>
+              <a href={"/#{assigns[:current_region].slug}"} class="badge badge-primary badge-sm hover:badge-secondary transition-colors">
+                {assigns[:current_region].name}
+              </a>
+            <% end %>
           </div>
-          
+
 <!-- Desktop nav -->
           <% region_prefix = if assigns[:current_region], do: "/#{assigns[:current_region].slug}", else: "" %>
           <div class="hidden md:flex items-center gap-1">
-            <a href={"#{region_prefix}/search"} class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}
-            </a>
-            <a href={"#{region_prefix}/cities"} class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-map w-4 h-4"></span> {gettext("Cities")}
-            </a>
-            <a href={"#{region_prefix}/categories"} class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
-            </a>
-            <a href={"#{region_prefix}/recommend"} class="btn btn-ghost btn-sm gap-1">
-              <span class="hero-plus-circle w-4 h-4"></span> {gettext("Recommend")}
-            </a>
+            <%= if !is_home_page && assigns[:current_region] do %>
+              <a href={"#{region_prefix}/search"} class="btn btn-ghost btn-sm gap-1">
+                <span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}
+              </a>
+              <a href={"#{region_prefix}/cities"} class="btn btn-ghost btn-sm gap-1">
+                <span class="hero-map w-4 h-4"></span> {gettext("Cities")}
+              </a>
+              <a href={"#{region_prefix}/categories"} class="btn btn-ghost btn-sm gap-1">
+                <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
+              </a>
+              <a href={"#{region_prefix}/recommend"} class="btn btn-ghost btn-sm gap-1">
+                <span class="hero-plus-circle w-4 h-4"></span> {gettext("Recommend")}
+              </a>
+            <% end %>
             <form method="post" action="/locale" class="flex items-center">
               <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
               <input type="hidden" name="locale" value={if assigns[:locale] == "es", do: "en", else: "es"} />
@@ -177,20 +186,22 @@
                 tabindex="0"
                 class="dropdown-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-lg border border-base-200 mt-2"
               >
-                <li>
-                  <a href={"#{region_prefix}/search"}><span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}</a>
-                </li>
-                <li><a href={"#{region_prefix}/cities"}><span class="hero-map w-4 h-4"></span> {gettext("Cities")}</a></li>
-                <li>
-                  <a href={"#{region_prefix}/categories"}>
-                    <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
-                  </a>
-                </li>
-                <li>
-                  <a href={"#{region_prefix}/recommend"}>
-                    <span class="hero-plus-circle w-4 h-4"></span> {gettext("Recommend a Place")}
-                  </a>
-                </li>
+                <%= if !is_home_page && assigns[:current_region] do %>
+                  <li>
+                    <a href={"#{region_prefix}/search"}><span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}</a>
+                  </li>
+                  <li><a href={"#{region_prefix}/cities"}><span class="hero-map w-4 h-4"></span> {gettext("Cities")}</a></li>
+                  <li>
+                    <a href={"#{region_prefix}/categories"}>
+                      <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
+                    </a>
+                  </li>
+                  <li>
+                    <a href={"#{region_prefix}/recommend"}>
+                      <span class="hero-plus-circle w-4 h-4"></span> {gettext("Recommend a Place")}
+                    </a>
+                  </li>
+                <% end %>
                 <li>
                   <form method="post" action="/locale">
                     <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
