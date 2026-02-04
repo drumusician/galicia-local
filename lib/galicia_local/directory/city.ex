@@ -120,6 +120,7 @@ defmodule GaliciaLocal.Directory.City do
     end
 
     has_many :businesses, GaliciaLocal.Directory.Business
+    has_many :translations, GaliciaLocal.Directory.CityTranslation
   end
 
   identities do

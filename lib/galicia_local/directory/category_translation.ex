@@ -27,6 +27,11 @@ defmodule GaliciaLocal.Directory.CategoryTranslation do
       description "Localized category name for display"
     end
 
+    attribute :description, :string do
+      public? true
+      description "Localized category description"
+    end
+
     attribute :search_translation, :string do
       public? true
       description "Base search term in this locale"
@@ -58,18 +63,18 @@ defmodule GaliciaLocal.Directory.CategoryTranslation do
 
     create :create do
       primary? true
-      accept [:category_id, :locale, :name, :search_translation, :search_queries]
+      accept [:category_id, :locale, :name, :description, :search_translation, :search_queries]
     end
 
     create :upsert do
       upsert? true
       upsert_identity :unique_category_locale
-      accept [:category_id, :locale, :name, :search_translation, :search_queries]
+      accept [:category_id, :locale, :name, :description, :search_translation, :search_queries]
     end
 
     update :update do
       primary? true
-      accept [:name, :search_translation, :search_queries]
+      accept [:name, :description, :search_translation, :search_queries]
     end
 
     read :for_category_locale do

@@ -5,9 +5,11 @@ defmodule GaliciaLocal.Directory do
   resources do
     resource GaliciaLocal.Directory.Region
     resource GaliciaLocal.Directory.City
+    resource GaliciaLocal.Directory.CityTranslation
     resource GaliciaLocal.Directory.Category
     resource GaliciaLocal.Directory.CategoryTranslation
     resource GaliciaLocal.Directory.Business
+    resource GaliciaLocal.Directory.BusinessTranslation
     resource GaliciaLocal.Directory.ScrapeJob
     resource GaliciaLocal.Directory.BusinessClaim
   end

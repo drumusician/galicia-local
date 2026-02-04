@@ -8,30 +8,30 @@
 ### to merge POT files into PO files.
 msgid ""
 msgstr ""
-"Language: es\n"
+"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:179
 #, elixir-autogen, elixir-format
 msgid "%{count} category"
 msgid_plural "%{count} categories"
-msgstr[0] "%{count} categoría"
-msgstr[1] "%{count} categorías"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:152
 #, elixir-autogen, elixir-format
 msgid "%{count} enriched"
 msgid_plural "%{count} enriched"
-msgstr[0] "%{count} enriquecido"
-msgstr[1] "%{count} enriquecidos"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:238
 #: lib/galicia_local_web/live/netherlands_home_live.ex:233
 #, elixir-autogen, elixir-format
 msgid "%{count} listing"
 msgid_plural "%{count} listings"
-msgstr[0] "%{count} listado"
-msgstr[1] "%{count} listados"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lib/galicia_local_web/live/business_live.ex:256
 #: lib/galicia_local_web/live/galicia_home_live.ex:415
@@ -39,33 +39,33 @@ msgstr[1] "%{count} listados"
 #, elixir-autogen, elixir-format
 msgid "%{count} review"
 msgid_plural "%{count} reviews"
-msgstr[0] "%{count} reseña"
-msgstr[1] "%{count} reseñas"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lib/galicia_local_web/live/cities_live.ex:93
 #, elixir-autogen, elixir-format
 msgid "%{population} pop."
-msgstr "%{population} hab."
+msgstr "%{population} inw."
 
 #: lib/galicia_local_web/live/category_live.ex:313
 #, elixir-autogen, elixir-format
 msgid "(map area)"
-msgstr "(área del mapa)"
+msgstr "(kaartgebied)"
 
 #: lib/galicia_local_web/live/member_live.ex:74
 #, elixir-autogen, elixir-format
 msgid "1 Review"
 msgid_plural "%{count} Reviews"
-msgstr[0] "1 Reseña"
-msgstr[1] "%{count} Reseñas"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lib/galicia_local_web/live/cities_live.ex:91
 #: lib/galicia_local_web/live/city_live.ex:123
 #, elixir-autogen, elixir-format
 msgid "1 listing"
 msgid_plural "%{count} listings"
-msgstr[0] "1 listado"
-msgstr[1] "%{count} listados"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lib/galicia_local_web/live/category_live.ex:311
 #: lib/galicia_local_web/live/city_live.ex:167
@@ -73,79 +73,79 @@ msgstr[1] "%{count} listados"
 #, elixir-autogen, elixir-format
 msgid "1 result"
 msgid_plural "%{count} results"
-msgstr[0] "1 resultado"
-msgstr[1] "%{count} resultados"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lib/galicia_local_web/live/edit_business_live.ex:157
 #, elixir-autogen, elixir-format
 msgid "A brief one-liner about your business"
-msgstr "Una breve descripción de tu negocio"
+msgstr "Een korte omschrijving van uw bedrijf"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:359
 #: lib/galicia_local_web/live/netherlands_home_live.ex:354
 #, elixir-autogen, elixir-format
 msgid "About"
-msgstr "Acerca de"
+msgstr "Over ons"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:5
 #, elixir-autogen, elixir-format
 msgid "About GaliciaLocal"
-msgstr "Acerca de GaliciaLocal"
+msgstr "Over GaliciaLocal"
 
 #: lib/galicia_local_web/live/profile_live.ex:86
 #, elixir-autogen, elixir-format
 msgid "About Me"
-msgstr "Sobre mí"
+msgstr "Over mij"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:43
 #, elixir-autogen, elixir-format
 msgid "Access your personal data"
-msgstr "Acceder a tus datos personales"
+msgstr "Toegang tot uw persoonlijke gegevens"
 
 #: lib/galicia_local_web/components/core_components.ex:368
 #, elixir-autogen, elixir-format
 msgid "Actions"
-msgstr "Acciones"
+msgstr "Acties"
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:33
 #, elixir-autogen, elixir-format
 msgid "Add Your Business"
-msgstr "Añade tu negocio"
+msgstr "Voeg uw bedrijf toe"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:353
 #, elixir-autogen, elixir-format
 msgid "Added"
-msgstr "Añadido"
+msgstr "Toegevoegd"
 
 #: lib/galicia_local_web/live/business_live.ex:395
 #: lib/galicia_local_web/live/edit_business_live.ex:164
 #: lib/galicia_local_web/live/recommend_business_live.ex:170
 #, elixir-autogen, elixir-format
 msgid "Address"
-msgstr "Dirección"
+msgstr "Adres"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:162
 #: lib/galicia_local_web/components/layouts/root.html.heex:234
 #, elixir-autogen, elixir-format
 msgid "Admin"
-msgstr "Admin"
+msgstr "Beheer"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:20
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:81
 #, elixir-autogen, elixir-format
 msgid "Admin Dashboard"
-msgstr "Panel de administración"
+msgstr "Beheerderspaneel"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:185
 #, elixir-autogen, elixir-format
 msgid "Admin Tools"
-msgstr "Herramientas de administración"
+msgstr "Beheertools"
 
 #: lib/galicia_local_web/live/city_live.ex:141
 #: lib/galicia_local_web/live/search_live.ex:213
 #, elixir-autogen, elixir-format
 msgid "All Categories"
-msgstr "Todas las categorías"
+msgstr "Alle categorieën"
 
 #: lib/galicia_local_web/live/category_live.ex:268
 #: lib/galicia_local_web/live/galicia_home_live.ex:158
@@ -153,148 +153,148 @@ msgstr "Todas las categorías"
 #: lib/galicia_local_web/live/search_live.ex:199
 #, elixir-autogen, elixir-format
 msgid "All Cities"
-msgstr "Todas las ciudades"
+msgstr "Alle steden"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:255
 #, elixir-autogen, elixir-format
 msgid "Analytics"
-msgstr "Analíticas"
+msgstr "Statistieken"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:199
 #: lib/galicia_local_web/live/netherlands_home_live.ex:194
 #, elixir-autogen, elixir-format
 msgid "Another"
-msgstr "Otro"
+msgstr "Nog een"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:123
 #, elixir-autogen, elixir-format
 msgid "Approve"
-msgstr "Aprobar"
+msgstr "Goedkeuren"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:121
 #, elixir-autogen, elixir-format
 msgid "Approve this claim? This will make the user the owner of this business."
-msgstr "¿Aprobar esta solicitud? Esto convertirá al usuario en propietario de este negocio."
+msgstr "Deze claim goedkeuren? De gebruiker wordt dan eigenaar van dit bedrijf."
 
 #: lib/galicia_local_web/live/claim_business_live.ex:128
 #, elixir-autogen, elixir-format
 msgid "Are you the owner of this business? Submit a claim and our team will verify your ownership. Once approved, you'll be able to update your business information, add photos, and more."
-msgstr "¿Eres el propietario de este negocio? Envía una solicitud y nuestro equipo verificará tu propiedad. Una vez aprobada, podrás actualizar la información de tu negocio, añadir fotos y más."
+msgstr "Bent u de eigenaar van dit bedrijf? Dien een claim in en ons team zal uw eigenaarschap verifiëren. Na goedkeuring kunt u uw bedrijfsinformatie bijwerken, foto's toevoegen en meer."
 
 #: lib/galicia_local_web/components/layouts.ex:99
 #: lib/galicia_local_web/components/layouts.ex:111
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
-msgstr "Intentando reconectar"
+msgstr "Opnieuw verbinden..."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:176
 #: lib/galicia_local_web/live/netherlands_home_live.ex:171
 #, elixir-autogen, elixir-format
 msgid "Authentic Local Gems"
-msgstr "Joyas locales auténticas"
+msgstr "Authentieke lokale parels"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:16
 #, elixir-autogen, elixir-format
 msgid "Automatically:"
-msgstr "Automáticamente:"
+msgstr "Automatisch:"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:161
 #, elixir-autogen, elixir-format
 msgid "Awaiting LLM processing"
-msgstr "Pendiente de procesamiento LLM"
+msgstr "Wacht op AI-verwerking"
 
 #: lib/galicia_local_web/live/business_live.ex:661
 #, elixir-autogen, elixir-format
 msgid "Back to %{city}"
-msgstr "Volver a %{city}"
+msgstr "Terug naar %{city}"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:122
 #, elixir-autogen, elixir-format
 msgid "Back to %{name}"
-msgstr "Volver a %{name}"
+msgstr "Terug naar %{name}"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:94
 #, elixir-autogen, elixir-format
 msgid "Back to Admin"
-msgstr "Volver a Admin"
+msgstr "Terug naar beheer"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:94
 #: lib/galicia_local_web/live/claim_business_live.ex:108
 #, elixir-autogen, elixir-format
 msgid "Back to business"
-msgstr "Volver al negocio"
+msgstr "Terug naar bedrijf"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:426
 #, elixir-autogen, elixir-format
 msgid "Basic Spanish helpful"
-msgstr "Español básico útil"
+msgstr "Basis Spaans handig"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:428
 #: lib/galicia_local_web/live/netherlands_home_live.ex:422
 #, elixir-autogen, elixir-format
 msgid "Bring a local friend!"
-msgstr "¡Lleva a un amigo local!"
+msgstr "Neem een local mee!"
 
 #: lib/galicia_local_web/live/categories_live.ex:36
 #: lib/galicia_local_web/live/favorites_live.ex:97
 #, elixir-autogen, elixir-format
 msgid "Browse Categories"
-msgstr "Explorar categorías"
+msgstr "Categorieën bekijken"
 
 #: lib/galicia_local_web/live/favorites_live.ex:95
 #, elixir-autogen, elixir-format
 msgid "Browse businesses and click the heart to save them here."
-msgstr "Explora negocios y haz clic en el corazón para guardarlos aquí."
+msgstr "Bekijk bedrijven en klik op het hartje om ze hier op te slaan."
 
 #: lib/galicia_local_web/live/categories_live.ex:23
 #: lib/galicia_local_web/live/galicia_home_live.ex:283
 #: lib/galicia_local_web/live/netherlands_home_live.ex:278
 #, elixir-autogen, elixir-format
 msgid "Browse by Category"
-msgstr "Explorar por categoría"
+msgstr "Blader per categorie"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:31
 #: lib/galicia_local_web/live/admin/claims_live.ex:89
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:270
 #, elixir-autogen, elixir-format
 msgid "Business Claims"
-msgstr "Solicitudes de propiedad"
+msgstr "Bedrijfsclaims"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:413
 #: lib/galicia_local_web/live/edit_business_live.ex:140
 #: lib/galicia_local_web/live/recommend_business_live.ex:117
 #, elixir-autogen, elixir-format
 msgid "Business Name"
-msgstr "Nombre del negocio"
+msgstr "Bedrijfsnaam"
 
 #: lib/galicia_local_web/live/business_live.ex:62
 #: lib/galicia_local_web/live/claim_business_live.ex:35
 #: lib/galicia_local_web/live/edit_business_live.ex:40
 #, elixir-autogen, elixir-format
 msgid "Business not found"
-msgstr "Negocio no encontrado"
+msgstr "Bedrijf niet gevonden"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:62
 #, elixir-autogen, elixir-format
 msgid "Business updated successfully!"
-msgstr "¡Negocio actualizado correctamente!"
+msgstr "Bedrijf succesvol bijgewerkt!"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:210
 #, elixir-autogen, elixir-format
 msgid "Businesses"
-msgstr "Negocios"
+msgstr "Bedrijven"
 
 #: lib/galicia_local_web/live/favorites_live.ex:48
 #, elixir-autogen, elixir-format
 msgid "Businesses you've saved for later."
-msgstr "Negocios que has guardado para después."
+msgstr "Bedrijven die u heeft opgeslagen."
 
 #: lib/galicia_local_web/live/claim_business_live.ex:150
 #: lib/galicia_local_web/live/edit_business_live.ex:245
 #: lib/galicia_local_web/live/recommend_business_live.ex:223
 #, elixir-autogen, elixir-format
 msgid "Cancel"
-msgstr "Cancelar"
+msgstr "Annuleren"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:113
 #: lib/galicia_local_web/components/layouts/root.html.heex:196
@@ -302,12 +302,12 @@ msgstr "Cancelar"
 #: lib/galicia_local_web/live/category_live.ex:240
 #, elixir-autogen, elixir-format
 msgid "Categories"
-msgstr "Categorías"
+msgstr "Categorieën"
 
 #: lib/galicia_local_web/live/category_live.ex:47
 #, elixir-autogen, elixir-format
 msgid "Category not found"
-msgstr "Categoría no encontrada"
+msgstr "Categorie niet gevonden"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:110
 #: lib/galicia_local_web/components/layouts/root.html.heex:193
@@ -316,83 +316,83 @@ msgstr "Categoría no encontrada"
 #: lib/galicia_local_web/live/city_live.ex:118
 #, elixir-autogen, elixir-format
 msgid "Cities"
-msgstr "Ciudades"
+msgstr "Steden"
 
 #: lib/galicia_local_web/live/city_live.ex:48
 #, elixir-autogen, elixir-format
 msgid "City not found"
-msgstr "Ciudad no encontrada"
+msgstr "Stad niet gevonden"
 
 #: lib/galicia_local_web/live/business_live.ex:528
 #: lib/galicia_local_web/live/claim_business_live.ex:75
 #, elixir-autogen, elixir-format
 msgid "Claim"
-msgstr "Reclamar"
+msgstr "Claimen"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:25
 #: lib/galicia_local_web/live/claim_business_live.ex:83
 #, elixir-autogen, elixir-format
 msgid "Claim %{name}"
-msgstr "Reclamar %{name}"
+msgstr "Claim %{name}"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:57
 #, elixir-autogen, elixir-format
 msgid "Claim approved — %{business} is now owned by %{email}"
-msgstr "Solicitud aprobada — %{business} ahora pertenece a %{email}"
+msgstr "Claim goedgekeurd — %{business} is nu eigendom van %{email}"
 
 #: lib/galicia_local_web/live/business_live.ex:524
 #, elixir-autogen, elixir-format
 msgid "Claim it to update your information and manage your listing."
-msgstr "Reclámalo para actualizar tu información y gestionar tu listado."
+msgstr "Claim het om uw informatie bij te werken en uw vermelding te beheren."
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:74
 #, elixir-autogen, elixir-format
 msgid "Claim rejected"
-msgstr "Solicitud rechazada"
+msgstr "Claim afgewezen"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:116
 #, elixir-autogen, elixir-format
 msgid "Claim submitted!"
-msgstr "¡Solicitud enviada!"
+msgstr "Claim ingediend!"
 
 #: lib/galicia_local_web/live/business_live.ex:234
 #, elixir-autogen, elixir-format
 msgid "Claimed"
-msgstr "Reclamado"
+msgstr "Geclaimd"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:111
 #, elixir-autogen, elixir-format
 msgid "Claimed by"
-msgstr "Reclamado por"
+msgstr "Geclaimd door"
 
 #: lib/galicia_local_web/live/business_live.ex:623
 #: lib/galicia_local_web/live/member_live.ex:52
 #, elixir-autogen, elixir-format
 msgid "Community Member"
-msgstr "Miembro de la comunidad"
+msgstr "Communitylid"
 
 #: lib/galicia_local_web/live/business_live.ex:559
 #, elixir-autogen, elixir-format
 msgid "Community Reviews"
-msgstr "Reseñas de la comunidad"
+msgstr "Community beoordelingen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:360
 #: lib/galicia_local_web/live/netherlands_home_live.ex:355
 #, elixir-autogen, elixir-format
 msgid "Contact"
-msgstr "Contacto"
+msgstr "Contact"
 
 #: lib/galicia_local_web/live/business_live.ex:389
 #: lib/galicia_local_web/live/edit_business_live.ex:160
 #, elixir-autogen, elixir-format
 msgid "Contact Information"
-msgstr "Información de contacto"
+msgstr "Contactgegevens"
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:3
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:49
 #, elixir-autogen, elixir-format
 msgid "Contact Us"
-msgstr "Contáctanos"
+msgstr "Neem contact op"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:17
 #, elixir-autogen, elixir-format
@@ -402,71 +402,71 @@ msgstr "Cookies:"
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:44
 #, elixir-autogen, elixir-format
 msgid "Correct inaccurate data"
-msgstr "Corregir datos inexactos"
+msgstr "Onjuiste gegevens corrigeren"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:62
 #, elixir-autogen, elixir-format
 msgid "Could not submit claim. You may have already claimed this business."
-msgstr "No se pudo enviar la solicitud. Es posible que ya hayas reclamado este negocio."
+msgstr "Kon claim niet indienen. U heeft dit bedrijf mogelijk al geclaimd."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:452
 #: lib/galicia_local_web/live/netherlands_home_live.ex:446
 #, elixir-autogen, elixir-format
 msgid "Culture & Leisure"
-msgstr "Cultura y ocio"
+msgstr "Cultuur & Vrije tijd"
 
 #: lib/galicia_local_web/live/categories_live.ex:87
 #: lib/galicia_local_web/live/galicia_home_live.ex:451
 #: lib/galicia_local_web/live/netherlands_home_live.ex:445
 #, elixir-autogen, elixir-format
 msgid "Daily Life"
-msgstr "Vida diaria"
+msgstr "Dagelijks leven"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:35
 #, elixir-autogen, elixir-format
 msgid "Data Security"
-msgstr "Seguridad de datos"
+msgstr "Gegevensbeveiliging"
 
 #: lib/galicia_local_web/live/business_live.ex:640
 #, elixir-autogen, elixir-format
 msgid "Delete this review?"
-msgstr "¿Eliminar esta reseña?"
+msgstr "Deze beoordeling verwijderen?"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:150
 #, elixir-autogen, elixir-format
 msgid "Descripción (Español)"
-msgstr "Descripción (Español)"
+msgstr "Beschrijving (Spaans)"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:145
 #, elixir-autogen, elixir-format
 msgid "Description (English)"
-msgstr "Descripción (Inglés)"
+msgstr "Beschrijving (Engels)"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:170
 #, elixir-autogen, elixir-format
 msgid "Detected from reviews"
-msgstr "Detectado de reseñas"
+msgstr "Gedetecteerd uit beoordelingen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:343
 #: lib/galicia_local_web/live/netherlands_home_live.ex:338
 #, elixir-autogen, elixir-format
 msgid "Discover Local Gems"
-msgstr "Descubre joyas locales"
+msgstr "Ontdek lokale parels"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:125
 #, elixir-autogen, elixir-format
 msgid "Discover local businesses, learn Galician customs, and truly integrate into your new community."
-msgstr "Descubre negocios locales, aprende las costumbres gallegas e intégrate de verdad en tu nueva comunidad."
+msgstr "Ontdek lokale bedrijven, leer Galicische gewoontes en integreer echt in uw nieuwe gemeenschap."
 
 #: lib/galicia_local_web/live/profile_live.ex:75
 #, elixir-autogen, elixir-format
 msgid "Display Name"
-msgstr "Nombre visible"
+msgstr "Weergavenaam"
 
 #: lib/galicia_local_web/live/business_live.ex:687
 #, elixir-autogen, elixir-format
 msgid "Dutch"
-msgstr "Neerlandés"
+msgstr "Nederlands"
 
 #: lib/galicia_local_web/live/category_live.ex:379
 #: lib/galicia_local_web/live/city_live.ex:211
@@ -479,212 +479,212 @@ msgstr "EN"
 #: lib/galicia_local_web/live/netherlands_home_live.ex:206
 #, elixir-autogen, elixir-format
 msgid "Each city has its own character and charm"
-msgstr "Cada ciudad tiene su propio carácter y encanto"
+msgstr "Elke stad heeft zijn eigen karakter en charme"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:424
 #: lib/galicia_local_web/live/netherlands_home_live.ex:418
 #, elixir-autogen, elixir-format
 msgid "Easy for newcomers"
-msgstr "Fácil para recién llegados"
+msgstr "Makkelijk voor nieuwkomers"
 
 #: lib/galicia_local_web/live/my_businesses_live.ex:62
 #, elixir-autogen, elixir-format
 msgid "Edit"
-msgstr "Editar"
+msgstr "Bewerken"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:26
 #: lib/galicia_local_web/live/edit_business_live.ex:135
 #, elixir-autogen, elixir-format
 msgid "Edit %{name}"
-msgstr "Editar %{name}"
+msgstr "Bewerk %{name}"
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:15
 #: lib/galicia_local_web/live/business_live.ex:417
 #: lib/galicia_local_web/live/edit_business_live.ex:174
 #, elixir-autogen, elixir-format
 msgid "Email"
-msgstr "Correo electrónico"
+msgstr "E-mail"
 
 #: lib/galicia_local_web/live/business_live.ex:682
 #: lib/galicia_local_web/live/favorites_live.ex:73
 #, elixir-autogen, elixir-format
 msgid "English"
-msgstr "Inglés"
+msgstr "Engels"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:168
 #, elixir-autogen, elixir-format
 msgid "English Speaking"
-msgstr "Hablan inglés"
+msgstr "Engelssprekend"
 
 #: lib/galicia_local_web/live/business_live.ex:228
 #, elixir-autogen, elixir-format
 msgid "English Spoken"
-msgstr "Se habla inglés"
+msgstr "Engels gesproken"
 
 #: lib/galicia_local_web/live/business_live.ex:479
 #, elixir-autogen, elixir-format
 msgid "English confidence:"
-msgstr "Nivel de inglés:"
+msgstr "Engels zekerheid:"
 
 #: lib/galicia_local_web/live/search_live.ex:245
 #, elixir-autogen, elixir-format
 msgid "English speaking"
-msgstr "Hablan inglés"
+msgstr "Engelssprekend"
 
 #: lib/galicia_local_web/live/category_live.ex:288
 #: lib/galicia_local_web/live/city_live.ex:161
 #: lib/galicia_local_web/live/search_live.ex:233
 #, elixir-autogen, elixir-format
 msgid "English speaking only"
-msgstr "Solo con inglés"
+msgstr "Alleen Engelssprekend"
 
 #: lib/galicia_local_web/live/category_live.ex:378
 #: lib/galicia_local_web/live/city_live.ex:210
 #: lib/galicia_local_web/live/search_live.ex:302
 #, elixir-autogen, elixir-format
 msgid "English spoken"
-msgstr "Se habla inglés"
+msgstr "Engels gesproken"
 
 #: lib/galicia_local_web/live/categories_live.ex:92
 #, elixir-autogen, elixir-format
 msgid "Essential services for expats and newcomers - lawyers, doctors, real estate, and more."
-msgstr "Servicios esenciales para expatriados y recién llegados: abogados, médicos, inmobiliarias y más."
+msgstr "Essentiële diensten voor expats en nieuwkomers - advocaten, artsen, makelaars en meer."
 
 #: lib/galicia_local_web/live/categories_live.ex:93
 #, elixir-autogen, elixir-format
 msgid "Everyday essentials - groceries, markets, and personal services."
-msgstr "Necesidades del día a día: supermercados, mercados y servicios personales."
+msgstr "Dagelijkse benodigdheden - boodschappen, markten en persoonlijke diensten."
 
 #: lib/galicia_local_web/live/categories_live.ex:86
 #, elixir-autogen, elixir-format
 msgid "Expat Essentials"
-msgstr "Esenciales para expatriados"
+msgstr "Expat essentials"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:44
 #, elixir-autogen, elixir-format
 msgid "Expat-Focused Categories"
-msgstr "Categorías para expatriados"
+msgstr "Categorieën voor expats"
 
 #: lib/galicia_local_web/live/categories_live.ex:94
 #, elixir-autogen, elixir-format
 msgid "Experience the best of Galicia - restaurants, wineries, and cultural spots."
-msgstr "Vive lo mejor de Galicia: restaurantes, bodegas y lugares culturales."
+msgstr "Ervaar het beste van Galicië - restaurants, wijnhuizen en culturele plekken."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:239
 #: lib/galicia_local_web/live/netherlands_home_live.ex:234
 #: lib/galicia_local_web/live/region_selector_live.ex:57
 #, elixir-autogen, elixir-format
 msgid "Explore"
-msgstr "Explorar"
+msgstr "Ontdekken"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:346
 #: lib/galicia_local_web/live/netherlands_home_live.ex:341
 #, elixir-autogen, elixir-format
 msgid "Explore Cities"
-msgstr "Explorar ciudades"
+msgstr "Ontdek steden"
 
 #: lib/galicia_local_web/live/cities_live.ex:97
 #, elixir-autogen, elixir-format
 msgid "Explore →"
-msgstr "Explorar →"
+msgstr "Ontdek →"
 
 #: lib/galicia_local_web/live/cities_live.ex:78
 #, elixir-autogen, elixir-format
 msgid "Featured"
-msgstr "Destacado"
+msgstr "Uitgelicht"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:284
 #: lib/galicia_local_web/live/netherlands_home_live.ex:279
 #, elixir-autogen, elixir-format
 msgid "Find exactly what you need"
-msgstr "Encuentra exactamente lo que necesitas"
+msgstr "Vind precies wat u nodig heeft"
 
 #: lib/galicia_local_web/live/categories_live.ex:38
 #, elixir-autogen, elixir-format
 msgid "Find exactly what you need, from essential expat services to local lifestyle experiences."
-msgstr "Encuentra exactamente lo que necesitas, desde servicios esenciales para expatriados hasta experiencias locales."
+msgstr "Vind precies wat u nodig heeft, van essentiële expat-diensten tot lokale ervaringen."
 
 #: lib/galicia_local_web/live/my_businesses_live.ex:73
 #, elixir-autogen, elixir-format
 msgid "Find your business and claim it to start managing your listing."
-msgstr "Busca tu negocio y reclámalo para empezar a gestionar tu listado."
+msgstr "Vind uw bedrijf en claim het om uw vermelding te beheren."
 
 #: lib/galicia_local_web/live/business_live.ex:686
 #, elixir-autogen, elixir-format
 msgid "French"
-msgstr "Francés"
+msgstr "Frans"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:320
 #: lib/galicia_local_web/live/netherlands_home_live.ex:315
 #, elixir-autogen, elixir-format
 msgid "Fresh additions to help you explore"
-msgstr "Nuevas incorporaciones para ayudarte a explorar"
+msgstr "Verse toevoegingen om te ontdekken"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:45
 #, elixir-autogen, elixir-format
 msgid "From immigration lawyers to international schools — categories that matter to you."
-msgstr "Desde abogados de inmigración hasta colegios internacionales — categorías que te importan."
+msgstr "Van immigratieadvocaten tot internationale scholen — categorieën die voor u belangrijk zijn."
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:26
 #, elixir-autogen, elixir-format
 msgid "Galicia, Spain"
-msgstr "Galicia, España"
+msgstr "Galicië, Spanje"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:10
 #, elixir-autogen, elixir-format
 msgid "GaliciaLocal (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website galicialocal.com."
-msgstr "GaliciaLocal (\"nosotros\") se compromete a proteger tu privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos tu información cuando visitas nuestro sitio web galicialocal.com."
+msgstr "GaliciaLocal (\"wij\", \"ons\", of \"onze\") zet zich in voor de bescherming van uw privacy. Dit Privacybeleid legt uit hoe wij uw informatie verzamelen, gebruiken en beschermen wanneer u onze website galicialocal.com bezoekt."
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:74
 #, elixir-autogen, elixir-format
 msgid "GaliciaLocal is a passion project created by people who love this beautiful region of northwestern Spain and want to help others discover its charms. We work with locals on the ground to verify information and ensure our listings reflect what you'll actually find when you get there."
-msgstr "GaliciaLocal es un proyecto creado con pasión por personas que aman esta hermosa región del noroeste de España y quieren ayudar a otros a descubrir sus encantos. Trabajamos con personas locales para verificar la información y asegurarnos de que nuestros listados reflejan lo que realmente encontrarás cuando llegues."
+msgstr "GaliciaLocal is een passieproject gemaakt door mensen die van deze prachtige regio in Noordwest-Spanje houden en anderen willen helpen de charmes te ontdekken. We werken samen met locals om informatie te verifiëren en ervoor te zorgen dat onze vermeldingen weerspiegelen wat u werkelijk zult vinden."
 
 #: lib/galicia_local_web/live/business_live.ex:683
 #, elixir-autogen, elixir-format
 msgid "Galician"
-msgstr "Gallego"
+msgstr "Galicisch"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:180
 #, elixir-autogen, elixir-format
 msgid "Galician Cities"
-msgstr "Ciudades gallegas"
+msgstr "Galicische steden"
 
 #: lib/galicia_local_web/live/business_live.ex:685
 #, elixir-autogen, elixir-format
 msgid "German"
-msgstr "Alemán"
+msgstr "Duits"
 
 #: lib/galicia_local_web/live/business_live.ex:548
 #, elixir-autogen, elixir-format
 msgid "Get Directions"
-msgstr "Cómo llegar"
+msgstr "Route opvragen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:450
 #: lib/galicia_local_web/live/netherlands_home_live.ex:444
 #, elixir-autogen, elixir-format
 msgid "Getting Started"
-msgstr "Primeros pasos"
+msgstr "Aan de slag"
 
 #: lib/galicia_local_web/live/business_live.ex:374
 #, elixir-autogen, elixir-format
 msgid "Good to Know"
-msgstr "Bueno saber"
+msgstr "Goed om te weten"
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Have a question, suggestion, or want to add your business? We'd love to hear from you!"
-msgstr "¿Tienes alguna pregunta, sugerencia o quieres añadir tu negocio? ¡Nos encantaría saber de ti!"
+msgstr "Heeft u een vraag, suggestie of wilt u uw bedrijf toevoegen? We horen graag van u!"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:356
 #, elixir-autogen, elixir-format
 msgid "Helping newcomers integrate into Galician life"
-msgstr "Ayudando a los recién llegados a integrarse en la vida gallega"
+msgstr "Nieuwkomers helpen integreren in het Galicische leven"
 
 #: lib/galicia_local_web/live/business_live.ex:357
 #, elixir-autogen, elixir-format
 msgid "Highlights"
-msgstr "Destacados"
+msgstr "Hoogtepunten"
 
 #: lib/galicia_local_web/live/business_live.ex:197
 #: lib/galicia_local_web/live/category_live.ex:239
@@ -693,190 +693,190 @@ msgstr "Destacados"
 #: lib/galicia_local_web/live/recommend_business_live.ex:77
 #, elixir-autogen, elixir-format
 msgid "Home"
-msgstr "Inicio"
+msgstr "Home"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:21
 #, elixir-autogen, elixir-format
 msgid "How We Use Your Information"
-msgstr "Cómo usamos tu información"
+msgstr "Hoe wij uw informatie gebruiken"
 
 #: lib/galicia_local_web/live/profile_live.ex:80
 #, elixir-autogen, elixir-format
 msgid "How you want to be known"
-msgstr "Cómo quieres que te conozcan"
+msgstr "Hoe u bekend wilt staan"
 
 #: lib/galicia_local_web/live/business_live.ex:591
 #, elixir-autogen, elixir-format
 msgid "I have visited this place"
-msgstr "He visitado este lugar"
+msgstr "Ik heb deze plek bezocht"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:51
 #, elixir-autogen, elixir-format
 msgid "If you have questions about this Privacy Policy, please contact us at"
-msgstr "Si tienes preguntas sobre esta Política de Privacidad, contáctanos en"
+msgstr "Als u vragen heeft over dit privacybeleid, neem dan contact met ons op via"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:196
 #, elixir-autogen, elixir-format
 msgid "Import businesses from Google Places"
-msgstr "Importar negocios desde Google Places"
+msgstr "Importeer bedrijven van Google Places"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:25
 #, elixir-autogen, elixir-format
 msgid "Improve and personalize your experience"
-msgstr "Mejorar y personalizar tu experiencia"
+msgstr "Uw ervaring verbeteren en personaliseren"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:13
 #, elixir-autogen, elixir-format
 msgid "Information We Collect"
-msgstr "Información que recopilamos"
+msgstr "Informatie die wij verzamelen"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:18
 #, elixir-autogen, elixir-format
 msgid "Information you provide when contacting us or submitting a business listing."
-msgstr "Información que proporcionas al contactarnos o enviar un listado de negocio."
+msgstr "Informatie die u verstrekt bij contact of het indienen van een bedrijfsvermelding."
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Introduction"
-msgstr "Introducción"
+msgstr "Introductie"
 
 #: lib/galicia_local_web/live/business_live.ex:523
 #, elixir-autogen, elixir-format
 msgid "Is this your business?"
-msgstr "¿Es este tu negocio?"
+msgstr "Is dit uw bedrijf?"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:301
 #, elixir-autogen, elixir-format
 msgid "Job Queue"
-msgstr "Cola de trabajos"
+msgstr "Jobwachtrij"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:175
 #: lib/galicia_local_web/components/layouts/root.html.heex:250
 #, elixir-autogen, elixir-format
 msgid "Join Community"
-msgstr "Únete a la comunidad"
+msgstr "Word lid"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:37
 #, elixir-autogen, elixir-format
 msgid "Language Detection"
-msgstr "Detección de idiomas"
+msgstr "Taaldetectie"
 
 #: lib/galicia_local_web/live/business_live.ex:468
 #, elixir-autogen, elixir-format
 msgid "Languages Spoken"
-msgstr "Idiomas hablados"
+msgstr "Gesproken talen"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:6
 #, elixir-autogen, elixir-format
 msgid "Last updated: January 28, 2026"
-msgstr "Última actualización: 28 de enero de 2026"
+msgstr "Laatst bijgewerkt: 28 januari 2026"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:190
 #, elixir-autogen, elixir-format
 msgid "Learn Galician"
-msgstr "Aprende gallego"
+msgstr "Leer Galicisch"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:155
 #: lib/galicia_local_web/live/netherlands_home_live.ex:150
 #, elixir-autogen, elixir-format
 msgid "Legal Help"
-msgstr "Ayuda legal"
+msgstr "Juridische hulp"
 
 #: lib/galicia_local_web/live/categories_live.ex:88
 #, elixir-autogen, elixir-format
 msgid "Lifestyle & Culture"
-msgstr "Estilo de vida y cultura"
+msgstr "Lifestyle & Cultuur"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:253
 #, elixir-autogen, elixir-format
 msgid "Living Like a Galician"
-msgstr "Vivir como un gallego"
+msgstr "Leven als een Galiciër"
 
 #: lib/galicia_local_web/live/business_live.ex:513
 #: lib/galicia_local_web/live/category_live.ex:330
 #: lib/galicia_local_web/live/cities_live.ex:61
 #, elixir-autogen, elixir-format
 msgid "Loading map..."
-msgstr "Cargando mapa..."
+msgstr "Kaart laden..."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:172
 #: lib/galicia_local_web/live/netherlands_home_live.ex:167
 #, elixir-autogen, elixir-format
 msgid "Local Businesses"
-msgstr "Negocios locales"
+msgstr "Lokale bedrijven"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:149
 #: lib/galicia_local_web/live/netherlands_home_live.ex:144
 #: lib/galicia_local_web/live/search_live.ex:248
 #, elixir-autogen, elixir-format
 msgid "Local Gems"
-msgstr "Joyas locales"
+msgstr "Lokale parels"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:51
 #, elixir-autogen, elixir-format
 msgid "Local Insights"
-msgstr "Perspectivas locales"
+msgstr "Lokale inzichten"
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:25
 #: lib/galicia_local_web/live/business_live.ex:502
 #, elixir-autogen, elixir-format
 msgid "Location"
-msgstr "Ubicación"
+msgstr "Locatie"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:115
 #, elixir-autogen, elixir-format
 msgid "Logged in as"
-msgstr "Conectado como"
+msgstr "Ingelogd als"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:122
 #, elixir-autogen, elixir-format
 msgid "Make Galicia Your Home"
-msgstr "Haz de Galicia tu hogar"
+msgstr "Maak Galicië uw thuis"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:211
 #, elixir-autogen, elixir-format
 msgid "Manage all business listings"
-msgstr "Gestionar todos los listados de negocios"
+msgstr "Beheer alle bedrijfsvermeldingen"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:241
 #, elixir-autogen, elixir-format
 msgid "Manage business categories"
-msgstr "Gestionar categorías de negocios"
+msgstr "Beheer bedrijfscategorieën"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:226
 #, elixir-autogen, elixir-format
 msgid "Manage city listings"
-msgstr "Gestionar listados de ciudades"
+msgstr "Beheer stadsvermeldingen"
 
 #: lib/galicia_local_web/live/member_live.ex:24
 #, elixir-autogen, elixir-format
 msgid "Member"
-msgstr "Miembro"
+msgstr "Lid"
 
 #: lib/galicia_local_web/live/member_live.ex:32
 #, elixir-autogen, elixir-format
 msgid "Member not found"
-msgstr "Miembro no encontrado"
+msgstr "Lid niet gevonden"
 
 #: lib/galicia_local_web/live/member_live.ex:63
 #, elixir-autogen, elixir-format
 msgid "Member since %{date}"
-msgstr "Miembro desde %{date}"
+msgstr "Lid sinds %{date}"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:116
 #, elixir-autogen, elixir-format
 msgid "Message:"
-msgstr "Mensaje:"
+msgstr "Bericht:"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:27
 #, elixir-autogen, elixir-format
 msgid "Monitor usage and analyze trends"
-msgstr "Supervisar el uso y analizar tendencias"
+msgstr "Gebruik monitoren en trends analyseren"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:21
 #, elixir-autogen, elixir-format
 msgid "Moving to a new country is challenging. Finding a doctor who speaks your language, a lawyer who understands immigration, or simply the best local bakery shouldn't be. We're building the most comprehensive, curated directory of services in Galicia, with a special focus on businesses that welcome international clients."
-msgstr "Mudarse a un nuevo país es un reto. Encontrar un médico que hable tu idioma, un abogado que entienda de inmigración, o simplemente la mejor panadería local no debería serlo. Estamos construyendo el directorio de servicios más completo y cuidado de Galicia, con especial atención a los negocios que acogen a clientes internacionales."
+msgstr "Verhuizen naar een nieuw land is uitdagend. Een arts vinden die uw taal spreekt, een advocaat die immigratie begrijpt, of simpelweg de beste lokale bakker zou dat niet moeten zijn. Wij bouwen de meest uitgebreide gids van diensten in Galicië, met speciale aandacht voor bedrijven die internationale klanten verwelkomen."
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:157
 #: lib/galicia_local_web/components/layouts/root.html.heex:229
@@ -885,7 +885,7 @@ msgstr "Mudarse a un nuevo país es un reto. Encontrar un médico que hable tu i
 #: lib/galicia_local_web/live/my_businesses_live.ex:41
 #, elixir-autogen, elixir-format
 msgid "My Businesses"
-msgstr "Mis negocios"
+msgstr "Mijn bedrijven"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:152
 #: lib/galicia_local_web/components/layouts/root.html.heex:224
@@ -893,7 +893,7 @@ msgstr "Mis negocios"
 #: lib/galicia_local_web/live/favorites_live.ex:46
 #, elixir-autogen, elixir-format
 msgid "My Favorites"
-msgstr "Mis favoritos"
+msgstr "Mijn favorieten"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:147
 #: lib/galicia_local_web/components/layouts/root.html.heex:219
@@ -901,279 +901,279 @@ msgstr "Mis favoritos"
 #: lib/galicia_local_web/live/profile_live.ex:69
 #, elixir-autogen, elixir-format
 msgid "My Profile"
-msgstr "Mi perfil"
+msgstr "Mijn profiel"
 
 #: lib/galicia_local_web/live/profile_live.ex:126
 #, elixir-autogen, elixir-format
 msgid "My Reviews"
-msgstr "Mis reseñas"
+msgstr "Mijn beoordelingen"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:350
 #, elixir-autogen, elixir-format
 msgid "Name"
-msgstr "Nombre"
+msgstr "Naam"
 
 #: lib/galicia_local_web/live/category_live.ex:298
 #, elixir-autogen, elixir-format
 msgid "Near me"
-msgstr "Cerca de mí"
+msgstr "In de buurt"
 
 #: lib/galicia_local_web/live/category_live.ex:298
 #, elixir-autogen, elixir-format
 msgid "Near me ✓"
-msgstr "Cerca de mí ✓"
+msgstr "In de buurt ✓"
 
 #: lib/galicia_local_web/live/category_live.ex:345
 #: lib/galicia_local_web/live/city_live.ex:181
 #, elixir-autogen, elixir-format
 msgid "No businesses found"
-msgstr "No se encontraron negocios"
+msgstr "Geen bedrijven gevonden"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:392
 #, elixir-autogen, elixir-format
 msgid "No businesses yet. Start by importing some from the Scraper."
-msgstr "Aún no hay negocios. Empieza importando algunos desde el Scraper."
+msgstr "Nog geen bedrijven. Begin met importeren via de Scraper."
 
 #: lib/galicia_local_web/live/favorites_live.ex:94
 #, elixir-autogen, elixir-format
 msgid "No favorites yet"
-msgstr "Aún no tienes favoritos"
+msgstr "Nog geen favorieten"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:139
 #, elixir-autogen, elixir-format
 msgid "No pending claims"
-msgstr "No hay solicitudes pendientes"
+msgstr "Geen openstaande claims"
 
 #: lib/galicia_local_web/live/search_live.ex:262
 #, elixir-autogen, elixir-format
 msgid "No results found"
-msgstr "No se encontraron resultados"
+msgstr "Geen resultaten gevonden"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:418
 #: lib/galicia_local_web/live/netherlands_home_live.ex:412
 #, elixir-autogen, elixir-format
 msgid "No reviews yet"
-msgstr "Aún sin reseñas"
+msgstr "Nog geen beoordelingen"
 
 #: lib/galicia_local_web/live/business_live.ex:654
 #, elixir-autogen, elixir-format
 msgid "No reviews yet. Be the first to share your experience!"
-msgstr "Aún no hay reseñas. ¡Sé el primero en compartir tu experiencia!"
+msgstr "Nog geen beoordelingen. Wees de eerste om uw ervaring te delen!"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:304
 #, elixir-autogen, elixir-format
 msgid "Oban job dashboard"
-msgstr "Panel de trabajos Oban"
+msgstr "Oban job dashboard"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:46
 #, elixir-autogen, elixir-format
 msgid "Object to processing of your data"
-msgstr "Oponerte al tratamiento de tus datos"
+msgstr "Bezwaar maken tegen verwerking van uw gegevens"
 
 #: lib/galicia_local_web/live/business_live.ex:443
 #: lib/galicia_local_web/live/edit_business_live.ex:211
 #, elixir-autogen, elixir-format
 msgid "Opening Hours"
-msgstr "Horario de apertura"
+msgstr "Openingstijden"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:144
 #, elixir-autogen, elixir-format
 msgid "Optional but helps us verify faster"
-msgstr "Opcional pero nos ayuda a verificar más rápido"
+msgstr "Optioneel maar helpt ons sneller verifiëren"
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:31
 #, elixir-autogen, elixir-format
 msgid "Or"
-msgstr "O"
+msgstr "Of"
 
 #: lib/galicia_local_web/live/profile_live.ex:107
 #, elixir-autogen, elixir-format
 msgid "Originally From"
-msgstr "Lugar de origen"
+msgstr "Oorspronkelijk uit"
 
 #: lib/galicia_local_web/live/member_live.ex:60
 #, elixir-autogen, elixir-format
 msgid "Originally from %{country}"
-msgstr "Originalmente de %{country}"
+msgstr "Oorspronkelijk uit %{country}"
 
 #: lib/galicia_local_web/live/categories_live.ex:90
 #: lib/galicia_local_web/live/galicia_home_live.ex:454
 #: lib/galicia_local_web/live/netherlands_home_live.ex:448
 #, elixir-autogen, elixir-format
 msgid "Other"
-msgstr "Otros"
+msgstr "Overig"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:18
 #, elixir-autogen, elixir-format
 msgid "Our Mission"
-msgstr "Nuestra misión"
+msgstr "Onze missie"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:256
 #, elixir-autogen, elixir-format
 msgid "Page views and traffic"
-msgstr "Páginas vistas y tráfico"
+msgstr "Paginaweergaven en verkeer"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:159
 #, elixir-autogen, elixir-format
 msgid "Pending Enrichment"
-msgstr "Enriquecimiento pendiente"
+msgstr "Wacht op verrijking"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:319
 #, elixir-autogen, elixir-format
 msgid "Phoenix Dashboard"
-msgstr "Panel de Phoenix"
+msgstr "Phoenix Dashboard"
 
 #: lib/galicia_local_web/live/business_live.ex:405
 #: lib/galicia_local_web/live/edit_business_live.ex:169
 #: lib/galicia_local_web/live/recommend_business_live.ex:197
 #, elixir-autogen, elixir-format
 msgid "Phone"
-msgstr "Teléfono"
+msgstr "Telefoon"
 
 #: lib/galicia_local_web/live/business_live.ex:684
 #, elixir-autogen, elixir-format
 msgid "Portuguese"
-msgstr "Portugués"
+msgstr "Portugees"
 
 #: lib/galicia_local_web/live/categories_live.ex:89
 #: lib/galicia_local_web/live/galicia_home_live.ex:453
 #: lib/galicia_local_web/live/netherlands_home_live.ex:447
 #, elixir-autogen, elixir-format
 msgid "Practical Services"
-msgstr "Servicios prácticos"
+msgstr "Praktische diensten"
 
 #: lib/galicia_local_web/live/categories_live.ex:95
 #, elixir-autogen, elixir-format
 msgid "Practical services for your home and car."
-msgstr "Servicios prácticos para tu hogar y tu coche."
+msgstr "Praktische diensten voor uw huis en auto."
 
 #: lib/galicia_local_web/live/categories_live.ex:48
 #, elixir-autogen, elixir-format
 msgid "Priority %{number}"
-msgstr "Prioridad %{number}"
+msgstr "Prioriteit %{number}"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:361
 #: lib/galicia_local_web/live/netherlands_home_live.ex:356
 #, elixir-autogen, elixir-format
 msgid "Privacy"
-msgstr "Privacidad"
+msgstr "Privacy"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:3
 #, elixir-autogen, elixir-format
 msgid "Privacy Policy"
-msgstr "Política de privacidad"
+msgstr "Privacybeleid"
 
 #: lib/galicia_local_web/live/profile_live.ex:57
 #, elixir-autogen, elixir-format
 msgid "Profile updated!"
-msgstr "¡Perfil actualizado!"
+msgstr "Profiel bijgewerkt!"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:24
 #, elixir-autogen, elixir-format
 msgid "Provide and maintain our service"
-msgstr "Proporcionar y mantener nuestro servicio"
+msgstr "Onze dienst leveren en onderhouden"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:352
 #, elixir-autogen, elixir-format
 msgid "Rating"
-msgstr "Valoración"
+msgstr "Beoordeling"
 
 #: lib/galicia_local_web/live/business_live.ex:569
 #, elixir-autogen, elixir-format
 msgid "Rating:"
-msgstr "Valoración:"
+msgstr "Beoordeling:"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:52
 #, elixir-autogen, elixir-format
 msgid "Real summaries and highlights distilled from local reviews and experiences."
-msgstr "Resúmenes reales y destacados extraídos de reseñas y experiencias locales."
+msgstr "Echte samenvattingen en hoogtepunten uit lokale beoordelingen en ervaringen."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:319
 #: lib/galicia_local_web/live/netherlands_home_live.ex:314
 #, elixir-autogen, elixir-format
 msgid "Recently Added"
-msgstr "Añadidos recientemente"
+msgstr "Recent toegevoegd"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:342
 #, elixir-autogen, elixir-format
 msgid "Recently Added Businesses"
-msgstr "Negocios añadidos recientemente"
+msgstr "Recent toegevoegde bedrijven"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:127
 #, elixir-autogen, elixir-format
 msgid "Reject"
-msgstr "Rechazar"
+msgstr "Afwijzen"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:125
 #, elixir-autogen, elixir-format
 msgid "Reject this claim?"
-msgstr "¿Rechazar esta solicitud?"
+msgstr "Deze claim afwijzen?"
 
 #: lib/galicia_local_web/live/search_live.ex:275
 #, elixir-autogen, elixir-format
 msgid "Remove English filter"
-msgstr "Quitar filtro de inglés"
+msgstr "Engels filter verwijderen"
 
 #: lib/galicia_local_web/live/favorites_live.ex:82
 #, elixir-autogen, elixir-format
 msgid "Remove from favorites?"
-msgstr "¿Eliminar de favoritos?"
+msgstr "Verwijderen uit favorieten?"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:45
 #, elixir-autogen, elixir-format
 msgid "Request deletion of your data"
-msgstr "Solicitar la eliminación de tus datos"
+msgstr "Verzoek om verwijdering van uw gegevens"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:26
 #, elixir-autogen, elixir-format
 msgid "Respond to your inquiries"
-msgstr "Responder a tus consultas"
+msgstr "Reageren op uw vragen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:152
 #: lib/galicia_local_web/live/netherlands_home_live.ex:147
 #, elixir-autogen, elixir-format
 msgid "Restaurants"
-msgstr "Restaurantes"
+msgstr "Restaurants"
 
 #: lib/galicia_local_web/live/admin/claims_live.ex:91
 #, elixir-autogen, elixir-format
 msgid "Review and approve business ownership claims."
-msgstr "Revisar y aprobar solicitudes de propiedad de negocios."
+msgstr "Beoordeel en keur bedrijfseigenaarsclaims goed."
 
 #: lib/galicia_local_web/live/business_live.ex:183
 #, elixir-autogen, elixir-format
 msgid "Review deleted"
-msgstr "Reseña eliminada"
+msgstr "Beoordeling verwijderd"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:271
 #, elixir-autogen, elixir-format
 msgid "Review ownership claims"
-msgstr "Revisar solicitudes de propiedad"
+msgstr "Beoordeel eigenaarsclaims"
 
 #: lib/galicia_local_web/live/business_live.ex:161
 #, elixir-autogen, elixir-format
 msgid "Review submitted!"
-msgstr "¡Reseña enviada!"
+msgstr "Beoordeling ingediend!"
 
 #: lib/galicia_local_web/live/business_live.ex:222
 #, elixir-autogen, elixir-format
 msgid "Save"
-msgstr "Guardar"
+msgstr "Opslaan"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:248
 #, elixir-autogen, elixir-format
 msgid "Save Changes"
-msgstr "Guardar cambios"
+msgstr "Wijzigingen opslaan"
 
 #: lib/galicia_local_web/live/profile_live.ex:118
 #, elixir-autogen, elixir-format
 msgid "Save Profile"
-msgstr "Guardar perfil"
+msgstr "Profiel opslaan"
 
 #: lib/galicia_local_web/live/business_live.ex:222
 #, elixir-autogen, elixir-format
 msgid "Saved"
-msgstr "Guardado"
+msgstr "Opgeslagen"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:195
 #, elixir-autogen, elixir-format
@@ -1188,849 +1188,849 @@ msgstr "Scraper"
 #: lib/galicia_local_web/live/search_live.ex:191
 #, elixir-autogen, elixir-format
 msgid "Search"
-msgstr "Buscar"
+msgstr "Zoeken"
 
 #: lib/galicia_local_web/live/my_businesses_live.ex:75
 #: lib/galicia_local_web/live/search_live.ex:169
 #, elixir-autogen, elixir-format
 msgid "Search Businesses"
-msgstr "Buscar negocios"
+msgstr "Zoek bedrijven"
 
 #: lib/galicia_local_web/live/search_live.ex:185
 #, elixir-autogen, elixir-format
 msgid "Search for businesses, services..."
-msgstr "Buscar negocios, servicios..."
+msgstr "Zoek naar bedrijven, diensten..."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:135
 #: lib/galicia_local_web/live/netherlands_home_live.ex:130
 #, elixir-autogen, elixir-format
 msgid "Search for lawyers, restaurants, services..."
-msgstr "Buscar abogados, restaurantes, servicios..."
+msgstr "Zoek naar advocaten, restaurants, diensten..."
 
 #: lib/galicia_local_web/live/profile_live.ex:97
 #, elixir-autogen, elixir-format
 msgid "Select your area..."
-msgstr "Selecciona tu zona..."
+msgstr "Selecteer uw gebied..."
 
 #: lib/galicia_local_web/live/business_live.ex:566
 #, elixir-autogen, elixir-format
 msgid "Share your experience"
-msgstr "Comparte tu experiencia"
+msgstr "Deel uw ervaring"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:155
 #, elixir-autogen, elixir-format
 msgid "Short Summary"
-msgstr "Resumen breve"
+msgstr "Korte samenvatting"
 
 #: lib/galicia_local_web/live/category_live.ex:306
 #, elixir-autogen, elixir-format
 msgid "Show all"
-msgstr "Mostrar todos"
+msgstr "Toon alles"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:174
 #: lib/galicia_local_web/components/layouts/root.html.heex:245
 #, elixir-autogen, elixir-format
 msgid "Sign In"
-msgstr "Iniciar sesión"
+msgstr "Inloggen"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:168
 #: lib/galicia_local_web/components/layouts/root.html.heex:239
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:123
 #, elixir-autogen, elixir-format
 msgid "Sign Out"
-msgstr "Cerrar sesión"
+msgstr "Uitloggen"
 
 #: lib/galicia_local_web/live/business_live.ex:602
 #, elixir-autogen, elixir-format
 msgid "Sign in"
-msgstr "Iniciar sesión"
+msgstr "Inloggen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:338
 #: lib/galicia_local_web/live/netherlands_home_live.ex:333
 #, elixir-autogen, elixir-format
 msgid "Skip the tourist traps. Find the places locals actually go. Learn the customs that earn respect. Make real connections."
-msgstr "Evita las trampas para turistas. Encuentra los sitios donde van los locales. Aprende las costumbres que generan respeto. Haz conexiones reales."
+msgstr "Vermijd de toeristenvallen. Vind de plekken waar locals echt komen. Leer de gewoontes die respect verdienen. Maak echte connecties."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:255
 #, elixir-autogen, elixir-format
 msgid "Small things that make a big difference when integrating into local life"
-msgstr "Pequeñas cosas que marcan una gran diferencia al integrarse en la vida local"
+msgstr "Kleine dingen die een groot verschil maken bij integratie in het lokale leven"
 
 #: lib/galicia_local_web/components/layouts.ex:106
 #, elixir-autogen, elixir-format
 msgid "Something went wrong!"
-msgstr "¡Algo ha salido mal!"
+msgstr "Er ging iets mis!"
 
 #: lib/galicia_local_web/live/business_live.ex:681
 #, elixir-autogen, elixir-format
 msgid "Spanish"
-msgstr "Español"
+msgstr "Spaans"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:83
 #, elixir-autogen, elixir-format
 msgid "Start Exploring"
-msgstr "Empieza a explorar"
+msgstr "Begin met ontdekken"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:351
 #, elixir-autogen, elixir-format
 msgid "Status"
-msgstr "Estado"
+msgstr "Status"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:103
 #, elixir-autogen, elixir-format
 msgid "Status:"
-msgstr "Estado:"
+msgstr "Status:"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:154
 #, elixir-autogen, elixir-format
 msgid "Submit Claim"
-msgstr "Enviar solicitud"
+msgstr "Claim indienen"
 
 #: lib/galicia_local_web/live/business_live.ex:595
 #, elixir-autogen, elixir-format
 msgid "Submit Review"
-msgstr "Enviar reseña"
+msgstr "Beoordeling verzenden"
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:38
 #, elixir-autogen, elixir-format
 msgid "Submit Your Business"
-msgstr "Envía tu negocio"
+msgstr "Dien uw bedrijf in"
 
 #: lib/galicia_local_web/live/my_businesses_live.ex:93
 #, elixir-autogen, elixir-format
 msgid "Submitted %{date}"
-msgstr "Enviado %{date}"
+msgstr "Ingediend %{date}"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:322
 #, elixir-autogen, elixir-format
 msgid "System metrics & performance"
-msgstr "Métricas del sistema y rendimiento"
+msgstr "Systeemstatistieken & prestaties"
 
 #: lib/galicia_local_web/live/profile_live.ex:89
 #, elixir-autogen, elixir-format
 msgid "Tell the community a bit about yourself..."
-msgstr "Cuéntale a la comunidad un poco sobre ti..."
+msgstr "Vertel de community iets over uzelf..."
 
 #: lib/galicia_local_web/live/claim_business_live.ex:139
 #, elixir-autogen, elixir-format
 msgid "Tell us how you're connected to this business (e.g. 'I am the founder', 'I manage this location')"
-msgstr "Cuéntanos tu relación con este negocio (ej. 'Soy el fundador', 'Gestiono este local')"
+msgstr "Vertel ons hoe u verbonden bent met dit bedrijf (bijv. 'Ik ben de oprichter', 'Ik beheer deze locatie')"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:71
 #, elixir-autogen, elixir-format
 msgid "The Team"
-msgstr "El equipo"
+msgstr "Het team"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:30
 #, elixir-autogen, elixir-format
 msgid "Third-Party Services"
-msgstr "Servicios de terceros"
+msgstr "Diensten van derden"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:90
 #, elixir-autogen, elixir-format
 msgid "This business has already been claimed by its owner."
-msgstr "Este negocio ya ha sido reclamado por su propietario."
+msgstr "Dit bedrijf is al geclaimd door de eigenaar."
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:150
 #, elixir-autogen, elixir-format
 msgid "Total Businesses"
-msgstr "Total de negocios"
+msgstr "Totaal bedrijven"
 
 #: lib/galicia_local_web/live/category_live.ex:347
 #: lib/galicia_local_web/live/city_live.ex:183
 #, elixir-autogen, elixir-format
 msgid "Try adjusting your filters or check back later."
-msgstr "Prueba a ajustar tus filtros o vuelve más tarde."
+msgstr "Probeer uw filters aan te passen of kom later terug."
 
 #: lib/galicia_local_web/live/search_live.ex:264
 #, elixir-autogen, elixir-format
 msgid "Try different search terms or adjust your filters."
-msgstr "Prueba con otros términos de búsqueda o ajusta tus filtros."
+msgstr "Probeer andere zoektermen of pas uw filters aan."
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:41
 #, elixir-autogen, elixir-format
 msgid "Under GDPR, you have the right to:"
-msgstr "Según el RGPD, tienes derecho a:"
+msgstr "Onder de AVG heeft u het recht om:"
 
 #: lib/galicia_local_web/live/business_live.ex:282
 #, elixir-autogen, elixir-format
 msgid "Ver en español"
-msgstr "Ver en español"
+msgstr "Bekijk in het Spaans"
 
 #: lib/galicia_local_web/live/business_live.ex:240
 #, elixir-autogen, elixir-format
 msgid "Verified"
-msgstr "Verificado"
+msgstr "Geverifieerd"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:58
 #, elixir-autogen, elixir-format
 msgid "Verified Information"
-msgstr "Información verificada"
+msgstr "Geverifieerde informatie"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:381
 #, elixir-autogen, elixir-format
 msgid "View"
-msgstr "Ver"
+msgstr "Bekijken"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:119
 #, elixir-autogen, elixir-format
 msgid "View Site"
-msgstr "Ver sitio"
+msgstr "Bekijk site"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:214
 #: lib/galicia_local_web/live/netherlands_home_live.ex:209
 #, elixir-autogen, elixir-format
 msgid "View all cities"
-msgstr "Ver todas las ciudades"
+msgstr "Bekijk alle steden"
 
 #: lib/galicia_local_web/live/business_live.ex:538
 #, elixir-autogen, elixir-format
 msgid "View on Google Maps"
-msgstr "Ver en Google Maps"
+msgstr "Bekijk op Google Maps"
 
 #: lib/galicia_local_web/live/business_live.ex:630
 #: lib/galicia_local_web/live/member_live.ex:99
 #, elixir-autogen, elixir-format
 msgid "Visited"
-msgstr "Visitado"
+msgstr "Bezocht"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:18
 #, elixir-autogen, elixir-format
 msgid "Voluntarily:"
-msgstr "Voluntariamente:"
+msgstr "Vrijwillig:"
 
 #: lib/galicia_local_web/controllers/page_html/contact.html.heex:35
 #, elixir-autogen, elixir-format
 msgid "Want to list your business on GaliciaLocal? Send us an email with your business details and we'll get back to you."
-msgstr "¿Quieres listar tu negocio en GaliciaLocal? Envíanos un correo con los datos de tu negocio y te responderemos."
+msgstr "Wilt u uw bedrijf op GaliciaLocal vermelden? Stuur ons een e-mail met uw bedrijfsgegevens en we nemen contact met u op."
 
 #: lib/galicia_local_web/components/layouts.ex:94
 #, elixir-autogen, elixir-format
 msgid "We can't find the internet"
-msgstr "No encontramos conexión a internet"
+msgstr "We kunnen geen internetverbinding vinden"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:38
 #, elixir-autogen, elixir-format
 msgid "We identify which businesses have English-speaking staff, so you know before you go."
-msgstr "Identificamos qué negocios tienen personal que habla inglés, para que lo sepas antes de ir."
+msgstr "Wij identificeren welke bedrijven Engelssprekend personeel hebben, zodat u het van tevoren weet."
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:37
 #, elixir-autogen, elixir-format
 msgid "We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet is 100%% secure."
-msgstr "Implementamos medidas de seguridad adecuadas para proteger tu información personal. Sin embargo, ningún método de transmisión por Internet es 100%% seguro."
+msgstr "Wij implementeren passende beveiligingsmaatregelen om uw persoonlijke informatie te beschermen. Echter, geen enkele verzendmethode via internet is 100%% veilig."
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:59
 #, elixir-autogen, elixir-format
 msgid "We keep listings accurate and up-to-date so you can rely on what you find."
-msgstr "Mantenemos los listados precisos y actualizados para que puedas confiar en lo que encuentres."
+msgstr "Wij houden vermeldingen accuraat en up-to-date zodat u kunt vertrouwen op wat u vindt."
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:14
 #, elixir-autogen, elixir-format
 msgid "We may collect information in the following ways:"
-msgstr "Podemos recopilar información de las siguientes maneras:"
+msgstr "Wij kunnen op de volgende manieren informatie verzamelen:"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:32
 #, elixir-autogen, elixir-format
 msgid "We may use third-party services (such as analytics providers and map services) that collect, monitor, and analyze information to improve our service."
-msgstr "Podemos utilizar servicios de terceros (como proveedores de analítica y servicios de mapas) que recopilan, supervisan y analizan información para mejorar nuestro servicio."
+msgstr "Wij kunnen diensten van derden gebruiken die informatie verzamelen om onze dienst te verbeteren."
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:17
 #, elixir-autogen, elixir-format
 msgid "We use cookies to improve your experience on our site."
-msgstr "Usamos cookies para mejorar tu experiencia en nuestro sitio."
+msgstr "Wij gebruiken cookies om uw ervaring op onze site te verbeteren."
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:22
 #, elixir-autogen, elixir-format
 msgid "We use the information we collect to:"
-msgstr "Usamos la información que recopilamos para:"
+msgstr "Wij gebruiken de verzamelde informatie om:"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:117
 #, elixir-autogen, elixir-format
 msgid "We'll review your claim and get back to you. Once approved, you'll be able to manage your business listing."
-msgstr "Revisaremos tu solicitud y te responderemos. Una vez aprobada, podrás gestionar el listado de tu negocio."
+msgstr "Wij beoordelen uw claim en nemen contact met u op. Na goedkeuring kunt u uw bedrijfsvermelding beheren."
 
 #: lib/galicia_local_web/live/business_live.ex:429
 #: lib/galicia_local_web/live/edit_business_live.ex:179
 #: lib/galicia_local_web/live/recommend_business_live.ex:184
 #, elixir-autogen, elixir-format
 msgid "Website"
-msgstr "Sitio web"
+msgstr "Website"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:120
 #, elixir-autogen, elixir-format
 msgid "Welcome to Galicia"
-msgstr "Bienvenido a Galicia"
+msgstr "Welkom in Galicië"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:31
 #, elixir-autogen, elixir-format
 msgid "What Makes Us Different"
-msgstr "Qué nos hace diferentes"
+msgstr "Wat ons anders maakt"
 
 #: lib/galicia_local_web/live/business_live.ex:583
 #, elixir-autogen, elixir-format
 msgid "What was your experience like? Any tips for others?"
-msgstr "¿Cómo fue tu experiencia? ¿Algún consejo para otros?"
+msgstr "Hoe was uw ervaring? Tips voor anderen?"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:16
 #, elixir-autogen, elixir-format
 msgid "When you visit our site, we may collect certain information automatically, including your IP address, browser type, and pages visited."
-msgstr "Cuando visitas nuestro sitio, podemos recopilar cierta información automáticamente, incluyendo tu dirección IP, tipo de navegador y páginas visitadas."
+msgstr "Wanneer u onze site bezoekt, kunnen wij automatisch bepaalde informatie verzamelen."
 
 #: lib/galicia_local_web/live/profile_live.ex:95
 #, elixir-autogen, elixir-format
 msgid "Where I Live"
-msgstr "Dónde vivo"
+msgstr "Waar ik woon"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:134
 #, elixir-autogen, elixir-format
 msgid "Why are you the owner?"
-msgstr "¿Por qué eres el propietario?"
+msgstr "Waarom bent u de eigenaar?"
 
 #: lib/galicia_local_web/live/claim_business_live.ex:102
 #, elixir-autogen, elixir-format
 msgid "You already submitted a claim for this business."
-msgstr "Ya has enviado una solicitud para este negocio."
+msgstr "U heeft al een claim ingediend voor dit bedrijf."
 
 #: lib/galicia_local_web/live/edit_business_live.ex:33
 #, elixir-autogen, elixir-format
 msgid "You don't have permission to edit this business"
-msgstr "No tienes permiso para editar este negocio"
+msgstr "U heeft geen toestemming om dit bedrijf te bewerken"
 
 #: lib/galicia_local_web/live/my_businesses_live.ex:72
 #, elixir-autogen, elixir-format
 msgid "You don't own any businesses yet."
-msgstr "Aún no tienes ningún negocio."
+msgstr "U bezit nog geen bedrijven."
 
 #: lib/galicia_local_web/live/my_businesses_live.ex:83
 #, elixir-autogen, elixir-format
 msgid "Your Claims"
-msgstr "Tus solicitudes"
+msgstr "Uw claims"
 
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:40
 #, elixir-autogen, elixir-format
 msgid "Your Rights"
-msgstr "Tus derechos"
+msgstr "Uw rechten"
 
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:7
 #, elixir-autogen, elixir-format
 msgid "Your comprehensive guide to services and businesses across Galicia, Spain — built for expats, newcomers, and visitors who want to experience Galicia like a local."
-msgstr "Tu guía completa de servicios y negocios en toda Galicia, España — creada para expatriados, recién llegados y visitantes que quieren vivir Galicia como un local."
+msgstr "Uw uitgebreide gids voor diensten en bedrijven in Galicië, Spanje — gemaakt voor expats, nieuwkomers en bezoekers die Galicië als een local willen ervaren."
 
 #: lib/galicia_local_web/components/core_components.ex:74
 #, elixir-autogen, elixir-format
 msgid "close"
-msgstr "cerrar"
+msgstr "sluiten"
 
 #: lib/galicia_local_web/live/profile_live.ex:112
 #, elixir-autogen, elixir-format
 msgid "e.g. Netherlands, UK, Galicia..."
-msgstr "ej. Países Bajos, Reino Unido, Galicia..."
+msgstr "bijv. Nederland, VK, Galicië..."
 
 #: lib/galicia_local_web/live/categories_live.ex:72
 #, elixir-autogen, elixir-format
 msgid "listings"
-msgstr "listados"
+msgstr "vermeldingen"
 
 #: lib/galicia_local_web/live/business_live.ex:602
 #, elixir-autogen, elixir-format
 msgid "to leave a review"
-msgstr "para dejar una reseña"
+msgstr "om een beoordeling achter te laten"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:15
 #, elixir-autogen, elixir-format
 msgid "Afternoon greeting 2pm-8pm"
-msgstr "Saludo de la tarde, de 14h a 20h"
+msgstr "Middaggroet 14:00-20:00"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:18
 #, elixir-autogen, elixir-format
 msgid "Being polite"
-msgstr "Ser educado"
+msgstr "Beleefd zijn"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:30
 #, elixir-autogen, elixir-format
 msgid "Cash is King"
-msgstr "El efectivo manda"
+msgstr "Cash is koning"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:19
 #: lib/galicia_local_web/live/netherlands_home_live.ex:20
 #, elixir-autogen, elixir-format
 msgid "Casual goodbye"
-msgstr "Despedida informal"
+msgstr "Informeel afscheid"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:21
 #: lib/galicia_local_web/live/netherlands_home_live.ex:21
 #, elixir-autogen, elixir-format
 msgid "Cheers!"
-msgstr "¡Salud!"
+msgstr "Proost!"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:20
 #, elixir-autogen, elixir-format
 msgid "Enjoy your meal"
-msgstr "Buen provecho"
+msgstr "Eet smakelijk"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:16
 #, elixir-autogen, elixir-format
 msgid "Evening greeting after 8pm"
-msgstr "Saludo nocturno, después de las 20h"
+msgstr "Avondgroet na 20:00"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:29
 #, elixir-autogen, elixir-format
 msgid "Free Tapas Culture"
-msgstr "Cultura de tapas gratis"
+msgstr "Gratis tapas cultuur"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:28
 #, elixir-autogen, elixir-format
 msgid "Galicians eat lunch 2-4pm. Restaurants are empty at noon."
-msgstr "Los gallegos comen de 14h a 16h. Los restaurantes están vacíos a mediodía."
+msgstr "Galiciërs lunchen 14:00-16:00. Restaurants zijn leeg om 12:00."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:15
 #: lib/galicia_local_web/live/netherlands_home_live.ex:15
 #, elixir-autogen, elixir-format
 msgid "Good afternoon"
-msgstr "Buenas tardes"
+msgstr "Goedemiddag"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:16
 #: lib/galicia_local_web/live/netherlands_home_live.ex:16
 #, elixir-autogen, elixir-format
 msgid "Good evening"
-msgstr "Buenas noches"
+msgstr "Goedenavond"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:14
 #: lib/galicia_local_web/live/netherlands_home_live.ex:14
 #, elixir-autogen, elixir-format
 msgid "Good morning"
-msgstr "Buenos días"
+msgstr "Goedemorgen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:31
 #, elixir-autogen, elixir-format
 msgid "Greet Everyone"
-msgstr "Saluda a todos"
+msgstr "Groet iedereen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:29
 #, elixir-autogen, elixir-format
 msgid "In many bars, tapas come free with drinks. Just order a caña!"
-msgstr "En muchos bares, las tapas vienen gratis con las bebidas. ¡Solo pide una caña!"
+msgstr "In veel bars krijg je gratis tapas bij drankjes. Bestel gewoon een caña!"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:28
 #, elixir-autogen, elixir-format
 msgid "Lunch is the Main Meal"
-msgstr "La comida es la comida principal"
+msgstr "Lunch is de hoofdmaaltijd"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:27
 #, elixir-autogen, elixir-format
 msgid "Many shops close 2-5pm. Plan errands for mornings or evenings."
-msgstr "Muchas tiendas cierran de 14h a 17h. Planifica tus recados por la mañana o la tarde."
+msgstr "Veel winkels sluiten 14:00-17:00. Plan boodschappen voor ochtend of avond."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:14
 #, elixir-autogen, elixir-format
 msgid "Morning greeting until ~2pm"
-msgstr "Saludo matutino hasta las ~14h"
+msgstr "Ochtendgroet tot ~14:00"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:32
 #, elixir-autogen, elixir-format
 msgid "Ourense has free public hot springs. Bring a towel and join the locals!"
-msgstr "Ourense tiene termas públicas gratuitas. ¡Lleva una toalla y únete a los locales!"
+msgstr "Ourense heeft gratis openbare warmwaterbronnen. Neem een handdoek mee!"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:18
 #, elixir-autogen, elixir-format
 msgid "Please"
-msgstr "Por favor"
+msgstr "Alstublieft"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:20
 #, elixir-autogen, elixir-format
 msgid "Said before eating"
-msgstr "Se dice antes de comer"
+msgstr "Gezegd voor het eten"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:31
 #, elixir-autogen, elixir-format
 msgid "Say 'Bos días' when entering shops. It's expected and appreciated."
-msgstr "Di 'Bos días' al entrar en las tiendas. Se espera y se agradece."
+msgstr "Zeg 'Bos días' bij het betreden van winkels. Het wordt verwacht en gewaardeerd."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:19
 #, elixir-autogen, elixir-format
 msgid "See you later"
-msgstr "Hasta luego"
+msgstr "Tot ziens"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:17
 #, elixir-autogen, elixir-format
 msgid "Showing appreciation"
-msgstr "Mostrar agradecimiento"
+msgstr "Waardering tonen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:30
 #, elixir-autogen, elixir-format
 msgid "Smaller shops often prefer cash. Always have some euros handy."
-msgstr "Las tiendas pequeñas suelen preferir efectivo. Ten siempre algunos euros a mano."
+msgstr "Kleinere winkels geven vaak de voorkeur aan contant geld."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:17
 #, elixir-autogen, elixir-format
 msgid "Thank you very much"
-msgstr "Muchas gracias"
+msgstr "Hartelijk dank"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:27
 #, elixir-autogen, elixir-format
 msgid "The Siesta is Real"
-msgstr "La siesta es real"
+msgstr "De siësta is echt"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:32
 #, elixir-autogen, elixir-format
 msgid "Thermal Springs"
-msgstr "Termas"
+msgstr "Thermale bronnen"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:21
 #: lib/galicia_local_web/live/netherlands_home_live.ex:21
 #, elixir-autogen, elixir-format
 msgid "Toast when drinking"
-msgstr "Brindis al beber"
+msgstr "Proosten bij het drinken"
 
 #: lib/galicia_local_web/live/business_live.ex:282
 #, elixir-autogen, elixir-format
 msgid "View in English"
-msgstr "Ver en inglés"
+msgstr "Bekijk in het Engels"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:31
 #, elixir-autogen, elixir-format
 msgid "'Going Dutch' is real. Each person pays for themselves at dinner."
-msgstr ""
+msgstr "'Going Dutch' is echt. Iedereen betaalt voor zichzelf bij het diner."
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:15
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Afternoon greeting"
-msgstr "Saludo de la tarde, de 14h a 20h"
+msgstr "Middaggroet"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:33
 #, elixir-autogen, elixir-format
 msgid "Agenda Culture"
-msgstr ""
+msgstr "Agendacultuur"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:32
 #, elixir-autogen, elixir-format
 msgid "At birthdays, you sit in a circle and congratulate everyone, not just the birthday person."
-msgstr ""
+msgstr "Bij verjaardagen zit je in een kring en feliciteer je iedereen, niet alleen de jarige."
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:99
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Back to Home"
-msgstr "Volver a %{name}"
+msgstr "Terug naar home"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:420
 #, elixir-autogen, elixir-format
 msgid "Basic Dutch helpful"
-msgstr ""
+msgstr "Basis Nederlands handig"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:29
 #, elixir-autogen, elixir-format
 msgid "Be Direct"
-msgstr ""
+msgstr "Wees direct"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:18
 #, elixir-autogen, elixir-format
 msgid "Being polite or handing something"
-msgstr ""
+msgstr "Beleefd zijn of iets overhandigen"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:32
 #, elixir-autogen, elixir-format
 msgid "Birthday Circles"
-msgstr ""
+msgstr "Verjaardagskringen"
 
 #: lib/galicia_local_web/live/categories_live.ex:24
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Browse local businesses in %{region} by category. From restaurants and legal help to healthcare and education – find what you need."
-msgstr "Explora negocios locales en Galicia por categoría. Desde restaurantes y asesoría legal hasta salud y educación – encuentra lo que necesitas."
+msgstr "Blader door lokale bedrijven in %{region} per categorie. Van restaurants en juridische hulp tot gezondheidszorg – vind wat u nodig heeft."
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:20
 #, elixir-autogen, elixir-format
 msgid "Bye"
-msgstr ""
+msgstr "Doei"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:152
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Category"
-msgstr "Categorías"
+msgstr "Categorie"
 
 #: lib/galicia_local_web/live/region_selector_live.ex:78
 #, elixir-autogen, elixir-format
 msgid "Celtic heritage, incredible seafood, warm communities"
-msgstr ""
+msgstr "Keltisch erfgoed, ongelooflijke zeevruchten, warme gemeenschappen"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:90
 #, elixir-autogen, elixir-format
 msgid "Change region"
-msgstr ""
+msgstr "Wijzig regio"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:34
 #, elixir-autogen, elixir-format
 msgid "Chocolate sprinkles on bread for breakfast is totally normal here!"
-msgstr ""
+msgstr "Hagelslag op brood voor ontbijt is hier heel normaal!"
 
 #: lib/galicia_local_web/live/region_selector_live.ex:16
 #, elixir-autogen, elixir-format
 msgid "Choose Your Region"
-msgstr ""
+msgstr "Kies uw regio"
 
 #: lib/galicia_local_web/live/cities_live.ex:23
 #, elixir-autogen, elixir-format
 msgid "Cities in %{region}"
-msgstr ""
+msgstr "Steden in %{region}"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:414
 #, elixir-autogen, elixir-format
 msgid "City"
-msgstr ""
+msgstr "Stad"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:135
 #, elixir-autogen, elixir-format
 msgid "City / Town"
-msgstr ""
+msgstr "Stad / Gemeente"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:22
 #, elixir-autogen, elixir-format
 msgid "Cozy/fun/nice atmosphere"
-msgstr ""
+msgstr "Gezellige/leuke sfeer"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:30
 #, elixir-autogen, elixir-format
 msgid "Cycle Everywhere"
-msgstr ""
+msgstr "Fiets overal"
 
 #: lib/galicia_local_web/live/region_selector_live.ex:79
 #, elixir-autogen, elixir-format
 msgid "Cycling culture, canals, welcoming expat scene"
-msgstr ""
+msgstr "Fietscultuur, grachten, gastvrije expat-scene"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:76
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Discover %{count}+ local businesses across %{cities} cities. Find restaurants, legal help, services and learn Dutch customs to truly integrate into life in the Netherlands."
-msgstr "Descubre más de %{count} negocios locales en %{cities} ciudades gallegas. Encuentra restaurantes, asesoría legal, servicios y aprende las costumbres locales para integrarte de verdad en la vida gallega."
+msgstr "Ontdek %{count}+ lokale bedrijven in %{cities} steden. Vind restaurants, juridische hulp, diensten en leer Nederlandse gewoontes om echt te integreren."
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:77
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Discover %{count}+ local businesses across %{cities} cities. Find restaurants, legal help, services and learn local customs to truly integrate into %{region} life."
-msgstr "Descubre más de %{count} negocios locales en %{cities} ciudades gallegas. Encuentra restaurantes, asesoría legal, servicios y aprende las costumbres locales para integrarte de verdad en la vida gallega."
+msgstr "Ontdek %{count}+ lokale bedrijven in %{cities} steden. Vind restaurants, juridische hulp, diensten en leer lokale gewoontes."
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:120
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Discover local businesses, learn Dutch customs, and truly integrate into your new community."
-msgstr "Descubre negocios locales, aprende las costumbres gallegas e intégrate de verdad en tu nueva comunidad."
+msgstr "Ontdek lokale bedrijven, leer Nederlandse gewoontes en integreer echt in uw nieuwe gemeenschap."
 
 #: lib/galicia_local_web/live/region_selector_live.ex:35
 #, elixir-autogen, elixir-format
 msgid "Discover local businesses, services, and insider tips from the community."
-msgstr ""
+msgstr "Ontdek lokale bedrijven, diensten en insider tips van de community."
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:14
 #: lib/galicia_local_web/components/layouts/root.html.heex:22
 #: lib/galicia_local_web/components/layouts/root.html.heex:31
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Discover local businesses, services, and insider tips from the community. Your guide to settling into a new community."
-msgstr "Descubre negocios locales, aprende las costumbres gallegas e intégrate de verdad en tu nueva comunidad. Tu guía para hacer de Galicia tu hogar."
+msgstr "Ontdek lokale bedrijven, diensten en insider tips van de community. Uw gids voor een nieuwe start."
 
 #: lib/galicia_local_web/live/cities_live.ex:39
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Discover the beautiful cities and towns of %{region}. Each place has its own charm and character."
-msgstr "Descubre las hermosas ciudades y pueblos de Galicia. Desde aguas termales hasta rutas históricas de peregrinación, cada lugar tiene su propio encanto."
+msgstr "Ontdek de prachtige steden en dorpen van %{region}. Elke plek heeft zijn eigen charme."
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:175
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Dutch Cities"
-msgstr "Neerlandés"
+msgstr "Nederlandse steden"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:33
 #, elixir-autogen, elixir-format
 msgid "Dutch people plan everything weeks ahead. Spontaneous visits are rare."
-msgstr ""
+msgstr "Nederlanders plannen alles weken van tevoren. Spontane bezoeken zijn zeldzaam."
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:29
 #, elixir-autogen, elixir-format
 msgid "Dutch people value directness. It's not rude, it's efficient!"
-msgstr ""
+msgstr "Nederlanders waarderen directheid. Het is niet onbeleefd, het is efficiënt!"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:16
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Evening greeting"
-msgstr "Saludo nocturno, después de las 20h"
+msgstr "Avondgroet"
 
 #: lib/galicia_local_web/live/cities_live.ex:37
 #: lib/galicia_local_web/live/galicia_home_live.ex:210
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Explore %{region}"
-msgstr "Explorar"
+msgstr "Ontdek %{region}"
 
 #: lib/galicia_local_web/live/cities_live.ex:24
 #, elixir-autogen, elixir-format
 msgid "Explore all cities in %{region}. Find local businesses and integrate into %{region} life."
-msgstr ""
+msgstr "Ontdek alle steden in %{region}. Vind lokale bedrijven en integreer."
 
 #: lib/galicia_local_web/live/city_live.ex:36
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Explore local businesses in %{city}, %{region}. Find restaurants, services, and more to help you integrate into local life."
-msgstr "Explora negocios locales en %{city}, Galicia. Encuentra restaurantes, servicios y más para ayudarte a integrarte en la vida local."
+msgstr "Ontdek lokale bedrijven in %{city}, %{region}. Vind restaurants, diensten en meer."
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:205
 #, elixir-autogen, elixir-format
 msgid "Explore the Netherlands"
-msgstr ""
+msgstr "Ontdek Nederland"
 
 #: lib/galicia_local_web/live/search_live.ex:171
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Find services and businesses across %{region}"
-msgstr "Encuentra servicios y negocios en toda Galicia"
+msgstr "Vind diensten en bedrijven in %{region}"
 
 #: lib/galicia_local_web/live/category_live.ex:33
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Find the best %{category} in %{region}. Browse local listings with reviews, ratings, and insider tips."
-msgstr "Encuentra los mejores %{category} en Galicia. Explora listados locales con reseñas, valoraciones y consejos de expertos."
+msgstr "Vind de beste %{category} in %{region}. Blader door lokale vermeldingen met beoordelingen en tips."
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:19
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Formal goodbye"
-msgstr "Despedida informal"
+msgstr "Formeel afscheid"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:30
 #, elixir-autogen, elixir-format
 msgid "Get a bike! It's the main transport. Learn the rules and always signal."
-msgstr ""
+msgstr "Koop een fiets! Het is het belangrijkste vervoermiddel. Leer de regels!"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:19
 #, elixir-autogen, elixir-format
 msgid "Goodbye"
-msgstr ""
+msgstr "Tot ziens"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:34
 #, elixir-autogen, elixir-format
 msgid "Hagelslag for Breakfast"
-msgstr ""
+msgstr "Hagelslag voor ontbijt"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:351
 #, elixir-autogen, elixir-format
 msgid "Helping immigrants integrate into Dutch life"
-msgstr ""
+msgstr "Immigranten helpen integreren in het Nederlandse leven"
 
 #: lib/galicia_local_web/live/region_selector_live.ex:68
 #, elixir-autogen, elixir-format
 msgid "Helping newcomers feel at home since 2026"
-msgstr ""
+msgstr "Nieuwkomers helpen thuis te voelen sinds 2026"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:189
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Highlights & Specialties"
-msgstr "Destacados"
+msgstr "Hoogtepunten & specialiteiten"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:193
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Highlights (English)"
-msgstr "Destacados"
+msgstr "Hoogtepunten (Engels)"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:199
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Highlights (Spanish)"
-msgstr "Destacados"
+msgstr "Hoogtepunten (Spaans)"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:17
 #, elixir-autogen, elixir-format
 msgid "Informal thanks"
-msgstr ""
+msgstr "Informeel bedanken"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:76
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Integrate into %{region} Life"
-msgstr "Intégrate en la vida gallega"
+msgstr "Integreer in het %{region} leven"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:75
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Integrate into Dutch Life"
-msgstr "Intégrate en la vida gallega"
+msgstr "Integreer in het Nederlandse leven"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:111
 #, elixir-autogen, elixir-format
 msgid "Know a great local business in %{region}? Help the community by recommending it!"
-msgstr ""
+msgstr "Kent u een geweldig lokaal bedrijf in %{region}? Beveel het aan!"
 
 #: lib/galicia_local_web/live/business_live.ex:490
 #, elixir-autogen, elixir-format
 msgid "Languages Taught"
-msgstr ""
+msgstr "Talen die worden onderwezen"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:185
 #, elixir-autogen, elixir-format
 msgid "Learn Dutch"
-msgstr ""
+msgstr "Leer Nederlands"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:248
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Living Like a Dutchie"
-msgstr "Vivir como un gallego"
+msgstr "Leven als een Nederlander"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:117
 #, elixir-autogen, elixir-format
 msgid "Make the Netherlands Your Home"
-msgstr ""
+msgstr "Maak Nederland uw thuis"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:14
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Morning greeting"
-msgstr "Saludo matutino hasta las ~14h"
+msgstr "Ochtendgroet"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:435
 #, elixir-autogen, elixir-format
 msgid "No pending suggestions."
-msgstr ""
+msgstr "Geen openstaande suggesties."
 
 #: lib/galicia_local_web/live/edit_business_live.ex:241
 #, elixir-autogen, elixir-format
 msgid "One URL per line"
-msgstr ""
+msgstr "Eén URL per regel"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:195
 #: lib/galicia_local_web/live/edit_business_live.ex:201
 #: lib/galicia_local_web/live/edit_business_live.ex:208
 #, elixir-autogen, elixir-format
 msgid "One per line"
-msgstr ""
+msgstr "Eén per regel"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:402
 #, elixir-autogen, elixir-format
 msgid "Pending Suggestions"
-msgstr ""
+msgstr "Openstaande suggesties"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:239
 #, elixir-autogen, elixir-format
 msgid "Photo URLs"
-msgstr ""
+msgstr "Foto URL's"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:228
 #, elixir-autogen, elixir-format
 msgid "Photos"
-msgstr ""
+msgstr "Foto's"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:18
 #, elixir-autogen, elixir-format
 msgid "Please / Here you go"
-msgstr ""
+msgstr "Alstublieft / Hier"
 
 #: lib/galicia_local_web/live/galicia_home_live.ex:336
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Ready to Become Part of %{region}?"
-msgstr "¿Listo para formar parte de Galicia?"
+msgstr "Klaar om deel uit te maken van %{region}?"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:331
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Ready to Become Part of the Netherlands?"
-msgstr "¿Listo para formar parte de Galicia?"
+msgstr "Klaar om deel uit te maken van Nederland?"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:415
 #, elixir-autogen, elixir-format
 msgid "Reason"
-msgstr ""
+msgstr "Reden"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:116
 #, elixir-autogen, elixir-format
 msgid "Recommend"
-msgstr ""
+msgstr "Aanbevelen"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:97
 #, elixir-autogen, elixir-format
 msgid "Recommend Another"
-msgstr ""
+msgstr "Nog een aanbevelen"
 
 #: lib/galicia_local_web/components/layouts/root.html.heex:201
 #: lib/galicia_local_web/live/recommend_business_live.ex:20
@@ -2038,139 +2038,139 @@ msgstr ""
 #: lib/galicia_local_web/live/recommend_business_live.ex:108
 #, elixir-autogen, elixir-format
 msgid "Recommend a Place"
-msgstr ""
+msgstr "Beveel een plek aan"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:158
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Select a category..."
-msgstr "Selecciona tu zona..."
+msgstr "Selecteer een categorie..."
 
 #: lib/galicia_local_web/live/edit_business_live.ex:206
 #, elixir-autogen, elixir-format
 msgid "Service Specialties"
-msgstr ""
+msgstr "Servicespecialiteiten"
 
 #: lib/galicia_local_web/live/edit_business_live.ex:185
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Short Summary (Spanish)"
-msgstr "Resumen breve"
+msgstr "Korte samenvatting (Spaans)"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:250
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Small things that make a big difference when integrating into Dutch life"
-msgstr "Pequeñas cosas que marcan una gran diferencia al integrarse en la vida local"
+msgstr "Kleine dingen die een groot verschil maken bij integratie in het Nederlandse leven"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:31
 #, elixir-autogen, elixir-format
 msgid "Split the Bill"
-msgstr ""
+msgstr "Rekening splitsen"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:226
 #, elixir-autogen, elixir-format
 msgid "Submit Recommendation"
-msgstr ""
+msgstr "Aanbeveling indienen"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:416
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Submitted"
-msgstr "Enviado %{date}"
+msgstr "Ingediend"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:93
 #, elixir-autogen, elixir-format
 msgid "Switch Region"
-msgstr ""
+msgstr "Wijzig regio"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:23
 #, elixir-autogen, elixir-format
 msgid "Tasty/nice/good"
-msgstr ""
+msgstr "Lekker/leuk/goed"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:17
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Thank you"
-msgstr "Muchas gracias"
+msgstr "Dank u"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:90
 #, elixir-autogen, elixir-format
 msgid "Thank you!"
-msgstr ""
+msgstr "Dank u wel!"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:56
 #, elixir-autogen, elixir-format
 msgid "Thanks for your recommendation! We'll review it soon."
-msgstr ""
+msgstr "Bedankt voor uw aanbeveling! We beoordelen het binnenkort."
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:22
 #, elixir-autogen, elixir-format
 msgid "The most Dutch word - describes a good vibe"
-msgstr ""
+msgstr "Het meest Nederlandse woord - beschrijft een goede sfeer"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:23
 #, elixir-autogen, elixir-format
 msgid "Used for food, weather, feelings"
-msgstr ""
+msgstr "Gebruikt voor eten, weer, gevoelens"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:285
 #, elixir-autogen, elixir-format
 msgid "Users"
-msgstr ""
+msgstr "Gebruikers"
 
 #: lib/galicia_local_web/live/admin/dashboard_live.ex:286
 #, elixir-autogen, elixir-format
 msgid "View and manage users"
-msgstr ""
+msgstr "Bekijk en beheer gebruikers"
 
 #: lib/galicia_local_web/live/region_selector_live.ex:28
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Welcome to StartLocal"
-msgstr "Bienvenido a Galicia"
+msgstr "Welkom bij StartLocal"
 
 #: lib/galicia_local_web/live/netherlands_home_live.ex:115
 #, elixir-autogen, elixir-format
 msgid "Welcome to the Netherlands"
-msgstr ""
+msgstr "Welkom in Nederland"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:216
 #, elixir-autogen, elixir-format
 msgid "What makes this place special? Any tips for newcomers?"
-msgstr ""
+msgstr "Wat maakt deze plek speciaal? Tips voor nieuwkomers?"
 
 #: lib/galicia_local_web/live/region_selector_live.ex:31
 #, elixir-autogen, elixir-format
 msgid "Where are you"
-msgstr ""
+msgstr "Waar gaat u"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:211
 #, elixir-autogen, elixir-format
 msgid "Why do you recommend this place?"
-msgstr ""
+msgstr "Waarom beveelt u deze plek aan?"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:92
 #, elixir-autogen, elixir-format
 msgid "Your recommendation has been submitted. We'll review it and add it to the directory if it's a good fit."
-msgstr ""
+msgstr "Uw aanbeveling is ingediend. We beoordelen het en voegen het toe aan de gids."
 
 #: lib/galicia_local_web/live/edit_business_live.ex:222
 #, elixir-autogen, elixir-format
 msgid "e.g. 9:00 AM – 1:30 PM"
-msgstr ""
+msgstr "bijv. 9:00 – 13:30"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:124
 #, elixir-autogen, elixir-format
 msgid "e.g. Café La Marina"
-msgstr ""
+msgstr "bijv. Café La Marina"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:177
 #, elixir-autogen, elixir-format
 msgid "e.g. Rúa do Franco 12, Santiago de Compostela"
-msgstr ""
+msgstr "bijv. Rúa do Franco 12, Santiago de Compostela"
 
 #: lib/galicia_local_web/live/recommend_business_live.ex:142
 #, elixir-autogen, elixir-format
 msgid "e.g. Vigo, Ourense, Pontevedra"
-msgstr ""
+msgstr "bijv. Vigo, Ourense, Pontevedra"
 
 #: lib/galicia_local_web/live/region_selector_live.ex:32
 #, elixir-autogen, elixir-format
 msgid "settling in?"
-msgstr ""
+msgstr "wonen?"

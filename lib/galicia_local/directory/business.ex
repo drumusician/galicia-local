@@ -445,6 +445,8 @@ defmodule GaliciaLocal.Directory.Business do
     belongs_to :owner, GaliciaLocal.Accounts.User do
       attribute_writable? true
     end
+
+    has_many :translations, GaliciaLocal.Directory.BusinessTranslation
   end
 
   identities do

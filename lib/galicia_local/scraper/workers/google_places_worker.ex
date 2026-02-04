@@ -38,9 +38,12 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
 
     Logger.info("Starting Google Places search: #{query}")
 
-    # Load city for location context
+    # Load city for location context (includes region)
     city = if city_id, do: City.get_by_id!(city_id), else: nil
     category = if category_id, do: Category.get_by_id!(category_id), else: nil
+
+    # Get region_id from city
+    region_id = city && city.region_id
 
     # Create scrape job record
     {:ok, scrape_job} =
@@ -48,7 +51,8 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
         source: :google_maps,
         query: query,
         city_id: city_id,
-        category_id: category_id
+        category_id: category_id,
+        region_id: region_id
       })
 
     # Build location from city
@@ -132,7 +136,8 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
         business_status: place[:business_status]
       },
       city_id: city && city.id,
-      category_id: category && category.id
+      category_id: category && category.id,
+      region_id: city && city.region_id
     }
 
     # Check if business already exists by place_id
