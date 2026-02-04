@@ -9,6 +9,10 @@ defmodule GaliciaLocalWeb.CityLive do
 
   @impl true
   def mount(%{"slug" => slug}, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+    region_name = if region, do: region.name, else: "Galicia"
+
     case City.get_by_slug(slug) do
       {:ok, city} ->
         city = Ash.load!(city, [:business_count])
@@ -29,13 +33,14 @@ defmodule GaliciaLocalWeb.CityLive do
         {:ok,
          socket
          |> assign(:page_title, "#{city.name}, #{city.province}")
-         |> assign(:meta_description, city.description || gettext("Explore local businesses in %{city}, Galicia. Find restaurants, services, and more to help you integrate into local life.", city: city.name))
+         |> assign(:meta_description, city.description || gettext("Explore local businesses in %{city}, %{region}. Find restaurants, services, and more to help you integrate into local life.", city: city.name, region: region_name))
          |> assign(:city, city)
          |> assign(:businesses, businesses)
          |> assign(:categories, categories)
          |> assign(:businesses_by_category, businesses_by_category)
          |> assign(:selected_category, nil)
-         |> assign(:english_only, false)}
+         |> assign(:english_only, false)
+         |> assign(:region_slug, region_slug)}
 
       {:error, _} ->
         {:ok,
@@ -73,7 +78,8 @@ defmodule GaliciaLocalWeb.CityLive do
     category_slug = params["category"] || ""
     english = params["english"] == "true"
     url_params = build_params(category_slug, english)
-    {:noreply, push_patch(socket, to: ~p"/cities/#{socket.assigns.city.slug}?#{url_params}")}
+    region_slug = socket.assigns.region_slug
+    {:noreply, push_patch(socket, to: ~p"/#{region_slug}/cities/#{socket.assigns.city.slug}?#{url_params}")}
   end
 
   defp filter_businesses(businesses, nil, false), do: businesses
@@ -108,8 +114,8 @@ defmodule GaliciaLocalWeb.CityLive do
           <div class="container mx-auto max-w-6xl">
             <nav class="text-sm breadcrumbs text-white/70 mb-2">
               <ul>
-                <li><.link navigate={~p"/"} class="hover:text-white">{gettext("Home")}</.link></li>
-                <li><.link navigate={~p"/cities"} class="hover:text-white">{gettext("Cities")}</.link></li>
+                <li><.link navigate={~p"/#{@region_slug}"} class="hover:text-white">{gettext("Home")}</.link></li>
+                <li><.link navigate={~p"/#{@region_slug}/cities"} class="hover:text-white">{gettext("Cities")}</.link></li>
                 <li class="text-white">{@city.name}</li>
               </ul>
             </nav>
@@ -166,7 +172,7 @@ defmodule GaliciaLocalWeb.CityLive do
         <%= if length(@filtered_businesses) > 0 do %>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <%= for business <- @filtered_businesses do %>
-              <.business_card business={business} locale={@locale} />
+              <.business_card business={business} locale={@locale} region_slug={@region_slug} />
             <% end %>
           </div>
         <% else %>
@@ -185,9 +191,10 @@ defmodule GaliciaLocalWeb.CityLive do
 
   attr :business, :map, required: true
   attr :locale, :string, default: "en"
+  attr :region_slug, :string, default: "galicia"
   defp business_card(assigns) do
     ~H"""
-    <.link navigate={~p"/businesses/#{@business.id}"} class="group">
+    <.link navigate={~p"/#{@region_slug}/businesses/#{@business.id}"} class="group">
       <div class="card bg-base-100 border border-base-300 hover:border-primary hover:shadow-lg transition-all">
         <div class="card-body">
           <div class="flex justify-between items-start">

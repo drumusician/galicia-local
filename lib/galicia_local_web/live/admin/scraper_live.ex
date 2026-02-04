@@ -14,7 +14,15 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
       :timer.send_interval(3000, self(), :refresh_status)
     end
 
-    cities = City.list!() |> Enum.sort_by(& &1.name)
+    region = socket.assigns[:current_region]
+
+    # Filter cities by current region
+    cities =
+      City
+      |> then(fn q -> if region, do: Ash.Query.set_tenant(q, region.id), else: q end)
+      |> Ash.read!()
+      |> Enum.sort_by(& &1.name)
+
     categories = Category.list!() |> Enum.sort_by(& &1.priority)
 
     {:ok,
@@ -126,10 +134,11 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
   end
 
   defp load_scraper_data(socket, opts \\ []) do
+    region = socket.assigns[:current_region]
     spider_status = Scraper.status()
     oban_jobs = Scraper.job_status()
-    recent_jobs = load_recent_jobs()
-    db_stats = load_db_stats()
+    recent_jobs = load_recent_jobs(region)
+    db_stats = load_db_stats(region)
 
     socket =
       socket
@@ -140,21 +149,24 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
       |> assign(:scraping, map_size(spider_status) > 0 || length(oban_jobs) > 0)
 
     if Keyword.get(opts, :costs, false) do
-      assign(socket, :monthly_costs, load_monthly_costs())
+      assign(socket, :monthly_costs, load_monthly_costs(region))
     else
       socket
     end
   end
 
-  defp load_recent_jobs do
+  defp load_recent_jobs(region) do
     ScrapeJob
     |> Ash.Query.sort(inserted_at: :desc)
     |> Ash.Query.limit(10)
     |> Ash.Query.load([:city, :category])
+    |> then(fn q -> if region, do: Ash.Query.set_tenant(q, region.id), else: q end)
     |> Ash.read!()
   end
 
-  defp load_db_stats do
+  defp load_db_stats(region) do
+    region_filter = if region, do: "WHERE region_id = '#{region.id}'", else: ""
+
     %{rows: [[total, pending, english]]} =
       GaliciaLocal.Repo.query!("""
       SELECT
@@ -162,6 +174,7 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
         COUNT(*) FILTER (WHERE status = 'pending'),
         COUNT(*) FILTER (WHERE speaks_english = true)
       FROM businesses
+      #{region_filter}
       """)
 
     %{total: total, pending: pending, english: english}
@@ -177,11 +190,13 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
   # Tavily: 2 searches per business researched
   @tavily_cost_per_search 0.001
 
-  defp load_monthly_costs do
+  defp load_monthly_costs(region) do
     month_start =
       Date.utc_today()
       |> Date.beginning_of_month()
       |> DateTime.new!(~T[00:00:00], "Etc/UTC")
+
+    region_filter = if region, do: "AND region_id = '#{region.id}'", else: ""
 
     # Scrape jobs this month: each job = 1 search call, businesses_found = detail calls
     %{rows: [[search_calls, detail_calls]]} =
@@ -191,7 +206,7 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
           COUNT(*),
           COALESCE(SUM(businesses_found), 0)
         FROM scrape_jobs
-        WHERE started_at >= $1
+        WHERE started_at >= $1 #{region_filter}
         """,
         [month_start]
       )
@@ -205,7 +220,7 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
           COUNT(*) FILTER (WHERE summary_es IS NOT NULL AND summary_es != ''),
           COUNT(*) FILTER (WHERE status NOT IN ('pending'))
         FROM businesses
-        WHERE updated_at >= $1
+        WHERE updated_at >= $1 #{region_filter}
         """,
         [month_start]
       )

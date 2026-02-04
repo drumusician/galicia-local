@@ -11,6 +11,9 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+
     case Business.get_by_id(id) do
       {:ok, business} ->
         business = Ash.load!(business, [:city, :category])
@@ -22,7 +25,8 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
          |> assign(:page_title, "Edit: #{business.name}")
          |> assign(:business, business)
          |> assign(:cities, cities)
-         |> assign(:categories, categories)}
+         |> assign(:categories, categories)
+         |> assign(:region_slug, region_slug)}
 
       {:error, _} ->
         {:ok,
@@ -129,7 +133,7 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
               </div>
             </div>
             <div class="flex gap-2">
-              <.link navigate={~p"/businesses/#{@business.id}"} class="btn btn-ghost btn-sm">
+              <.link navigate={~p"/#{@region_slug}/businesses/#{@business.id}"} class="btn btn-ghost btn-sm">
                 View Public Page
               </.link>
             </div>

@@ -9,6 +9,10 @@ defmodule GaliciaLocalWeb.RecommendBusinessLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+    region_name = if region, do: region.name, else: "Galicia"
+
     categories = Category.list!() |> Enum.sort_by(& &1.priority)
 
     {:ok,
@@ -16,6 +20,8 @@ defmodule GaliciaLocalWeb.RecommendBusinessLive do
      |> assign(:page_title, gettext("Recommend a Place"))
      |> assign(:categories, categories)
      |> assign(:submitted, false)
+     |> assign(:region_slug, region_slug)
+     |> assign(:region_name, region_name)
      |> assign_form()}
   end
 
@@ -68,7 +74,7 @@ defmodule GaliciaLocalWeb.RecommendBusinessLive do
       <div class="container mx-auto max-w-2xl px-4 py-8">
         <nav class="text-sm breadcrumbs mb-6">
           <ul>
-            <li><.link navigate={~p"/"} class="hover:text-primary">{gettext("Home")}</.link></li>
+            <li><.link navigate={~p"/#{@region_slug}"} class="hover:text-primary">{gettext("Home")}</.link></li>
             <li class="text-base-content/60">{gettext("Recommend a Place")}</li>
           </ul>
         </nav>
@@ -90,7 +96,7 @@ defmodule GaliciaLocalWeb.RecommendBusinessLive do
                   <span class="hero-plus w-4 h-4"></span>
                   {gettext("Recommend Another")}
                 </button>
-                <.link navigate={~p"/"} class="btn btn-ghost">{gettext("Back to Home")}</.link>
+                <.link navigate={~p"/#{@region_slug}"} class="btn btn-ghost">{gettext("Back to Home")}</.link>
               </div>
             </div>
           </div>
@@ -102,7 +108,7 @@ defmodule GaliciaLocalWeb.RecommendBusinessLive do
                 {gettext("Recommend a Place")}
               </h1>
               <p class="text-base-content/60 mb-6">
-                {gettext("Know a great local business in Galicia? Help the community by recommending it!")}
+                {gettext("Know a great local business in %{region}? Help the community by recommending it!", region: @region_name)}
               </p>
 
               <.form for={@form} phx-change="validate" phx-submit="submit" class="space-y-5">
@@ -214,7 +220,7 @@ defmodule GaliciaLocalWeb.RecommendBusinessLive do
                 <div class="divider my-1"></div>
 
                 <div class="flex justify-end gap-3">
-                  <.link navigate={~p"/"} class="btn btn-ghost">{gettext("Cancel")}</.link>
+                  <.link navigate={~p"/#{@region_slug}"} class="btn btn-ghost">{gettext("Cancel")}</.link>
                   <button type="submit" class="btn btn-primary">
                     <span class="hero-paper-airplane w-5 h-5"></span>
                     {gettext("Submit Recommendation")}

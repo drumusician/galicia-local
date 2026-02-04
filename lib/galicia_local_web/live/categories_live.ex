@@ -8,6 +8,10 @@ defmodule GaliciaLocalWeb.CategoriesLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+    region_name = if region, do: region.name, else: "Galicia"
+
     categories =
       Category.list!()
       |> Ash.load!([:business_count])
@@ -17,8 +21,9 @@ defmodule GaliciaLocalWeb.CategoriesLive do
     {:ok,
      socket
      |> assign(:page_title, gettext("Browse by Category"))
-     |> assign(:meta_description, gettext("Browse local businesses in Galicia by category. From restaurants and legal help to healthcare and education – find what you need."))
-     |> assign(:categories_by_priority, categories)}
+     |> assign(:meta_description, gettext("Browse local businesses in %{region} by category. From restaurants and legal help to healthcare and education – find what you need.", region: region_name))
+     |> assign(:categories_by_priority, categories)
+     |> assign(:region_slug, region_slug)}
   end
 
   @impl true
@@ -47,7 +52,7 @@ defmodule GaliciaLocalWeb.CategoriesLive do
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <%= for category <- categories do %>
-                <.link navigate={~p"/categories/#{category.slug}"} class="group">
+                <.link navigate={~p"/#{@region_slug}/categories/#{category.slug}"} class="group">
                   <div class="card bg-base-100 border border-base-300 hover:border-primary hover:shadow-lg transition-all">
                     <div class="card-body flex-row items-center gap-4">
                       <div class={"w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 #{priority_bg_class(priority)}"}>

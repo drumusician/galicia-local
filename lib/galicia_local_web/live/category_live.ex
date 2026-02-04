@@ -9,6 +9,11 @@ defmodule GaliciaLocalWeb.CategoryLive do
 
   @impl true
   def mount(%{"slug" => slug}, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+    region_name = if region, do: region.name, else: "Galicia"
+    tenant_opts = if region, do: [tenant: region.id], else: []
+
     case Category.get_by_slug(slug) do
       {:ok, category} ->
         category = Ash.load!(category, [:business_count])
@@ -19,13 +24,13 @@ defmodule GaliciaLocalWeb.CategoryLive do
           |> Ash.load!([:city])
 
         cities =
-          City.list!()
+          City.list!(tenant_opts)
           |> Enum.sort_by(& &1.name)
 
         {:ok,
          socket
          |> assign(:page_title, category.name)
-         |> assign(:meta_description, category.description || gettext("Find the best %{category} in Galicia. Browse local listings with reviews, ratings, and insider tips.", category: category.name))
+         |> assign(:meta_description, category.description || gettext("Find the best %{category} in %{region}. Browse local listings with reviews, ratings, and insider tips.", category: category.name, region: region_name))
          |> assign(:category, category)
          |> assign(:businesses, businesses)
          |> assign(:cities, cities)
@@ -33,7 +38,8 @@ defmodule GaliciaLocalWeb.CategoryLive do
          |> assign(:english_only, false)
          |> assign(:user_location, nil)
          |> assign(:map_bounds, nil)
-         |> assign(:filtered_businesses, businesses)}
+         |> assign(:filtered_businesses, businesses)
+         |> assign(:region_slug, region_slug)}
 
       {:error, _} ->
         {:ok,
@@ -76,8 +82,9 @@ defmodule GaliciaLocalWeb.CategoryLive do
   def handle_event("filter", params, socket) do
     city_slug = Map.get(params, "city", "")
     english = Map.get(params, "english") == "true"
-    params = build_params(city_slug, english)
-    {:noreply, push_patch(socket, to: ~p"/categories/#{socket.assigns.category.slug}?#{params}")}
+    url_params = build_params(city_slug, english)
+    region_slug = socket.assigns.region_slug
+    {:noreply, push_patch(socket, to: ~p"/#{region_slug}/categories/#{socket.assigns.category.slug}?#{url_params}")}
   end
 
   @impl true
@@ -229,8 +236,8 @@ defmodule GaliciaLocalWeb.CategoryLive do
         <!-- Breadcrumbs -->
         <nav class="text-sm breadcrumbs mb-6">
           <ul>
-            <li><.link navigate={~p"/"} class="hover:text-primary">{gettext("Home")}</.link></li>
-            <li><.link navigate={~p"/categories"} class="hover:text-primary">{gettext("Categories")}</.link></li>
+            <li><.link navigate={~p"/#{@region_slug}"} class="hover:text-primary">{gettext("Home")}</.link></li>
+            <li><.link navigate={~p"/#{@region_slug}/categories"} class="hover:text-primary">{gettext("Categories")}</.link></li>
             <li class="text-base-content/60">{localized_name(@category, @locale)}</li>
           </ul>
         </nav>
@@ -329,7 +336,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
         <%= if length(@filtered_businesses) > 0 do %>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <%= for business <- @filtered_businesses do %>
-              <.business_card business={business} distance={distance_for(business, @user_location)} />
+              <.business_card business={business} distance={distance_for(business, @user_location)} region_slug={@region_slug} />
             <% end %>
           </div>
         <% else %>
@@ -348,9 +355,10 @@ defmodule GaliciaLocalWeb.CategoryLive do
 
   attr :business, :map, required: true
   attr :distance, :float, default: nil
+  attr :region_slug, :string, default: "galicia"
   defp business_card(assigns) do
     ~H"""
-    <.link navigate={~p"/businesses/#{@business.id}"} class="group">
+    <.link navigate={~p"/#{@region_slug}/businesses/#{@business.id}"} class="group">
       <div class="card bg-base-100 border border-base-300 hover:border-primary hover:shadow-lg transition-all">
         <div class="card-body">
           <div class="flex justify-between items-start">

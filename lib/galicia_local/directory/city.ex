@@ -1,6 +1,6 @@
 defmodule GaliciaLocal.Directory.City do
   @moduledoc """
-  A city in Galicia where businesses are located.
+  A city within a region where businesses are located.
   """
   use Ash.Resource,
     otp_app: :galicia_local,
@@ -10,6 +10,12 @@ defmodule GaliciaLocal.Directory.City do
   postgres do
     table "cities"
     repo GaliciaLocal.Repo
+  end
+
+  multitenancy do
+    strategy :attribute
+    attribute :region_id
+    global? true
   end
 
   code_interface do
@@ -25,12 +31,12 @@ defmodule GaliciaLocal.Directory.City do
 
     create :create do
       primary? true
-      accept [:name, :slug, :province, :description, :description_es, :latitude, :longitude, :population, :featured, :image_url]
+      accept [:name, :slug, :province, :description, :description_es, :latitude, :longitude, :population, :featured, :image_url, :region_id]
     end
 
     update :update do
       primary? true
-      accept [:name, :slug, :province, :description, :description_es, :latitude, :longitude, :population, :featured, :image_url]
+      accept [:name, :slug, :province, :description, :description_es, :latitude, :longitude, :population, :featured, :image_url, :region_id]
     end
 
     read :get_by_id do
@@ -108,11 +114,16 @@ defmodule GaliciaLocal.Directory.City do
   end
 
   relationships do
+    belongs_to :region, GaliciaLocal.Directory.Region do
+      allow_nil? false
+      attribute_writable? true
+    end
+
     has_many :businesses, GaliciaLocal.Directory.Business
   end
 
   identities do
-    identity :unique_slug, [:slug]
+    identity :unique_slug_per_region, [:slug, :region_id]
   end
 
   aggregates do

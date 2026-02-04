@@ -7,15 +7,29 @@ defmodule GaliciaLocalWeb.Admin.ClaimsLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+
     claims =
       BusinessClaim
       |> Ash.Query.for_read(:list_pending)
       |> Ash.read!()
-      |> Ash.load!([:user, :business])
+      |> Ash.load!([:user, business: [:region]])
+      |> then(fn claims ->
+        if region do
+          # Filter claims where business belongs to current region
+          Enum.filter(claims, fn claim ->
+            claim.business && claim.business.region_id == region.id
+          end)
+        else
+          claims
+        end
+      end)
 
     {:ok,
      socket
      |> assign(:page_title, gettext("Business Claims"))
+     |> assign(:region_slug, region_slug)
      |> assign(:claims, claims)}
   end
 
@@ -89,7 +103,7 @@ defmodule GaliciaLocalWeb.Admin.ClaimsLive do
                   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div class="flex-1">
                       <h3 class="font-bold text-lg">
-                        <.link navigate={~p"/businesses/#{claim.business.id}"} class="hover:text-primary">
+                        <.link navigate={~p"/#{@region_slug}/businesses/#{claim.business.id}"} class="hover:text-primary">
                           {claim.business.name}
                         </.link>
                       </h3>

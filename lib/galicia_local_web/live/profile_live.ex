@@ -7,9 +7,12 @@ defmodule GaliciaLocalWeb.ProfileLive do
   @impl true
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+    tenant_opts = if region, do: [tenant: region.id], else: []
 
     cities =
-      City.list!()
+      City.list!(tenant_opts)
       |> Enum.sort_by(& &1.name)
       |> Enum.map(&{&1.name, &1.id})
 
@@ -28,7 +31,8 @@ defmodule GaliciaLocalWeb.ProfileLive do
      |> assign(:page_title, gettext("My Profile"))
      |> assign(:cities, cities)
      |> assign(:reviews, reviews)
-     |> assign(:form, to_form(form))}
+     |> assign(:form, to_form(form))
+     |> assign(:region_slug, region_slug)}
   end
 
   @impl true
@@ -126,7 +130,7 @@ defmodule GaliciaLocalWeb.ProfileLive do
                 <div class="card-body py-4">
                   <div class="flex justify-between items-start">
                     <div>
-                      <.link navigate={~p"/businesses/#{review.business_id}"} class="font-semibold text-primary hover:underline">
+                      <.link navigate={~p"/#{@region_slug}/businesses/#{review.business_id}"} class="font-semibold text-primary hover:underline">
                         {review.business.name}
                       </.link>
                       <div class="flex items-center gap-1 mt-1">

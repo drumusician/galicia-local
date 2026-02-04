@@ -5,20 +5,27 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
   """
   use GaliciaLocalWeb, :live_view
 
-  alias GaliciaLocal.Directory.{City, Category, Business}
+  alias GaliciaLocal.Directory.{Business, Region}
   alias GaliciaLocal.Community.Suggestion
 
   @impl true
   def mount(_params, _session, socket) do
     actor = socket.assigns.current_user
+    current_region = socket.assigns[:current_region]
+    regions = Region.list_active!()
+    region_slug = if current_region, do: current_region.slug, else: "galicia"
 
     {:ok,
      socket
      |> assign(:page_title, gettext("Admin Dashboard"))
-     |> assign_async(:stats, fn -> {:ok, %{stats: load_stats(actor)}} end)}
+     |> assign(:regions, regions)
+     |> assign(:region_slug, region_slug)
+     |> assign_async(:stats, fn -> {:ok, %{stats: load_stats(actor, current_region)}} end)}
   end
 
-  defp load_stats(actor) do
+  defp load_stats(actor, current_region) do
+    region_filter = if current_region, do: "WHERE region_id = '#{current_region.id}'", else: ""
+
     %{rows: [[total_biz, pending, enriched, english]]} =
       GaliciaLocal.Repo.query!("""
       SELECT
@@ -27,15 +34,17 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
         COUNT(*) FILTER (WHERE status = 'enriched'),
         COUNT(*) FILTER (WHERE speaks_english = true)
       FROM businesses
+      #{region_filter}
       """)
 
-    %{rows: [[total_cities]]} = GaliciaLocal.Repo.query!("SELECT COUNT(*) FROM cities")
+    %{rows: [[total_cities]]} = GaliciaLocal.Repo.query!("SELECT COUNT(*) FROM cities #{region_filter}")
     %{rows: [[total_categories]]} = GaliciaLocal.Repo.query!("SELECT COUNT(*) FROM categories")
 
     recent_businesses =
       Business
       |> Ash.Query.sort(inserted_at: :desc)
       |> Ash.Query.limit(5)
+      |> then(fn q -> if current_region, do: Ash.Query.set_tenant(q, current_region.id), else: q end)
       |> Ash.read!()
 
     pending_suggestions = Suggestion.list_pending!(actor: actor)
@@ -53,6 +62,12 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
   end
 
   @impl true
+  def handle_event("switch_region", %{"region" => region_slug}, socket) do
+    # Redirect to the region switch endpoint which will update session and redirect back
+    {:noreply, redirect(socket, to: "/region?region=#{region_slug}")}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="min-h-screen bg-base-200">
@@ -67,6 +82,35 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
               </h1>
             </div>
             <div class="flex items-center gap-4">
+              <%!-- Region Switcher --%>
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-outline btn-sm gap-2">
+                  <span class="hero-globe-alt w-4 h-4"></span>
+                  <span class="font-semibold">{@current_region && @current_region.name || "Select Region"}</span>
+                  <span class="hero-chevron-down w-3 h-3"></span>
+                </div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg border border-base-200 mt-2">
+                  <li class="menu-title text-xs opacity-60 px-2 pt-1">{gettext("Switch Region")}</li>
+                  <%= for region <- @regions do %>
+                    <li>
+                      <button
+                        type="button"
+                        phx-click="switch_region"
+                        phx-value-region={region.slug}
+                        class={"flex items-center gap-2 w-full #{if @current_region && @current_region.id == region.id, do: "active", else: ""}"}
+                      >
+                        <span class="hero-map-pin w-4 h-4"></span>
+                        {region.name}
+                        <span class="badge badge-xs">{region.country_code}</span>
+                        <%= if @current_region && @current_region.id == region.id do %>
+                          <span class="hero-check w-4 h-4 text-success ml-auto"></span>
+                        <% end %>
+                      </button>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+
               <span class="text-sm text-base-content/70">
                 {gettext("Logged in as")} <strong>{@current_user.email}</strong>
               </span>
@@ -333,7 +377,7 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
                             {Calendar.strftime(business.inserted_at, "%b %d, %H:%M")}
                           </td>
                           <td>
-                            <.link navigate={~p"/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
+                            <.link navigate={~p"/#{@region_slug}/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
                               {gettext("View")}
                             </.link>
                           </td>

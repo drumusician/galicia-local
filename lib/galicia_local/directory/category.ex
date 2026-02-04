@@ -121,6 +121,7 @@ defmodule GaliciaLocal.Directory.Category do
       destination_attribute :parent_id
     end
     has_many :businesses, GaliciaLocal.Directory.Business
+    has_many :translations, GaliciaLocal.Directory.CategoryTranslation
   end
 
   identities do

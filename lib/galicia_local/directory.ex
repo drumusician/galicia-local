@@ -3,8 +3,10 @@ defmodule GaliciaLocal.Directory do
     otp_app: :galicia_local
 
   resources do
+    resource GaliciaLocal.Directory.Region
     resource GaliciaLocal.Directory.City
     resource GaliciaLocal.Directory.Category
+    resource GaliciaLocal.Directory.CategoryTranslation
     resource GaliciaLocal.Directory.Business
     resource GaliciaLocal.Directory.ScrapeJob
     resource GaliciaLocal.Directory.BusinessClaim

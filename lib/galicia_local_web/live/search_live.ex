@@ -10,7 +10,12 @@ defmodule GaliciaLocalWeb.SearchLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    cities = City.list!() |> Enum.sort_by(& &1.name)
+    region = socket.assigns[:current_region]
+    tenant_opts = if region, do: [tenant: region.id], else: []
+    region_slug = if region, do: region.slug, else: "galicia"
+    region_name = if region, do: region.name, else: "Galicia"
+
+    cities = City.list!(tenant_opts) |> Enum.sort_by(& &1.name)
     categories = Category.list!() |> Enum.sort_by(& &1.priority)
 
     {:ok,
@@ -24,7 +29,9 @@ defmodule GaliciaLocalWeb.SearchLive do
      |> assign(:selected_category, nil)
      |> assign(:english_only, false)
      |> assign(:local_gems, false)
-     |> assign(:loading, false)}
+     |> assign(:loading, false)
+     |> assign(:region_slug, region_slug)
+     |> assign(:region_name, region_name)}
   end
 
   @impl true
@@ -56,9 +63,10 @@ defmodule GaliciaLocalWeb.SearchLive do
     city = params["city"] || ""
     category = params["category"] || ""
     english = params["english"] == "true"
+    region_slug = socket.assigns.region_slug
 
     query_params = build_query_params(query, city, category, english)
-    {:noreply, push_patch(socket, to: ~p"/search?#{query_params}")}
+    {:noreply, push_patch(socket, to: ~p"/#{region_slug}/search?#{query_params}")}
   end
 
   @impl true
@@ -66,9 +74,10 @@ defmodule GaliciaLocalWeb.SearchLive do
     city = params["city"] || ""
     category = params["category"] || ""
     english = params["english"] == "true"
+    region_slug = socket.assigns.region_slug
 
     query_params = build_query_params(socket.assigns.query, city, category, english)
-    {:noreply, push_patch(socket, to: ~p"/search?#{query_params}")}
+    {:noreply, push_patch(socket, to: ~p"/#{region_slug}/search?#{query_params}")}
   end
 
   defp build_query_params(query, city, category, english) do
@@ -159,7 +168,7 @@ defmodule GaliciaLocalWeb.SearchLive do
         <div class="mb-8">
           <h1 class="text-3xl font-bold text-base-content mb-2">{gettext("Search Businesses")}</h1>
           <p class="text-base-content/60">
-            {gettext("Find services and businesses across Galicia")}
+            {gettext("Find services and businesses across %{region}", region: @region_name)}
           </p>
         </div>
 
@@ -244,7 +253,7 @@ defmodule GaliciaLocalWeb.SearchLive do
         <%= if length(@results) > 0 do %>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <%= for business <- @results do %>
-              <.business_card business={business} />
+              <.business_card business={business} region_slug={@region_slug} />
             <% end %>
           </div>
         <% else %>
@@ -274,9 +283,10 @@ defmodule GaliciaLocalWeb.SearchLive do
   end
 
   attr :business, :map, required: true
+  attr :region_slug, :string, default: "galicia"
   defp business_card(assigns) do
     ~H"""
-    <.link navigate={~p"/businesses/#{@business.id}"} class="group">
+    <.link navigate={~p"/#{@region_slug}/businesses/#{@business.id}"} class="group">
       <div class="card bg-base-100 border border-base-300 hover:border-primary hover:shadow-lg transition-all h-full">
         <div class="card-body">
           <div class="flex justify-between items-start">

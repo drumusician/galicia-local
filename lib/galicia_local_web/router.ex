@@ -17,6 +17,10 @@ defmodule GaliciaLocalWeb.Router do
     plug GaliciaLocalWeb.Plugs.SetLocale
   end
 
+  pipeline :with_region do
+    plug GaliciaLocalWeb.Plugs.SetRegion
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
     plug :load_from_bearer
@@ -27,35 +31,65 @@ defmodule GaliciaLocalWeb.Router do
     plug :require_admin_user
   end
 
+  # Root routes (no region required)
   scope "/", GaliciaLocalWeb do
     pipe_through :browser
 
-    ash_authentication_live_session :authenticated_routes,
+    # Region selector landing page
+    ash_authentication_live_session :landing_routes,
       on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_optional}] do
-      # Public routes that may have a logged in user
-      live "/", HomeLive, :index
-      live "/search", SearchLive, :index
-      live "/cities", CitiesLive, :index
-      live "/cities/:slug", CityLive, :show
-      live "/categories", CategoriesLive, :index
-      live "/categories/:slug", CategoryLive, :show
-      live "/businesses/:id", BusinessLive, :show
-      live "/members/:id", MemberLive, :show
+      live "/", RegionSelectorLive, :index
     end
 
-    ash_authentication_live_session :member_routes,
-      on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_required}] do
-      live "/profile", ProfileLive, :edit
-      live "/favorites", FavoritesLive, :index
-      live "/businesses/:id/claim", ClaimBusinessLive, :new
-      live "/my-businesses", MyBusinessesLive, :index
-      live "/my-businesses/:id/edit", EditBusinessLive, :edit
-      live "/recommend", RecommendBusinessLive, :new
-    end
+    # Locale switching
+    post "/locale", PageController, :set_locale
+
+    # Static pages (global)
+    get "/about", PageController, :about
+    get "/contact", PageController, :contact
+    get "/privacy", PageController, :privacy
+
+    # Auth routes (global)
+    auth_routes AuthController, GaliciaLocal.Accounts.User, path: "/auth"
+    sign_out_route AuthController
+
+    sign_in_route register_path: "/register",
+                  reset_path: "/reset",
+                  auth_routes_prefix: "/auth",
+                  on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_no_user}],
+                  overrides: [
+                    GaliciaLocalWeb.AuthOverrides,
+                    Elixir.AshAuthentication.Phoenix.Overrides.DaisyUI
+                  ]
+
+    reset_route auth_routes_prefix: "/auth",
+                overrides: [
+                  GaliciaLocalWeb.AuthOverrides,
+                  Elixir.AshAuthentication.Phoenix.Overrides.DaisyUI
+                ]
+
+    confirm_route GaliciaLocal.Accounts.User, :confirm_new_user,
+      auth_routes_prefix: "/auth",
+      overrides: [
+        GaliciaLocalWeb.AuthOverrides,
+        Elixir.AshAuthentication.Phoenix.Overrides.DaisyUI
+      ]
+
+    magic_sign_in_route(GaliciaLocal.Accounts.User, :magic_link,
+      auth_routes_prefix: "/auth",
+      overrides: [
+        GaliciaLocalWeb.AuthOverrides,
+        Elixir.AshAuthentication.Phoenix.Overrides.DaisyUI
+      ]
+    )
+  end
+
+  # Admin routes (global, with region switcher)
+  scope "/", GaliciaLocalWeb do
+    pipe_through [:browser, :with_region]
 
     ash_authentication_live_session :admin_routes,
       on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_admin_required}] do
-      # Admin routes (protected by on_mount)
       live "/admin", Admin.DashboardLive, :index
       live "/admin/scraper", Admin.ScraperLive, :index
       live "/admin/businesses", Admin.BusinessesLive, :index
@@ -67,57 +101,55 @@ defmodule GaliciaLocalWeb.Router do
       live "/admin/users", Admin.UsersLive, :index
     end
 
-    # Locale switching
-    post "/locale", PageController, :set_locale
-
-    # Static pages
-    get "/about", PageController, :about
-    get "/contact", PageController, :contact
-    get "/privacy", PageController, :privacy
-
-    # Auth routes
-    auth_routes AuthController, GaliciaLocal.Accounts.User, path: "/auth"
-    sign_out_route AuthController
-
-    # Remove these if you'd like to use your own authentication views
-    sign_in_route register_path: "/register",
-                  reset_path: "/reset",
-                  auth_routes_prefix: "/auth",
-                  on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_no_user}],
-                  overrides: [
-                    GaliciaLocalWeb.AuthOverrides,
-                    Elixir.AshAuthentication.Phoenix.Overrides.DaisyUI
-                  ]
-
-    # Remove this if you do not want to use the reset password feature
-    reset_route auth_routes_prefix: "/auth",
-                overrides: [
-                  GaliciaLocalWeb.AuthOverrides,
-                  Elixir.AshAuthentication.Phoenix.Overrides.DaisyUI
-                ]
-
-    # Remove this if you do not use the confirmation strategy
-    confirm_route GaliciaLocal.Accounts.User, :confirm_new_user,
-      auth_routes_prefix: "/auth",
-      overrides: [
-        GaliciaLocalWeb.AuthOverrides,
-        Elixir.AshAuthentication.Phoenix.Overrides.DaisyUI
-      ]
-
-    # Remove this if you do not use the magic link strategy.
-    magic_sign_in_route(GaliciaLocal.Accounts.User, :magic_link,
-      auth_routes_prefix: "/auth",
-      overrides: [
-        GaliciaLocalWeb.AuthOverrides,
-        Elixir.AshAuthentication.Phoenix.Overrides.DaisyUI
-      ]
-    )
+    # Region switching (for admin)
+    post "/region", PageController, :set_region
+    get "/region", PageController, :set_region
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", GaliciaLocalWeb do
-  #   pipe_through :api
-  # end
+  # Region-specific home pages
+  scope "/galicia", GaliciaLocalWeb do
+    pipe_through [:browser, :with_region]
+
+    ash_authentication_live_session :galicia_home,
+      on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_optional}] do
+      live "/", GaliciaHomeLive, :index
+    end
+  end
+
+  scope "/netherlands", GaliciaLocalWeb do
+    pipe_through [:browser, :with_region]
+
+    ash_authentication_live_session :netherlands_home,
+      on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_optional}] do
+      live "/", NetherlandsHomeLive, :index
+    end
+  end
+
+  # Region-scoped public routes (shared across all regions)
+  scope "/:region", GaliciaLocalWeb do
+    pipe_through [:browser, :with_region]
+
+    ash_authentication_live_session :region_public_routes,
+      on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_optional}] do
+      live "/search", SearchLive, :index
+      live "/cities", CitiesLive, :index
+      live "/cities/:slug", CityLive, :show
+      live "/categories", CategoriesLive, :index
+      live "/categories/:slug", CategoryLive, :show
+      live "/businesses/:id", BusinessLive, :show
+      live "/members/:id", MemberLive, :show
+    end
+
+    ash_authentication_live_session :region_member_routes,
+      on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_required}] do
+      live "/profile", ProfileLive, :edit
+      live "/favorites", FavoritesLive, :index
+      live "/businesses/:id/claim", ClaimBusinessLive, :new
+      live "/my-businesses", MyBusinessesLive, :index
+      live "/my-businesses/:id/edit", EditBusinessLive, :edit
+      live "/recommend", RecommendBusinessLive, :new
+    end
+  end
 
   import Phoenix.LiveDashboard.Router
 

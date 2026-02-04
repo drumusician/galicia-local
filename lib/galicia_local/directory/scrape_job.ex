@@ -14,6 +14,12 @@ defmodule GaliciaLocal.Directory.ScrapeJob do
     repo GaliciaLocal.Repo
   end
 
+  multitenancy do
+    strategy :attribute
+    attribute :region_id
+    global? true
+  end
+
   code_interface do
     define :list, action: :read
     define :create
@@ -26,7 +32,7 @@ defmodule GaliciaLocal.Directory.ScrapeJob do
 
     create :create do
       primary? true
-      accept [:source, :query, :city_id, :category_id]
+      accept [:source, :query, :city_id, :category_id, :region_id]
       change set_attribute(:status, :pending)
       change set_attribute(:started_at, &DateTime.utc_now/0)
     end
@@ -99,6 +105,11 @@ defmodule GaliciaLocal.Directory.ScrapeJob do
   end
 
   relationships do
+    belongs_to :region, GaliciaLocal.Directory.Region do
+      allow_nil? false
+      attribute_writable? true
+    end
+
     belongs_to :city, GaliciaLocal.Directory.City
     belongs_to :category, GaliciaLocal.Directory.Category
   end

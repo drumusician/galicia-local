@@ -13,10 +13,14 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+
     {:ok,
      socket
      |> assign(:page_title, "Manage Cities")
      |> assign(:provinces, @provinces)
+     |> assign(:region_slug, region_slug)
      |> assign(:editing, nil)
      |> assign(:creating, false)
      |> assign(:filter_province, "all")
@@ -28,9 +32,14 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   end
 
   defp reload_cities(socket) do
-    cities = City.list!()
-             |> Ash.load!([:business_count])
-             |> Enum.sort_by(&{&1.province, &1.name})
+    region = socket.assigns[:current_region]
+
+    cities =
+      City
+      |> then(fn q -> if region, do: Ash.Query.set_tenant(q, region.id), else: q end)
+      |> Ash.read!()
+      |> Ash.load!([:business_count])
+      |> Enum.sort_by(&{&1.province, &1.name})
 
     assign(socket, :cities, cities)
   end
@@ -192,7 +201,16 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
 
   @impl true
   def handle_event("create", %{"city" => params}, socket) do
+    region = socket.assigns[:current_region]
     params = process_params(params)
+
+    # Set region_id from current region
+    params =
+      if region do
+        Map.put(params, "region_id", region.id)
+      else
+        params
+      end
 
     case City.create(params) do
       {:ok, city} ->
@@ -508,7 +526,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
                     <span class="hero-pencil w-4 h-4"></span>
                     Edit
                   </button>
-                  <.link navigate={~p"/cities/#{city.slug}"} class="btn btn-sm btn-ghost">
+                  <.link navigate={~p"/#{@region_slug}/cities/#{city.slug}"} class="btn btn-sm btn-ghost">
                     View
                   </.link>
                 </div>

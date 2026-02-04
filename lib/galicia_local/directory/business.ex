@@ -16,6 +16,12 @@ defmodule GaliciaLocal.Directory.Business do
     repo GaliciaLocal.Repo
   end
 
+  multitenancy do
+    strategy :attribute
+    attribute :region_id
+    global? true
+  end
+
   oban do
     triggers do
       # Enrich businesses that have completed research
@@ -88,7 +94,7 @@ defmodule GaliciaLocal.Directory.Business do
         :cultural_notes, :cultural_notes_es,
         :expat_friendly_score, :expat_tips, :service_specialties, :languages_taught, :sentiment_summary, :review_insights,
         :status, :source, :raw_data, :quality_score, :photo_urls,
-        :city_id, :category_id
+        :city_id, :category_id, :region_id
       ]
     end
 
@@ -104,7 +110,7 @@ defmodule GaliciaLocal.Directory.Business do
         :cultural_notes, :cultural_notes_es,
         :expat_friendly_score, :expat_tips, :service_specialties, :languages_taught, :sentiment_summary, :review_insights,
         :status, :source, :raw_data, :quality_score, :photo_urls,
-        :city_id, :category_id, :last_enriched_at
+        :city_id, :category_id, :region_id, :last_enriched_at
       ]
     end
 
@@ -423,6 +429,11 @@ defmodule GaliciaLocal.Directory.Business do
   end
 
   relationships do
+    belongs_to :region, GaliciaLocal.Directory.Region do
+      allow_nil? false
+      attribute_writable? true
+    end
+
     belongs_to :city, GaliciaLocal.Directory.City do
       allow_nil? false
     end
@@ -437,7 +448,7 @@ defmodule GaliciaLocal.Directory.Business do
   end
 
   identities do
-    identity :unique_slug_per_city, [:slug, :city_id]
+    identity :unique_slug_per_city, [:slug, :city_id, :region_id]
   end
 
   calculations do

@@ -6,6 +6,9 @@ defmodule GaliciaLocalWeb.MemberLive do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+
     case User.get_by_id(%{id: id}) do
       {:ok, member} ->
         member = Ash.load!(member, [:city])
@@ -20,7 +23,8 @@ defmodule GaliciaLocalWeb.MemberLive do
          socket
          |> assign(:page_title, member.display_name || gettext("Member"))
          |> assign(:member, member)
-         |> assign(:reviews, reviews)}
+         |> assign(:reviews, reviews)
+         |> assign(:region_slug, region_slug)}
 
       {:error, _} ->
         {:ok,
@@ -75,7 +79,7 @@ defmodule GaliciaLocalWeb.MemberLive do
                 <div class="card-body py-4">
                   <div class="flex justify-between items-start">
                     <div>
-                      <.link navigate={~p"/businesses/#{review.business_id}"} class="font-semibold text-primary hover:underline">
+                      <.link navigate={~p"/#{@region_slug}/businesses/#{review.business_id}"} class="font-semibold text-primary hover:underline">
                         {review.business.name}
                       </.link>
                       <div class="flex items-center gap-1 mt-1">

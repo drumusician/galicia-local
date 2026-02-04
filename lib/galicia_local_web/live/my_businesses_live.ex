@@ -8,6 +8,8 @@ defmodule GaliciaLocalWeb.MyBusinessesLive do
   @impl true
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
 
     owned_businesses =
       Business
@@ -25,7 +27,8 @@ defmodule GaliciaLocalWeb.MyBusinessesLive do
      socket
      |> assign(:page_title, gettext("My Businesses"))
      |> assign(:owned_businesses, owned_businesses)
-     |> assign(:pending_claims, pending_claims)}
+     |> assign(:pending_claims, pending_claims)
+     |> assign(:region_slug, region_slug)}
   end
 
   @impl true
@@ -46,7 +49,7 @@ defmodule GaliciaLocalWeb.MyBusinessesLive do
                 <div class="card-body flex-row items-center justify-between">
                   <div>
                     <h3 class="font-bold text-lg">
-                      <.link navigate={~p"/businesses/#{business.id}"} class="hover:text-primary">
+                      <.link navigate={~p"/#{@region_slug}/businesses/#{business.id}"} class="hover:text-primary">
                         {business.name}
                       </.link>
                     </h3>
@@ -54,7 +57,7 @@ defmodule GaliciaLocalWeb.MyBusinessesLive do
                       {business.category.name} · {business.city.name}
                     </p>
                   </div>
-                  <.link navigate={~p"/my-businesses/#{business.id}/edit"} class="btn btn-primary btn-sm gap-1">
+                  <.link navigate={~p"/#{@region_slug}/my-businesses/#{business.id}/edit"} class="btn btn-primary btn-sm gap-1">
                     <span class="hero-pencil-square w-4 h-4"></span>
                     {gettext("Edit")}
                   </.link>
@@ -68,7 +71,7 @@ defmodule GaliciaLocalWeb.MyBusinessesLive do
               <span class="hero-building-storefront w-12 h-12 text-base-content/30 mx-auto"></span>
               <p class="text-base-content/50 mt-2">{gettext("You don't own any businesses yet.")}</p>
               <p class="text-sm text-base-content/40">{gettext("Find your business and claim it to start managing your listing.")}</p>
-              <.link navigate={~p"/search"} class="btn btn-primary btn-sm mt-4">
+              <.link navigate={~p"/#{@region_slug}/search"} class="btn btn-primary btn-sm mt-4">
                 {gettext("Search Businesses")}
               </.link>
             </div>
@@ -83,7 +86,7 @@ defmodule GaliciaLocalWeb.MyBusinessesLive do
               <div class="card bg-base-100 shadow">
                 <div class="card-body py-4 flex-row items-center justify-between">
                   <div>
-                    <.link navigate={~p"/businesses/#{claim.business.id}"} class="font-medium hover:text-primary">
+                    <.link navigate={~p"/#{@region_slug}/businesses/#{claim.business.id}"} class="font-medium hover:text-primary">
                       {claim.business.name}
                     </.link>
                     <p class="text-sm text-base-content/60">

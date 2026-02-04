@@ -12,6 +12,9 @@ defmodule GaliciaLocalWeb.BusinessLive do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
+
     case Business.get_by_id(id) do
       {:ok, business} ->
         business = Ash.load!(business, [:city, :category])
@@ -50,7 +53,8 @@ defmodule GaliciaLocalWeb.BusinessLive do
          |> assign(:review_form, review_form && to_form(review_form))
          |> assign(:review_rating, 5)
          |> assign(:lightbox_index, nil)
-         |> assign(:is_favorited, is_favorited)}
+         |> assign(:is_favorited, is_favorited)
+         |> assign(:region_slug, region_slug)}
 
       {:error, _} ->
         {:ok,
@@ -190,9 +194,9 @@ defmodule GaliciaLocalWeb.BusinessLive do
         <!-- Breadcrumbs -->
         <nav class="text-sm breadcrumbs mb-6">
           <ul>
-            <li><.link navigate={~p"/"} class="hover:text-primary">{gettext("Home")}</.link></li>
-            <li><.link navigate={~p"/cities/#{@business.city.slug}"} class="hover:text-primary">{@business.city.name}</.link></li>
-            <li><.link navigate={~p"/categories/#{@business.category.slug}"} class="hover:text-primary">{localized_name(@business.category, @locale)}</.link></li>
+            <li><.link navigate={~p"/#{@region_slug}"} class="hover:text-primary">{gettext("Home")}</.link></li>
+            <li><.link navigate={~p"/#{@region_slug}/cities/#{@business.city.slug}"} class="hover:text-primary">{@business.city.name}</.link></li>
+            <li><.link navigate={~p"/#{@region_slug}/categories/#{@business.category.slug}"} class="hover:text-primary">{localized_name(@business.category, @locale)}</.link></li>
             <li class="text-base-content/60">{@business.name}</li>
           </ul>
         </nav>
@@ -519,7 +523,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                   <p class="font-medium">{gettext("Is this your business?")}</p>
                   <p class="text-sm text-base-content/60">{gettext("Claim it to update your information and manage your listing.")}</p>
                 </div>
-                <.link navigate={~p"/businesses/#{@business.id}/claim"} class="btn btn-outline btn-sm gap-1">
+                <.link navigate={~p"/#{@region_slug}/businesses/#{@business.id}/claim"} class="btn btn-outline btn-sm gap-1">
                   <span class="hero-shield-check w-4 h-4"></span>
                   {gettext("Claim")}
                 </.link>
@@ -615,7 +619,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                           </div>
                         </div>
                         <div>
-                          <.link navigate={~p"/members/#{review.user_id}"} class="font-semibold hover:text-primary">
+                          <.link navigate={~p"/#{@region_slug}/members/#{review.user_id}"} class="font-semibold hover:text-primary">
                             {review.user.display_name || gettext("Community Member")}
                           </.link>
                           <div class="flex items-center gap-1">
@@ -653,7 +657,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
 
         <!-- Back link -->
         <div class="mt-8 text-center">
-          <.link navigate={~p"/cities/#{@business.city.slug}"} class="btn btn-ghost">
+          <.link navigate={~p"/#{@region_slug}/cities/#{@business.city.slug}"} class="btn btn-ghost">
             {gettext("Back to %{city}", city: @business.city.name)}
           </.link>
         </div>

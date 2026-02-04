@@ -6,6 +6,8 @@ defmodule GaliciaLocalWeb.Admin.AnalyticsLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
     days = 30
     summary = Tracker.summary(days)
     top_businesses = enrich_top("business", days, &load_business/1)
@@ -15,6 +17,7 @@ defmodule GaliciaLocalWeb.Admin.AnalyticsLive do
     {:ok,
      socket
      |> assign(:page_title, "Analytics")
+     |> assign(:region_slug, region_slug)
      |> assign(:days, days)
      |> assign(:summary, summary)
      |> assign(:top_businesses, top_businesses)
@@ -123,7 +126,7 @@ defmodule GaliciaLocalWeb.Admin.AnalyticsLive do
                         <tr>
                           <td class="text-base-content/40">{idx}</td>
                           <td>
-                            <.link navigate={~p"/businesses/#{item.resource.id}"} class="hover:text-primary font-medium text-sm">
+                            <.link navigate={~p"/#{@region_slug}/businesses/#{item.resource.id}"} class="hover:text-primary font-medium text-sm">
                               {item.resource.name}
                             </.link>
                           </td>
@@ -161,7 +164,7 @@ defmodule GaliciaLocalWeb.Admin.AnalyticsLive do
                         <tr>
                           <td class="text-base-content/40">{idx}</td>
                           <td>
-                            <.link navigate={~p"/cities/#{item.resource.slug}"} class="hover:text-primary font-medium text-sm">
+                            <.link navigate={~p"/#{@region_slug}/cities/#{item.resource.slug}"} class="hover:text-primary font-medium text-sm">
                               {item.resource.name}
                             </.link>
                           </td>
@@ -199,7 +202,7 @@ defmodule GaliciaLocalWeb.Admin.AnalyticsLive do
                         <tr>
                           <td class="text-base-content/40">{idx}</td>
                           <td>
-                            <.link navigate={~p"/categories/#{item.resource.slug}"} class="hover:text-primary font-medium text-sm">
+                            <.link navigate={~p"/#{@region_slug}/categories/#{item.resource.slug}"} class="hover:text-primary font-medium text-sm">
                               {item.resource.name}
                             </.link>
                           </td>

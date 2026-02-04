@@ -6,6 +6,8 @@ defmodule GaliciaLocalWeb.FavoritesLive do
   @impl true
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
+    region = socket.assigns[:current_region]
+    region_slug = if region, do: region.slug, else: "galicia"
 
     favorites =
       Favorite
@@ -16,7 +18,8 @@ defmodule GaliciaLocalWeb.FavoritesLive do
     {:ok,
      socket
      |> assign(:page_title, gettext("My Favorites"))
-     |> assign(:favorites, favorites)}
+     |> assign(:favorites, favorites)
+     |> assign(:region_slug, region_slug)}
   end
 
   @impl true
@@ -51,7 +54,7 @@ defmodule GaliciaLocalWeb.FavoritesLive do
                 <div class="card-body py-4">
                   <div class="flex justify-between items-start">
                     <div>
-                      <.link navigate={~p"/businesses/#{fav.business.id}"} class="card-title text-lg hover:text-primary transition-colors">
+                      <.link navigate={~p"/#{@region_slug}/businesses/#{fav.business.id}"} class="card-title text-lg hover:text-primary transition-colors">
                         {fav.business.name}
                       </.link>
                       <p class="text-sm text-base-content/60">
@@ -90,7 +93,7 @@ defmodule GaliciaLocalWeb.FavoritesLive do
             <span class="hero-heart w-16 h-16 text-base-content/20 mx-auto mb-4"></span>
             <h3 class="text-xl font-semibold mb-2">{gettext("No favorites yet")}</h3>
             <p class="text-base-content/60 mb-6">{gettext("Browse businesses and click the heart to save them here.")}</p>
-            <.link navigate={~p"/categories"} class="btn btn-primary">
+            <.link navigate={~p"/#{@region_slug}/categories"} class="btn btn-primary">
               {gettext("Browse Categories")}
             </.link>
           </div>

@@ -93,17 +93,18 @@
           </div>
           
 <!-- Desktop nav -->
+          <% region_prefix = if assigns[:current_region], do: "/#{assigns[:current_region].slug}", else: "" %>
           <div class="hidden md:flex items-center gap-1">
-            <a href="/search" class="btn btn-ghost btn-sm gap-1">
+            <a href={"#{region_prefix}/search"} class="btn btn-ghost btn-sm gap-1">
               <span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}
             </a>
-            <a href="/cities" class="btn btn-ghost btn-sm gap-1">
+            <a href={"#{region_prefix}/cities"} class="btn btn-ghost btn-sm gap-1">
               <span class="hero-map w-4 h-4"></span> {gettext("Cities")}
             </a>
-            <a href="/categories" class="btn btn-ghost btn-sm gap-1">
+            <a href={"#{region_prefix}/categories"} class="btn btn-ghost btn-sm gap-1">
               <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
             </a>
-            <a href="/recommend" class="btn btn-ghost btn-sm gap-1">
+            <a href={"#{region_prefix}/recommend"} class="btn btn-ghost btn-sm gap-1">
               <span class="hero-plus-circle w-4 h-4"></span> {gettext("Recommend")}
             </a>
             <form method="post" action="/locale" class="flex items-center">
@@ -177,16 +178,16 @@
                 class="dropdown-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-lg border border-base-200 mt-2"
               >
                 <li>
-                  <a href="/search"><span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}</a>
+                  <a href={"#{region_prefix}/search"}><span class="hero-magnifying-glass w-4 h-4"></span> {gettext("Search")}</a>
                 </li>
-                <li><a href="/cities"><span class="hero-map w-4 h-4"></span> {gettext("Cities")}</a></li>
+                <li><a href={"#{region_prefix}/cities"}><span class="hero-map w-4 h-4"></span> {gettext("Cities")}</a></li>
                 <li>
-                  <a href="/categories">
+                  <a href={"#{region_prefix}/categories"}>
                     <span class="hero-squares-2x2 w-4 h-4"></span> {gettext("Categories")}
                   </a>
                 </li>
                 <li>
-                  <a href="/recommend">
+                  <a href={"#{region_prefix}/recommend"}>
                     <span class="hero-plus-circle w-4 h-4"></span> {gettext("Recommend a Place")}
                   </a>
                 </li>

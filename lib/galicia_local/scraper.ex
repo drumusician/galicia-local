@@ -30,7 +30,7 @@ defmodule GaliciaLocal.Scraper do
 
   require Logger
 
-  alias GaliciaLocal.Directory.{City, Category}
+  alias GaliciaLocal.Directory.{City, Category, CategoryTranslation}
   alias GaliciaLocal.Scraper.Spiders.PaginasAmarillas
   alias GaliciaLocal.Scraper.Workers.GooglePlacesWorker
 
@@ -217,24 +217,14 @@ defmodule GaliciaLocal.Scraper do
       {:ok, job} = Scraper.search_google_places(city, category)
   """
   def search_google_places(%City{} = city, %Category{} = category) do
-    # Prefer DB-configured queries, fall back to hardcoded, then single translation
-    queries =
-      cond do
-        category.search_queries != nil and category.search_queries != [] ->
-          Enum.map(category.search_queries, fn sq -> "#{sq} #{city.name}" end)
+    # Load region for locale detection
+    city = Ash.load!(city, [:region])
+    locale = get_search_locale(city.region)
 
-        Map.has_key?(@category_sub_queries, category.slug) ->
-          Enum.map(@category_sub_queries[category.slug], fn sq -> "#{sq} #{city.name}" end)
+    # Get localized queries from CategoryTranslation table
+    queries = get_localized_queries(category, locale, city.name)
 
-        true ->
-          category_es =
-            category.search_translation ||
-              Map.get(@category_translations, category.slug, category.name_es || category.slug)
-
-          ["#{category_es} #{city.name}"]
-      end
-
-    Logger.info("Queuing #{length(queries)} Google Places searches for #{category.name} in #{city.name}")
+    Logger.info("Queuing #{length(queries)} Google Places searches for #{category.name} in #{city.name} (locale: #{locale})")
 
     jobs =
       Enum.map(queries, fn query ->
@@ -297,5 +287,54 @@ defmodule GaliciaLocal.Scraper do
         where: j.state in ["available", "executing", "scheduled"],
         select: %{id: j.id, state: j.state, args: j.args, inserted_at: j.inserted_at}
     )
+  end
+
+  # =============================================================================
+  # Localization Helpers
+  # =============================================================================
+
+  @doc """
+  Get the search locale for a region.
+  Uses the first non-English locale, falling back to default_locale.
+  """
+  def get_search_locale(region) do
+    region.supported_locales
+    |> Enum.find(fn l -> l != "en" end)
+    |> Kernel.||(region.default_locale)
+  end
+
+  @doc """
+  Get localized search queries for a category and locale.
+  Falls back to hardcoded translations if no database translation exists.
+  """
+  def get_localized_queries(category, locale, city_name) do
+    case CategoryTranslation.get_for_category_locale(category.id, locale) do
+      {:ok, translation} when not is_nil(translation) ->
+        if translation.search_queries != nil and translation.search_queries != [] do
+          Enum.map(translation.search_queries, &"#{&1} #{city_name}")
+        else
+          get_fallback_queries(category, city_name)
+        end
+
+      _ ->
+        get_fallback_queries(category, city_name)
+    end
+  end
+
+  defp get_fallback_queries(category, city_name) do
+    cond do
+      category.search_queries != nil and category.search_queries != [] ->
+        Enum.map(category.search_queries, fn sq -> "#{sq} #{city_name}" end)
+
+      Map.has_key?(@category_sub_queries, category.slug) ->
+        Enum.map(@category_sub_queries[category.slug], fn sq -> "#{sq} #{city_name}" end)
+
+      true ->
+        category_es =
+          category.search_translation ||
+            Map.get(@category_translations, category.slug, category.name_es || category.slug)
+
+        ["#{category_es} #{city_name}"]
+    end
   end
 end

@@ -8,16 +8,23 @@ defmodule GaliciaLocalWeb.CitiesLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    region = socket.assigns[:current_region]
+    tenant_opts = if region, do: [tenant: region.id], else: []
+    region_name = if region, do: region.name, else: "Galicia"
+    region_slug = if region, do: region.slug, else: "galicia"
+
     cities =
-      City.list!()
-      |> Ash.load!([:business_count])
+      City.list!(tenant_opts)
+      |> Ash.load!([:business_count], tenant_opts)
       |> Enum.sort_by(& &1.population, :desc)
 
     {:ok,
      socket
-     |> assign(:page_title, gettext("Cities in Galicia"))
-     |> assign(:meta_description, gettext("Explore all cities in Galicia, Spain. From Vigo and A Coruña to Santiago de Compostela – find local businesses and integrate into Galician life."))
-     |> assign(:cities, cities)}
+     |> assign(:page_title, gettext("Cities in %{region}", region: region_name))
+     |> assign(:meta_description, gettext("Explore all cities in %{region}. Find local businesses and integrate into %{region} life.", region: region_name))
+     |> assign(:cities, cities)
+     |> assign(:region_name, region_name)
+     |> assign(:region_slug, region_slug)}
   end
 
   @impl true
@@ -27,9 +34,9 @@ defmodule GaliciaLocalWeb.CitiesLive do
       <div class="container mx-auto max-w-6xl px-4 py-8">
         <!-- Header -->
         <div class="text-center mb-12">
-          <h1 class="text-4xl font-bold text-base-content mb-4">{gettext("Explore Galicia")}</h1>
+          <h1 class="text-4xl font-bold text-base-content mb-4">{gettext("Explore %{region}", region: @region_name)}</h1>
           <p class="text-base-content/70 max-w-2xl mx-auto">
-            {gettext("Discover the beautiful cities and towns of Galicia. From thermal springs to historic pilgrimage routes, each place has its own charm.")}
+            {gettext("Discover the beautiful cities and towns of %{region}. Each place has its own charm and character.", region: @region_name)}
           </p>
         </div>
 
@@ -58,7 +65,7 @@ defmodule GaliciaLocalWeb.CitiesLive do
         <!-- Cities Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <%= for city <- @cities do %>
-            <.link navigate={~p"/cities/#{city.slug}"} class="group">
+            <.link navigate={~p"/#{@region_slug}/cities/#{city.slug}"} class="group">
               <div class="card bg-base-100 shadow-xl overflow-hidden transition-all group-hover:scale-105 group-hover:shadow-2xl">
                 <figure class="relative h-48">
                   <img

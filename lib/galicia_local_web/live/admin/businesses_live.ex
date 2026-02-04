@@ -13,12 +13,24 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    cities = City.list!() |> Enum.sort_by(& &1.name)
+    region = socket.assigns[:current_region]
+    tenant_opts = if region, do: [tenant: region.id], else: []
+    region_slug = if region, do: region.slug, else: "galicia"
+
+    # Filter cities by current region
+    cities =
+      City
+      |> then(fn q -> if region, do: Ash.Query.set_tenant(q, region.id), else: q end)
+      |> Ash.read!()
+      |> Enum.sort_by(& &1.name)
+
     categories = Category.list!() |> Enum.sort_by(& &1.name)
 
     {:ok,
      socket
      |> assign(:page_title, "Manage Businesses")
+     |> assign(:tenant_opts, tenant_opts)
+     |> assign(:region_slug, region_slug)
      |> assign(:cities, cities)
      |> assign(:categories, categories)
      |> assign(:filter_status, "all")
@@ -33,6 +45,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
 
   defp load_page(socket) do
     offset = (socket.assigns.current_page - 1) * @per_page
+    region = socket.assigns[:current_region]
 
     page =
       Business
@@ -42,6 +55,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
       |> maybe_filter_category(socket.assigns.filter_category)
       |> maybe_search(socket.assigns.search_query)
       |> Ash.Query.load([:city, :category])
+      |> then(fn q -> if region, do: Ash.Query.set_tenant(q, region.id), else: q end)
       |> Ash.read!(page: [limit: @per_page, offset: offset, count: true])
 
     assign(socket, :page, page)
@@ -147,7 +161,16 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
 
   @impl true
   def handle_event("create_business", %{"business" => params}, socket) do
+    region = socket.assigns[:current_region]
     params = Map.put(params, "status", "pending")
+
+    # Set region_id from current region
+    params =
+      if region do
+        Map.put(params, "region_id", region.id)
+      else
+        params
+      end
 
     params =
       if params["slug"] in [nil, ""] do
@@ -393,7 +416,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                       </td>
                       <td>
                         <div class="flex gap-1">
-                          <.link navigate={~p"/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
+                          <.link navigate={~p"/#{@region_slug}/businesses/#{business.id}"} class="btn btn-ghost btn-xs">
                             View
                           </.link>
                           <.link navigate={~p"/admin/businesses/#{business.id}/edit"} class="btn btn-ghost btn-xs">
