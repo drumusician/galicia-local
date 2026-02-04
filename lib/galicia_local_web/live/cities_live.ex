@@ -45,6 +45,7 @@ defmodule GaliciaLocalWeb.CitiesLive do
           id="cities-map"
           class="h-96 bg-base-200 rounded-xl mb-10 shadow-lg"
           phx-hook="CitiesMap"
+          data-region={@region_slug}
           data-cities={Jason.encode!(Enum.map(@cities, fn city ->
             %{
               name: city.name,

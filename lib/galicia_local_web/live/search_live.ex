@@ -42,11 +42,12 @@ defmodule GaliciaLocalWeb.SearchLive do
     local_gems = filter == "local-gems"
     city_slug = params["city"]
     category_slug = params["category"]
+    region = socket.assigns[:current_region]
 
     selected_city = if city_slug, do: Enum.find(socket.assigns.cities, &(&1.slug == city_slug))
     selected_category = if category_slug, do: Enum.find(socket.assigns.categories, &(&1.slug == category_slug))
 
-    results = search_businesses(query, selected_city, selected_category, english_only, local_gems)
+    results = search_businesses(query, selected_city, selected_category, english_only, local_gems, region)
 
     {:noreply,
      socket
@@ -95,10 +96,12 @@ defmodule GaliciaLocalWeb.SearchLive do
   defp maybe_add_bool(params, _key, false), do: params
   defp maybe_add_bool(params, key, true), do: Map.put(params, key, "true")
 
-  defp search_businesses(query, city, category, english_only, local_gems) do
+  defp search_businesses(query, city, category, english_only, local_gems, region) do
+    tenant_opts = if region, do: [tenant: region.id], else: []
+
     cond do
       String.trim(query) != "" ->
-        Business.search!(query)
+        Business.search!(query, tenant_opts)
         |> filter_by_city(city)
         |> filter_by_category(category)
         |> filter_by_english(english_only)
@@ -106,7 +109,7 @@ defmodule GaliciaLocalWeb.SearchLive do
         |> Ash.load!([:city, :category])
 
       english_only ->
-        Business.english_speaking!()
+        Business.english_speaking!(tenant_opts)
         |> filter_by_city(city)
         |> filter_by_category(category)
         |> filter_by_local_gems(local_gems)
@@ -122,7 +125,7 @@ defmodule GaliciaLocalWeb.SearchLive do
         |> Ash.Query.sort(local_gem_score: :desc, rating: :desc_nils_last)
         |> Ash.Query.limit(50)
         |> Ash.Query.load([:city, :category])
-        |> Ash.read!()
+        |> Ash.read!(tenant_opts)
 
       true ->
         Business
@@ -133,7 +136,7 @@ defmodule GaliciaLocalWeb.SearchLive do
         |> Ash.Query.sort(rating: :desc_nils_last, name: :asc)
         |> Ash.Query.limit(50)
         |> Ash.Query.load([:city, :category])
-        |> Ash.read!()
+        |> Ash.read!(tenant_opts)
     end
   end
 

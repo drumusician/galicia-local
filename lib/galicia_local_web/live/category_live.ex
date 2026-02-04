@@ -16,11 +16,11 @@ defmodule GaliciaLocalWeb.CategoryLive do
 
     case Category.get_by_slug(slug) do
       {:ok, category} ->
-        category = Ash.load!(category, [:business_count])
+        category = Ash.load!(category, [:translations])
         if connected?(socket), do: Tracker.track_async("category", category.id)
 
         businesses =
-          Business.by_category!(category.id)
+          Business.by_category!(category.id, tenant_opts)
           |> Ash.load!([:city])
 
         cities =
@@ -323,6 +323,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
             phx-hook="BusinessesMap"
             phx-update="ignore"
             data-businesses={@businesses_json}
+            data-region={@region_slug}
             data-user-lat={@user_location && elem(@user_location, 0)}
             data-user-lng={@user_location && elem(@user_location, 1)}
           >

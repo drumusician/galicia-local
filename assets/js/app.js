@@ -98,7 +98,13 @@ const CitiesMap = {
   },
 
   initMap(cities) {
-    const map = L.map(this.el).setView([42.6, -8.0], 8)
+    const region = this.el.dataset.region || 'galicia'
+    const regionCenters = {
+      'galicia': [42.6, -8.0],
+      'netherlands': [52.3, 4.9]
+    }
+    const defaultCenter = regionCenters[region] || [42.6, -8.0]
+    const map = L.map(this.el).setView(defaultCenter, 8)
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
@@ -203,10 +209,18 @@ const BusinessesMap = {
     const businesses = JSON.parse(this.el.dataset.businesses || '[]')
     const userLat = parseFloat(this.el.dataset.userLat)
     const userLng = parseFloat(this.el.dataset.userLng)
+    const region = this.el.dataset.region || 'galicia'
+
+    // Region center coordinates
+    const regionCenters = {
+      'galicia': [42.6, -8.0],
+      'netherlands': [52.3, 4.9]
+    }
+    const defaultCenter = regionCenters[region] || [42.6, -8.0]
 
     if (!this.map) {
       this.el.innerHTML = ""
-      this.map = L.map(this.el).setView([42.6, -8.0], 8)
+      this.map = L.map(this.el).setView(defaultCenter, 8)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
       }).addTo(this.map)

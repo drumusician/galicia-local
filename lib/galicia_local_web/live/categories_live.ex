@@ -11,10 +11,17 @@ defmodule GaliciaLocalWeb.CategoriesLive do
     region = socket.assigns[:current_region]
     region_slug = if region, do: region.slug, else: "galicia"
     region_name = if region, do: region.name, else: "Galicia"
+    locale = socket.assigns[:locale] || "en"
+
+    # Get business counts per category for this region
+    business_counts = get_business_counts_by_category(region)
 
     categories =
       Category.list!()
-      |> Ash.load!([:business_count])
+      |> Ash.load!([:translations])
+      |> Enum.map(fn cat ->
+        Map.put(cat, :business_count, Map.get(business_counts, cat.id, 0))
+      end)
       |> Enum.group_by(& &1.priority)
       |> Enum.sort_by(fn {priority, _} -> priority end)
 
@@ -23,7 +30,22 @@ defmodule GaliciaLocalWeb.CategoriesLive do
      |> assign(:page_title, gettext("Browse by Category"))
      |> assign(:meta_description, gettext("Browse local businesses in %{region} by category. From restaurants and legal help to healthcare and education – find what you need.", region: region_name))
      |> assign(:categories_by_priority, categories)
-     |> assign(:region_slug, region_slug)}
+     |> assign(:region_slug, region_slug)
+     |> assign(:locale, locale)}
+  end
+
+  defp get_business_counts_by_category(nil), do: %{}
+  defp get_business_counts_by_category(region) do
+    import Ecto.Query
+
+    GaliciaLocal.Repo.all(
+      from b in "businesses",
+        where: b.region_id == type(^region.id, Ecto.UUID),
+        where: b.status in ["enriched", "verified"],
+        group_by: b.category_id,
+        select: {type(b.category_id, :binary_id), count(b.id)}
+    )
+    |> Enum.into(%{})
   end
 
   @impl true
@@ -60,11 +82,11 @@ defmodule GaliciaLocalWeb.CategoriesLive do
                       </div>
                       <div class="flex-1 min-w-0">
                         <h3 class="font-semibold text-lg group-hover:text-primary transition-colors">
-                          {localized_name(category, @locale)}
+                          {category_name(category, @locale)}
                         </h3>
-                        <p class="text-sm text-base-content/60">{category.name_es}</p>
+                        <p class="text-sm text-base-content/60">{secondary_name(category, @locale)}</p>
                         <p class="text-xs text-base-content/50 mt-1 truncate">
-                          {category.description}
+                          {category_description(category, @locale)}
                         </p>
                       </div>
                       <div class="flex flex-col items-end">
@@ -106,4 +128,26 @@ defmodule GaliciaLocalWeb.CategoriesLive do
   defp priority_bg_class(3), do: "bg-accent/10 text-accent"
   defp priority_bg_class(4), do: "bg-neutral/10 text-neutral"
   defp priority_bg_class(_), do: "bg-base-200"
+
+  # Localization helpers
+  defp category_name(category, locale) do
+    case get_translation(category, locale) do
+      %{name: name} when is_binary(name) and name != "" -> name
+      _ -> category.name
+    end
+  end
+
+  defp secondary_name(category, "en"), do: category.name_es || ""
+  defp secondary_name(category, _locale), do: category.name
+
+  defp category_description(category, locale) do
+    case get_translation(category, locale) do
+      %{description: desc} when is_binary(desc) and desc != "" -> desc
+      _ -> category.description
+    end
+  end
+
+  defp get_translation(category, locale) do
+    Enum.find(category.translations || [], fn t -> t.locale == locale end)
+  end
 end

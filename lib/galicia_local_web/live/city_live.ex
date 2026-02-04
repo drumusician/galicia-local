@@ -12,14 +12,15 @@ defmodule GaliciaLocalWeb.CityLive do
     region = socket.assigns[:current_region]
     region_slug = if region, do: region.slug, else: "galicia"
     region_name = if region, do: region.name, else: "Galicia"
+    tenant_opts = if region, do: [tenant: region.id], else: []
 
-    case City.get_by_slug(slug) do
+    case City.get_by_slug(slug, tenant_opts) do
       {:ok, city} ->
         city = Ash.load!(city, [:business_count])
         if connected?(socket), do: Tracker.track_async("city", city.id)
 
         businesses =
-          Business.by_city!(city.id)
+          Business.by_city!(city.id, tenant_opts)
           |> Ash.load!([:category])
 
         categories =
