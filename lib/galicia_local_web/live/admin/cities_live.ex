@@ -92,9 +92,16 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
 
     # Run lookup + descriptions in background
     pid = self()
+    region = socket.assigns[:current_region]
+    region_opts = if region do
+      [region_name: region.name, country: region_country(region)]
+    else
+      []
+    end
+
     Task.start(fn ->
-      lookup = GooglePlaces.lookup_city(city.name)
-      descriptions = Claude.generate_city_descriptions(city.name, city.province)
+      lookup = GooglePlaces.lookup_city(city.name, region_opts)
+      descriptions = Claude.generate_city_descriptions(city.name, city.province, region_opts)
       send(pid, {:enrich_result, lookup, descriptions})
     end)
 
@@ -118,8 +125,15 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     socket = assign(socket, :loading, true)
 
     pid = self()
+    region = socket.assigns[:current_region]
+    region_opts = if region do
+      [region_name: region.name, country: region_country(region)]
+    else
+      []
+    end
+
     Task.start(fn ->
-      result = GooglePlaces.lookup_city(name)
+      result = GooglePlaces.lookup_city(name, region_opts)
       send(pid, {:lookup_result, result})
     end)
 
@@ -407,6 +421,12 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   end
 
   defp format_ash_error(error), do: "Failed: #{inspect(error)}"
+
+  # Convert region country_code to country name
+  defp region_country(%{country_code: "ES"}), do: "Spain"
+  defp region_country(%{country_code: "NL"}), do: "Netherlands"
+  defp region_country(%{country_code: code}), do: code
+  defp region_country(_), do: "Spain"
 
   defp detect_province(nil), do: nil
   defp detect_province(address) do

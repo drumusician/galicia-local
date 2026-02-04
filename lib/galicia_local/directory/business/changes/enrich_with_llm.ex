@@ -2,22 +2,60 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
   @moduledoc """
   Ash change that enriches business data using Claude LLM.
 
-  This change performs deep analysis to help newcomers INTEGRATE into Galician life,
+  This change performs deep analysis to help newcomers INTEGRATE into local life,
   not isolate in an expat bubble. We highlight:
 
-  1. Local authenticity - Is this a genuine Galician experience?
-  2. Newcomer accessibility - Can someone with basic Spanish manage?
+  1. Local authenticity - Is this a genuine local experience?
+  2. Newcomer accessibility - Can someone with basic local language manage?
   3. Cultural context - What should newcomers know about local customs?
   4. Integration tips - How to connect with locals, not avoid them
 
   The enrichment now uses research data (website content, web search results)
   when available for deeper analysis.
+
+  Region-aware: Uses region-specific context (culture, language, examples) for each region.
   """
   use Ash.Resource.Change
 
   require Logger
 
   alias GaliciaLocal.Scraper.Workers.{WebsiteCrawlWorker, WebSearchWorker}
+
+  # Region-specific context for enrichment prompts
+  @region_context %{
+    "galicia" => %{
+      name: "Galicia",
+      country: "Spain",
+      main_language: "Spanish",
+      local_language: "Galician (Galego)",
+      language_code: "es",
+      local_greeting: "Bos días",
+      cultural_examples: [
+        "Pulperías are central to Galician social life",
+        "The siesta is real - many shops close 2-5pm",
+        "Tapas are often free with drinks",
+        "Galicians value personal relationships - expect friendly chat"
+      ],
+      food_examples: "pulpo, tapas, marisquería",
+      typical_business: "traditional family-run tapas bar"
+    },
+    "netherlands" => %{
+      name: "Netherlands",
+      country: "Netherlands",
+      main_language: "Dutch",
+      local_language: nil,
+      language_code: "nl",
+      local_greeting: "Hoi or Goedemorgen",
+      cultural_examples: [
+        "Dutch directness is normal - it's not rude, just honest",
+        "Most shops close early (17:00-18:00) and on Sundays",
+        "Appointments are everything - always book ahead",
+        "Splitting the bill (going Dutch) is completely normal"
+      ],
+      food_examples: "stroopwafels, bitterballen, Indonesian food",
+      typical_business: "local family bakery or brown café (bruin café)"
+    }
+  }
 
   @impl true
   def change(changeset, _opts, _context) do
@@ -61,10 +99,19 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
   end
 
   defp load_relationships(business) do
-    case Ash.load(business, [:city, :category]) do
+    case Ash.load(business, [:city, :category, :region]) do
       {:ok, loaded} -> loaded
       _ -> business
     end
+  end
+
+  defp get_region_context(business) do
+    region_slug = case business.region do
+      %{slug: slug} -> slug
+      _ -> "galicia"
+    end
+
+    Map.get(@region_context, region_slug, @region_context["galicia"])
   end
 
   defp enrich_business(business, research_data) do
@@ -93,23 +140,35 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
     website_content = format_website_research(research_data.website)
     search_content = format_search_research(research_data.search)
 
+    # Get region-specific context
+    region = get_region_context(business)
+    region_name = region.name
+    country = region.country
+    main_lang = region.main_language
+    local_lang = region.local_language
+    greeting = region.local_greeting
+    cultural_examples = Enum.join(region.cultural_examples, "\n    - ")
+    typical_biz = region.typical_business
+
+    location = if region_name == country, do: region_name, else: "#{region_name}, #{country}"
+
     """
-    You are an analyst for GaliciaLocal.com - a directory helping newcomers INTEGRATE into Galician life.
+    You are an analyst for a directory helping newcomers INTEGRATE into local life in #{region_name}.
 
     IMPORTANT PHILOSOPHY:
     We're NOT creating an "expat bubble" service. We help newcomers:
-    - Discover authentic local Galician businesses
-    - Learn to navigate services with basic Spanish (most Galicians are friendly and patient!)
+    - Discover authentic local businesses in #{region_name}
+    - Learn to navigate services with basic #{main_lang} (most locals are friendly and patient!)
     - Understand and respect local customs and culture
     - Connect WITH locals, not avoid them
 
-    A traditional family-run tapas bar where nobody speaks English but the owner helps you point-and-order
+    A #{typical_biz} where nobody speaks English but the owner helps you point-and-order
     is MORE valuable than a tourist trap with English menus. We celebrate authenticity.
 
     ## BUSINESS INFORMATION
     - Name: #{business.name}
     - Category: #{category_name}
-    - City: #{city_name}, Galicia, Spain
+    - City: #{city_name}, #{location}
     - Address: #{business.address || "Not provided"}
     - Phone: #{business.phone || "Not provided"}
     - Website: #{business.website || "Not provided"}
@@ -131,27 +190,27 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
       "summary": "One sentence (max 100 chars) capturing the essence",
 
       "local_gem_score": 0.0-1.0,
-      "local_gem_reasoning": "How authentically Galician is this? Family-run? Traditional? Local clientele?",
+      "local_gem_reasoning": "How authentically local is this? Family-run? Traditional? Local clientele?",
 
       "newcomer_friendly_score": 0.0-1.0,
-      "newcomer_friendly_reasoning": "Can someone with basic Spanish and willingness to try manage here? (High score = easy, but doesn't mean it's 'better')",
+      "newcomer_friendly_reasoning": "Can someone with basic #{main_lang} and willingness to try manage here? (High score = easy, but doesn't mean it's 'better')",
 
       "speaks_english": true/false,
       "speaks_english_confidence": 0.0-1.0,
-      "languages_spoken": ["es", "gl", "en", etc.],
+      "languages_spoken": ["#{region.language_code}", "en", etc.],
 
-      "languages_taught": ["Spanish", "Galician", "English", etc.],
+      "languages_taught": ["#{main_lang}"#{if local_lang, do: ", \"#{local_lang}\"", else: ""}, "English", etc.],
       // ONLY for language schools/academies. What languages does this school TEACH?
       // For non-language-school businesses, return an empty array [].
 
       "integration_tips": [
-        "Tip to help newcomers connect with locals (e.g., 'Ask about the local pulpo - owners love sharing')",
-        "Practical tip that respects local customs (e.g., 'Lunch is 2-4pm, don't arrive at noon')"
+        "Tip to help newcomers connect with locals",
+        "Practical tip that respects local customs"
       ],
 
       "cultural_notes": [
-        "Galician cultural context (e.g., 'Galicians value personal relationships - expect friendly chat')",
-        "Local custom to know (e.g., 'Tapas are often free with drinks here')"
+        "Local cultural context for #{region_name}",
+        "Local custom to know"
       ],
 
       "service_specialties": [
@@ -188,23 +247,22 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
     - 0.0-0.2: Chain/franchise or primarily tourist-oriented
 
     **newcomer_friendly_score** (accessibility, NOT "better"):
-    - 0.9-1.0: Easy for non-Spanish speakers (but might be less authentic!)
-    - 0.6-0.8: Manageable with basic Spanish and pointing
-    - 0.3-0.5: Helpful to speak decent Spanish
-    - 0.0-0.2: Really need good Spanish (but might be an amazing local gem!)
+    - 0.9-1.0: Easy for non-#{main_lang} speakers (but might be less authentic!)
+    - 0.6-0.8: Manageable with basic #{main_lang} and pointing
+    - 0.3-0.5: Helpful to speak decent #{main_lang}
+    - 0.0-0.2: Really need good #{main_lang} (but might be an amazing local gem!)
 
-    NOTE: A low newcomer_friendly_score is NOT negative! It means "bring a Spanish friend" or "great opportunity to practice Spanish" - we frame this positively.
+    NOTE: A low newcomer_friendly_score is NOT negative! It means "bring a #{main_lang}-speaking friend" or "great opportunity to practice #{main_lang}" - we frame this positively.
 
     **integration_tips** should help newcomers CONNECT with locals:
-    - "The owner loves talking about local wines - ask for recommendations"
+    - "The owner loves talking about local specialties - ask for recommendations"
     - "This is where locals watch football - great way to make friends"
-    - "Bring cash and try ordering in Spanish - they appreciate the effort"
+    - "Bring cash and try ordering in #{main_lang} - they appreciate the effort"
     - NOT "they speak English" or "tourist-friendly"
 
-    **cultural_notes** teach Galician culture:
-    - "Pulperías are central to Galician social life"
-    - "The siesta is real - many shops close 2-5pm"
-    - "Galicians often greet with 'Bos días' (Galician) - try it!"
+    **cultural_notes** teach local culture in #{region_name}:
+    - #{cultural_examples}
+    - Try greeting with '#{greeting}'!
 
     Respond ONLY with valid JSON. No markdown code blocks.
     """
@@ -396,20 +454,17 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
   end
   defp parse_decimal(_), do: nil
 
-  defp parse_languages(nil), do: [:es, :gl]
+  # Default languages when none can be parsed - will be overridden by actual business data
+  defp parse_languages(nil), do: []
 
   defp parse_languages(languages) when is_list(languages) do
     languages
     |> Enum.map(&normalize_language/1)
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq()
-    |> case do
-      [] -> [:es, :gl]
-      langs -> langs
-    end
   end
 
-  defp parse_languages(_), do: [:es, :gl]
+  defp parse_languages(_), do: []
 
   defp normalize_language(lang) when is_binary(lang) do
     case String.downcase(lang) do

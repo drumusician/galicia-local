@@ -65,27 +65,48 @@ defmodule GaliciaLocal.AI.Claude do
   end
 
   @doc """
-  Generate English and Spanish descriptions for a city.
+  Generate English and local language descriptions for a city.
   Returns {:ok, %{description: "...", description_es: "..."}} or {:error, reason}
+
+  Accepts optional region_opts with :region_name and :country.
   """
-  def generate_city_descriptions(city_name, province) do
+  def generate_city_descriptions(city_name, province, region_opts \\ []) do
+    region_name = Keyword.get(region_opts, :region_name, "Galicia")
+    country = Keyword.get(region_opts, :country, "Spain")
+
+    # Build location string
+    location = if region_name == country, do: region_name, else: "#{region_name}, #{country}"
+    province_part = if province && province != "", do: " in #{province},", else: " in"
+
+    # Determine local language description field based on region
+    {local_lang, local_field} = case country do
+      "Spain" -> {"Spanish", "description_es"}
+      "Netherlands" -> {"Dutch", "description_nl"}
+      _ -> {"local language", "description_local"}
+    end
+
     prompt = """
-    Write two brief descriptions (2-3 sentences each) for the city of #{city_name} in #{province}, Galicia, Spain.
-    These are for an expat guide website helping foreigners settle in Galicia.
+    Write two brief descriptions (2-3 sentences each) for the city of #{city_name}#{province_part} #{location}.
+    These are for an expat guide website helping foreigners settle in #{region_name}.
 
     Focus on: what makes the city interesting, quality of life, notable features, and relevance to expats.
 
     Also include the approximate population of the city (most recent available data).
 
     Respond ONLY with valid JSON in this exact format:
-    {"description": "English description here", "description_es": "Spanish description here", "population": 12345}
+    {"description": "English description here", "#{local_field}": "#{local_lang} description here", "population": 12345}
     """
 
     case complete(prompt, max_tokens: 512) do
       {:ok, text} ->
         case Jason.decode(text) do
-          {:ok, %{"description" => desc, "description_es" => desc_es} = parsed} ->
-            result = %{description: desc, description_es: desc_es}
+          {:ok, %{"description" => desc} = parsed} ->
+            result = %{description: desc}
+            # Handle local language description (could be description_es, description_nl, etc.)
+            result = case Map.get(parsed, local_field) do
+              nil -> result
+              local_desc -> Map.put(result, String.to_atom(local_field), local_desc)
+            end
             result = if parsed["population"], do: Map.put(result, :population, parsed["population"]), else: result
             {:ok, result}
 

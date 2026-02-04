@@ -289,22 +289,30 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
   end
 
   @doc """
-  Look up a city by name in Galicia. Returns basic location info.
+  Look up a city by name in a region. Returns basic location info.
+  Accepts optional region parameter with name and country_code.
   """
-  def lookup_city(city_name) do
+  def lookup_city(city_name, opts \\ []) do
+    region_name = Keyword.get(opts, :region_name, "Galicia")
+    country = Keyword.get(opts, :country, "Spain")
+
     case api_key() do
       nil ->
         Logger.warning("GOOGLE_PLACES_API_KEY not set, using mock city data")
-        {:ok, mock_city_result(city_name)}
+        {:ok, mock_city_result(city_name, region_name, country)}
 
       key ->
-        ApiCache.get_or_fetch({:city_lookup, city_name}, fn -> do_lookup_city(city_name, key) end)
+        cache_key = {:city_lookup, city_name, region_name, country}
+        ApiCache.get_or_fetch(cache_key, fn -> do_lookup_city(city_name, region_name, country, key) end)
     end
   end
 
-  defp do_lookup_city(city_name, api_key) do
+  defp do_lookup_city(city_name, region_name, country, api_key) do
+    # Build location string - if region is the country (e.g., Netherlands), don't repeat
+    location = if region_name == country, do: country, else: "#{region_name}, #{country}"
+
     body = %{
-      textQuery: "#{city_name}, Galicia, Spain",
+      textQuery: "#{city_name}, #{location}",
       languageCode: "en",
       maxResultCount: 5
     }
@@ -358,14 +366,23 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
     end
   end
 
-  defp mock_city_result(city_name) do
+  defp mock_city_result(city_name, region_name, country) do
+    location = if region_name == country, do: country, else: "#{region_name}, #{country}"
+
+    # Default coordinates based on region
+    {base_lat, base_lng} = case region_name do
+      "Netherlands" -> {52.37, 4.89}  # Amsterdam area
+      "Galicia" -> {42.34, -8.5}       # Galicia area
+      _ -> {42.34, -8.5}
+    end
+
     [
       %{
         name: city_name,
-        address: "#{city_name}, Galicia, Spain",
-        latitude: 42.34 + :rand.uniform() * 0.5,
-        longitude: -8.5 + :rand.uniform() * 0.5,
-        editorial_summary: "A charming city in Galicia, northwestern Spain.",
+        address: "#{city_name}, #{location}",
+        latitude: base_lat + :rand.uniform() * 0.5,
+        longitude: base_lng + :rand.uniform() * 0.5,
+        editorial_summary: "A charming city in #{region_name}.",
         image_url: nil
       }
     ]
