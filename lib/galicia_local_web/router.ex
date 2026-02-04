@@ -9,6 +9,7 @@ defmodule GaliciaLocalWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
+    plug GaliciaLocalWeb.Plugs.RedirectLegacyDomains
     plug :fetch_live_flash
     plug :put_root_layout, html: {GaliciaLocalWeb.Layouts, :root}
     plug :protect_from_forgery

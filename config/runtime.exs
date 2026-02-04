@@ -63,7 +63,14 @@ if config_env() == :prod do
   config :galicia_local, GaliciaLocalWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     check_origin: [
+      # Fly.io default
       "https://galicia-local.fly.dev",
+      # New primary domains
+      "https://startlocal.app",
+      "https://www.startlocal.app",
+      "https://galicia.startlocal.app",
+      "https://netherlands.startlocal.app",
+      # Legacy domains (for redirect handling)
       "https://galicialocal.com",
       "https://www.galicialocal.com",
       "https://galicialocal.es",
