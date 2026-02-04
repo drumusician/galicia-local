@@ -9,8 +9,6 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   alias GaliciaLocal.AI.Claude
   alias GaliciaLocalWeb.Layouts
 
-  @provinces ["A Coruña", "Lugo", "Ourense", "Pontevedra"]
-
   @impl true
   def mount(_params, _session, socket) do
     region = socket.assigns[:current_region]
@@ -19,7 +17,6 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     {:ok,
      socket
      |> assign(:page_title, "Manage Cities")
-     |> assign(:provinces, @provinces)
      |> assign(:region_slug, region_slug)
      |> assign(:editing, nil)
      |> assign(:creating, false)
@@ -41,7 +38,17 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
       |> Ash.load!([:business_count])
       |> Enum.sort_by(&{&1.province, &1.name})
 
-    assign(socket, :cities, cities)
+    # Extract unique provinces from cities
+    provinces =
+      cities
+      |> Enum.map(& &1.province)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+      |> Enum.sort()
+
+    socket
+    |> assign(:cities, cities)
+    |> assign(:provinces, provinces)
   end
 
   defp filtered_cities(cities, "all"), do: cities
@@ -404,10 +411,24 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   defp detect_province(nil), do: nil
   defp detect_province(address) do
     cond do
+      # Spanish/Galician provinces
       String.contains?(address, "A Coruña") or String.contains?(address, "La Coruña") -> "A Coruña"
       String.contains?(address, "Lugo") -> "Lugo"
       String.contains?(address, "Ourense") or String.contains?(address, "Orense") -> "Ourense"
       String.contains?(address, "Pontevedra") -> "Pontevedra"
+      # Dutch provinces
+      String.contains?(address, "Noord-Holland") -> "Noord-Holland"
+      String.contains?(address, "Zuid-Holland") -> "Zuid-Holland"
+      String.contains?(address, "Utrecht") -> "Utrecht"
+      String.contains?(address, "Noord-Brabant") -> "Noord-Brabant"
+      String.contains?(address, "Gelderland") -> "Gelderland"
+      String.contains?(address, "Overijssel") -> "Overijssel"
+      String.contains?(address, "Limburg") -> "Limburg"
+      String.contains?(address, "Groningen") -> "Groningen"
+      String.contains?(address, "Flevoland") -> "Flevoland"
+      String.contains?(address, "Friesland") or String.contains?(address, "Fryslân") -> "Friesland"
+      String.contains?(address, "Drenthe") -> "Drenthe"
+      String.contains?(address, "Zeeland") -> "Zeeland"
       true -> nil
     end
   end
