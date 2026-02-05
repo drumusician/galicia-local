@@ -97,7 +97,7 @@ defmodule GaliciaLocal.Directory.Category do
 
     attribute :search_translation, :string do
       public? true
-      description "Base Spanish search term for Google Places (e.g. 'abogados')"
+      description "Base English search term for Google Places (fallback when no locale translation exists)"
     end
 
     attribute :search_queries, {:array, :string} do

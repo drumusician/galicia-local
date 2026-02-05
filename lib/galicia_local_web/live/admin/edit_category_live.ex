@@ -249,17 +249,24 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
   defp translate_content(category_name, field, content, target_locale) do
     locale_label = locale_name(target_locale)
 
+    {formatted_content, format_hint} =
+      if is_list(content) do
+        {Jason.encode!(content), "Respond ONLY with a JSON array of translated strings."}
+      else
+        {content, "Respond ONLY with the translated text. Do not wrap in quotes."}
+      end
+
     prompt = """
     Translate the following content from English to #{locale_label}.
     This is the "#{field}" field for a business category called "#{category_name}".
 
-    Keep the same tone and style. For arrays, translate each item.
+    Keep the same tone and style. For arrays, translate each item individually.
     Preserve any proper names or technical terms.
 
     Content to translate:
-    #{Jason.encode!(content)}
+    #{formatted_content}
 
-    Respond ONLY with the translated content in the same format (string or JSON array).
+    #{format_hint}
     No markdown, no explanation, just the translated content.
     """
 
@@ -337,7 +344,13 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
   end
 
   defp parse_translated_content(response, _original) do
-    {:ok, String.trim(response)}
+    cleaned =
+      response
+      |> String.trim()
+      |> String.trim("\"")
+      |> String.trim()
+
+    {:ok, cleaned}
   end
 
   defp locale_name("en"), do: "English"
