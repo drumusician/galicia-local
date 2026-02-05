@@ -73,6 +73,7 @@ defmodule GaliciaLocal.Directory.Business do
     define :create
     define :enrich_with_llm
     define :translate_to_spanish
+    define :queue_re_enrichment
     define :update
     define :destroy
     define :english_speaking
@@ -124,6 +125,11 @@ defmodule GaliciaLocal.Directory.Business do
       require_atomic? false
       accept []
       change GaliciaLocal.Directory.Business.Changes.TranslateToSpanish
+    end
+
+    update :queue_re_enrichment do
+      accept []
+      change set_attribute(:status, :researched)
     end
 
     read :get_by_id do
@@ -414,6 +420,17 @@ defmodule GaliciaLocal.Directory.Business do
       public? true
       constraints min: 0, max: 1
       description "Overall data quality score"
+    end
+
+    attribute :category_fit_score, :decimal do
+      public? true
+      constraints min: 0, max: 1
+      description "How well the business fits its assigned category (0-1)"
+    end
+
+    attribute :suggested_category_slug, :string do
+      public? true
+      description "If category_fit_score < 0.5, a suggested better category slug"
     end
 
     attribute :last_enriched_at, :utc_datetime do

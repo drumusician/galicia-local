@@ -259,100 +259,47 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
     end
   end
 
-  # Translation helpers
+  # Translation helpers (using DeepL)
 
-  defp translate_content(business_name, field, content, target_locale) do
-    locale_label = locale_name(target_locale)
-
-    prompt = """
-    Translate the following content from English to #{locale_label}.
-    This is the "#{field}" field for a business called "#{business_name}".
-
-    Keep the same tone and style. For arrays, translate each item.
-    Preserve any proper names or technical terms.
-
-    Content to translate:
-    #{Jason.encode!(content)}
-
-    Respond ONLY with the translated content in the same format (string or JSON array).
-    No markdown, no explanation, just the translated content.
-    """
-
-    case GaliciaLocal.AI.Claude.complete(prompt, max_tokens: 1024, model: "claude-sonnet-4-20250514") do
-      {:ok, response} ->
-        parse_translated_content(response, content)
-
-      {:error, _} = error ->
-        error
-    end
+  defp translate_content(_business_name, _field, content, target_locale) when is_list(content) do
+    GaliciaLocal.AI.DeepL.translate_batch(content, target_locale, source_lang: "en")
   end
 
-  defp translate_all_fields(business_name, english_content, fields, target_locale) do
-    locale_label = locale_name(target_locale)
-
-    content_json =
-      fields
-      |> Enum.map(fn field -> {Atom.to_string(field), Map.get(english_content, field)} end)
-      |> Enum.into(%{})
-      |> Jason.encode!()
-
-    prompt = """
-    Translate the following business content from English to #{locale_label}.
-    This is for "#{business_name}".
-
-    Keep the same tone and style. For arrays, translate each item individually.
-    Preserve any proper names or technical terms.
-
-    Content to translate:
-    #{content_json}
-
-    Respond ONLY with valid JSON containing the translated fields with the same keys.
-    No markdown code blocks, just the JSON object.
-    """
-
-    case GaliciaLocal.AI.Claude.complete(prompt, max_tokens: 2048, model: "claude-sonnet-4-20250514") do
-      {:ok, response} ->
-        cleaned = response
-          |> String.replace(~r/^```json\s*/m, "")
-          |> String.replace(~r/\s*```$/m, "")
-          |> String.trim()
-
-        case Jason.decode(cleaned) do
-          {:ok, data} ->
-            result =
-              fields
-              |> Enum.reduce(%{}, fn field, acc ->
-                key = Atom.to_string(field)
-                case Map.get(data, key) do
-                  nil -> acc
-                  value -> Map.put(acc, field, value)
-                end
-              end)
-            {:ok, result}
-
-          {:error, _} ->
-            {:error, "Invalid response format"}
-        end
-
-      {:error, _} = error ->
-        error
-    end
+  defp translate_content(_business_name, _field, content, target_locale) do
+    GaliciaLocal.AI.DeepL.translate(content, target_locale, source_lang: "en")
   end
 
-  defp parse_translated_content(response, original) when is_list(original) do
-    cleaned = response
-      |> String.replace(~r/^```json\s*/m, "")
-      |> String.replace(~r/\s*```$/m, "")
-      |> String.trim()
+  defp translate_all_fields(_business_name, english_content, fields, target_locale) do
+    {string_fields, array_fields} =
+      Enum.split_with(fields, fn field ->
+        is_binary(Map.get(english_content, field))
+      end)
 
-    case Jason.decode(cleaned) do
-      {:ok, list} when is_list(list) -> {:ok, list}
-      _ -> {:error, "Invalid array format"}
+    string_keys = Enum.map(string_fields, fn f -> f end)
+    string_values = Enum.map(string_fields, fn f -> Map.get(english_content, f) end)
+
+    array_meta = Enum.map(array_fields, fn f -> {f, length(Map.get(english_content, f, []))} end)
+    array_values = Enum.flat_map(array_fields, fn f -> Map.get(english_content, f, []) end)
+
+    all_texts = string_values ++ array_values
+
+    case GaliciaLocal.AI.DeepL.translate_batch(all_texts, target_locale, source_lang: "en") do
+      {:ok, translated_all} ->
+        {translated_strings, translated_arrays_flat} = Enum.split(translated_all, length(string_values))
+
+        string_result = Enum.zip(string_keys, translated_strings) |> Map.new()
+
+        {array_result, _rest} =
+          Enum.reduce(array_meta, {%{}, translated_arrays_flat}, fn {key, count}, {acc, remaining} ->
+            {items, rest} = Enum.split(remaining, count)
+            {Map.put(acc, key, items), rest}
+          end)
+
+        {:ok, Map.merge(string_result, array_result)}
+
+      {:error, reason} ->
+        {:error, reason}
     end
-  end
-
-  defp parse_translated_content(response, _original) do
-    {:ok, String.trim(response)}
   end
 
   defp locale_name("en"), do: "English"

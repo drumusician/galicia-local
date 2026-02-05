@@ -234,7 +234,15 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
         "reviewer_demographics": "Who reviews this? Locals? Visitors? Mix?"
       },
 
-      "quality_score": 0.0-1.0
+      "quality_score": 0.0-1.0,
+
+      "category_fit_score": 0.0-1.0,
+      // How well does this business fit the category "#{get_category_name(business)}"?
+      // 0.9-1.0: Perfect fit. 0.5-0.8: Reasonable fit. Below 0.5: Wrong category.
+
+      "suggested_category_slug": null
+      // If category_fit_score < 0.5, suggest a better category slug from: restaurants, cafes, bars, bakeries, butchers, supermarkets, markets, hair-salons, dentists, doctors, lawyers, accountants, real-estate-agents, plumbers, electricians, car-services, language-schools, veterinarians, wineries, cider-houses
+      // Otherwise null
     }
     ```
 
@@ -380,16 +388,39 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
   end
 
   defp get_enrichment_hints(business) do
-    case business.category do
-      %{enrichment_hints: hints} when is_binary(hints) and hints != "" ->
-        """
+    # Try locale-specific hints first (from category translations), then fall back to global hints
+    locale_hints = get_locale_enrichment_hints(business)
+    global_hints = case business.category do
+      %{enrichment_hints: hints} when is_binary(hints) and hints != "" -> hints
+      _ -> nil
+    end
 
-        ## CATEGORY-SPECIFIC ANALYSIS INSTRUCTIONS
-        #{hints}
-        """
+    hints = locale_hints || global_hints
+
+    if hints do
+      """
+
+      ## CATEGORY-SPECIFIC ANALYSIS INSTRUCTIONS
+      #{hints}
+      """
+    else
+      ""
+    end
+  end
+
+  defp get_locale_enrichment_hints(business) do
+    region_ctx = get_region_context(business)
+    locale = region_ctx.language_code
+
+    case business.category do
+      %{id: category_id} when not is_nil(category_id) ->
+        case GaliciaLocal.Directory.CategoryTranslation.get_for_category_locale(category_id, locale) do
+          {:ok, %{enrichment_hints: hints}} when is_binary(hints) and hints != "" -> hints
+          _ -> nil
+        end
 
       _ ->
-        ""
+        nil
     end
   end
 
@@ -432,7 +463,9 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
           warnings: data["warnings"] || [],
           sentiment_summary: data["sentiment_summary"],
           review_insights: data["review_insights"],
-          quality_score: parse_decimal(data["quality_score"])
+          quality_score: parse_decimal(data["quality_score"]),
+          category_fit_score: parse_decimal(data["category_fit_score"]),
+          suggested_category_slug: data["suggested_category_slug"]
         }
 
         {:ok, enriched}

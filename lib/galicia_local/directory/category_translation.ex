@@ -43,6 +43,11 @@ defmodule GaliciaLocal.Directory.CategoryTranslation do
       description "Search queries for Google Places in this locale"
     end
 
+    attribute :enrichment_hints, :string do
+      public? true
+      description "Locale-specific hints for LLM enrichment of businesses in this category"
+    end
+
     create_timestamp :inserted_at
     update_timestamp :updated_at
   end
@@ -63,18 +68,18 @@ defmodule GaliciaLocal.Directory.CategoryTranslation do
 
     create :create do
       primary? true
-      accept [:category_id, :locale, :name, :description, :search_translation, :search_queries]
+      accept [:category_id, :locale, :name, :description, :search_translation, :search_queries, :enrichment_hints]
     end
 
     create :upsert do
       upsert? true
       upsert_identity :unique_category_locale
-      accept [:category_id, :locale, :name, :description, :search_translation, :search_queries]
+      accept [:category_id, :locale, :name, :description, :search_translation, :search_queries, :enrichment_hints]
     end
 
     update :update do
       primary? true
-      accept [:name, :description, :search_translation, :search_queries]
+      accept [:name, :description, :search_translation, :search_queries, :enrichment_hints]
     end
 
     read :for_category_locale do

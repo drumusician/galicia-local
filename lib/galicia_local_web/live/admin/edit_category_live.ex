@@ -51,7 +51,8 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
         name: category.name,
         description: category.description,
         search_translation: category.search_translation,
-        search_queries: category.search_queries || []
+        search_queries: category.search_queries || [],
+        enrichment_hints: category.enrichment_hints
       }
     }
 
@@ -61,7 +62,8 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
         name: translation.name,
         description: translation.description,
         search_translation: translation.search_translation,
-        search_queries: translation.search_queries || []
+        search_queries: translation.search_queries || [],
+        enrichment_hints: translation.enrichment_hints
       })
     end)
   end
@@ -109,7 +111,8 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
         "name" => params.name,
         "description" => params.description,
         "search_translation" => params.search_translation,
-        "search_queries" => params.search_queries
+        "search_queries" => params.search_queries,
+        "enrichment_hints" => params.enrichment_hints
       }
 
       case Ash.update(category, category_params) do
@@ -132,7 +135,8 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
         name: params.name,
         description: params.description,
         search_translation: params.search_translation,
-        search_queries: params.search_queries
+        search_queries: params.search_queries,
+        enrichment_hints: params.enrichment_hints
       }
 
       case CategoryTranslation.upsert(translation_params) do
@@ -244,113 +248,47 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
     end
   end
 
-  # Translation helpers
+  # Translation helpers (using DeepL)
 
-  defp translate_content(category_name, field, content, target_locale) do
-    locale_label = locale_name(target_locale)
-
-    {formatted_content, format_hint} =
-      if is_list(content) do
-        {Jason.encode!(content), "Respond ONLY with a JSON array of translated strings."}
-      else
-        {content, "Respond ONLY with the translated text. Do not wrap in quotes."}
-      end
-
-    prompt = """
-    Translate the following content from English to #{locale_label}.
-    This is the "#{field}" field for a business category called "#{category_name}".
-
-    Keep the same tone and style. For arrays, translate each item individually.
-    Preserve any proper names or technical terms.
-
-    Content to translate:
-    #{formatted_content}
-
-    #{format_hint}
-    No markdown, no explanation, just the translated content.
-    """
-
-    case GaliciaLocal.AI.Claude.complete(prompt, max_tokens: 1024, model: "claude-sonnet-4-20250514") do
-      {:ok, response} ->
-        parse_translated_content(response, content)
-
-      {:error, _} = error ->
-        error
-    end
+  defp translate_content(_category_name, _field, content, target_locale) when is_list(content) do
+    GaliciaLocal.AI.DeepL.translate_batch(content, target_locale, source_lang: "en")
   end
 
-  defp translate_all_fields(category_name, english_content, fields, target_locale) do
-    locale_label = locale_name(target_locale)
-
-    content_json =
-      fields
-      |> Enum.map(fn field -> {Atom.to_string(field), Map.get(english_content, field)} end)
-      |> Enum.into(%{})
-      |> Jason.encode!()
-
-    prompt = """
-    Translate the following category content from English to #{locale_label}.
-    This is for a business category called "#{category_name}".
-
-    Keep the same tone and style. For arrays, translate each item individually.
-    Preserve any proper names or technical terms.
-
-    Content to translate:
-    #{content_json}
-
-    Respond ONLY with valid JSON containing the translated fields with the same keys.
-    No markdown code blocks, just the JSON object.
-    """
-
-    case GaliciaLocal.AI.Claude.complete(prompt, max_tokens: 2048, model: "claude-sonnet-4-20250514") do
-      {:ok, response} ->
-        cleaned = response
-          |> String.replace(~r/^```json\s*/m, "")
-          |> String.replace(~r/\s*```$/m, "")
-          |> String.trim()
-
-        case Jason.decode(cleaned) do
-          {:ok, data} ->
-            result =
-              fields
-              |> Enum.reduce(%{}, fn field, acc ->
-                key = Atom.to_string(field)
-                case Map.get(data, key) do
-                  nil -> acc
-                  value -> Map.put(acc, field, value)
-                end
-              end)
-            {:ok, result}
-
-          {:error, _} ->
-            {:error, "Invalid response format"}
-        end
-
-      {:error, _} = error ->
-        error
-    end
+  defp translate_content(_category_name, _field, content, target_locale) do
+    GaliciaLocal.AI.DeepL.translate(content, target_locale, source_lang: "en")
   end
 
-  defp parse_translated_content(response, original) when is_list(original) do
-    cleaned = response
-      |> String.replace(~r/^```json\s*/m, "")
-      |> String.replace(~r/\s*```$/m, "")
-      |> String.trim()
+  defp translate_all_fields(_category_name, english_content, fields, target_locale) do
+    {string_fields, array_fields} =
+      Enum.split_with(fields, fn field ->
+        is_binary(Map.get(english_content, field))
+      end)
 
-    case Jason.decode(cleaned) do
-      {:ok, list} when is_list(list) -> {:ok, list}
-      _ -> {:error, "Invalid array format"}
+    string_keys = Enum.map(string_fields, fn f -> f end)
+    string_values = Enum.map(string_fields, fn f -> Map.get(english_content, f) end)
+
+    array_meta = Enum.map(array_fields, fn f -> {f, length(Map.get(english_content, f, []))} end)
+    array_values = Enum.flat_map(array_fields, fn f -> Map.get(english_content, f, []) end)
+
+    all_texts = string_values ++ array_values
+
+    case GaliciaLocal.AI.DeepL.translate_batch(all_texts, target_locale, source_lang: "en") do
+      {:ok, translated_all} ->
+        {translated_strings, translated_arrays_flat} = Enum.split(translated_all, length(string_values))
+
+        string_result = Enum.zip(string_keys, translated_strings) |> Map.new()
+
+        {array_result, _rest} =
+          Enum.reduce(array_meta, {%{}, translated_arrays_flat}, fn {key, count}, {acc, remaining} ->
+            {items, rest} = Enum.split(remaining, count)
+            {Map.put(acc, key, items), rest}
+          end)
+
+        {:ok, Map.merge(string_result, array_result)}
+
+      {:error, reason} ->
+        {:error, reason}
     end
-  end
-
-  defp parse_translated_content(response, _original) do
-    cleaned =
-      response
-      |> String.trim()
-      |> String.trim("\"")
-      |> String.trim()
-
-    {:ok, cleaned}
   end
 
   defp locale_name("en"), do: "English"
@@ -389,7 +327,8 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
       name: params["name"],
       description: params["description"],
       search_translation: params["search_translation"],
-      search_queries: search_queries
+      search_queries: search_queries,
+      enrichment_hints: params["enrichment_hints"]
     }
   end
 
@@ -655,6 +594,18 @@ defmodule GaliciaLocalWeb.Admin.EditCategoryLive do
                   placeholder={"One search term per line...\nCity name will be appended automatically"}
                 >{format_array(get_translation_field(@translations_map, @active_locale, :search_queries))}</textarea>
                 <label class="label"><span class="label-text-alt text-base-content/50">Each line is searched separately with city name appended</span></label>
+              </div>
+
+              <!-- Enrichment Hints -->
+              <div class="form-control">
+                <label class="label"><span class="label-text font-medium">Enrichment Hints</span></label>
+                <textarea
+                  name="translation[enrichment_hints]"
+                  class="textarea textarea-bordered w-full font-mono text-sm"
+                  rows="4"
+                  placeholder="Locale-specific instructions for the LLM when enriching businesses in this category..."
+                >{get_translation_field(@translations_map, @active_locale, :enrichment_hints)}</textarea>
+                <label class="label"><span class="label-text-alt text-base-content/50">These hints guide the AI when generating descriptions for businesses in this category (locale-specific)</span></label>
               </div>
 
               <div class="flex justify-end mt-4">

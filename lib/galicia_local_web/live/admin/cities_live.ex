@@ -157,7 +157,15 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
       end
 
       Task.start(fn ->
-        result = Claude.generate_city_description_for_locale(city.name, city.province, locale, region_opts)
+        result =
+          if city.description && city.description != "" do
+            # English description exists - translate with DeepL (cheaper, faster)
+            GaliciaLocal.AI.DeepL.translate(city.description, locale, source_lang: "en")
+          else
+            # No English description - generate with Claude
+            Claude.generate_city_description_for_locale(city.name, city.province, locale, region_opts)
+          end
+
         send(pid, {:translation_result, result, locale})
       end)
 

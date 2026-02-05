@@ -249,6 +249,32 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
     end
   end
 
+  @impl true
+  def handle_event("bulk_re_enrich", _params, socket) do
+    region = socket.assigns[:current_region]
+
+    businesses =
+      Business
+      |> Ash.Query.filter(status in [:enriched, :verified])
+      |> maybe_filter_category(socket.assigns.filter_category)
+      |> maybe_filter_city(socket.assigns.filter_city)
+      |> then(fn q -> if region, do: Ash.Query.set_tenant(q, region.id), else: q end)
+      |> Ash.read!()
+
+    count =
+      Enum.reduce(businesses, 0, fn business, acc ->
+        case Business.queue_re_enrichment(business) do
+          {:ok, _} -> acc + 1
+          _ -> acc
+        end
+      end)
+
+    {:noreply,
+     socket
+     |> put_flash(:info, "Queued #{count} businesses for re-enrichment")
+     |> load_page()}
+  end
+
   # Helpers
 
   defp total_pages(page) do
@@ -364,9 +390,20 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
             </select>
           </form>
 
-          <%= if @page.count do %>
-            <span class="text-sm text-base-content/60 ml-auto">{@page.count} results</span>
-          <% end %>
+          <div class="flex items-center gap-2 ml-auto">
+            <%= if @page.count do %>
+              <span class="text-sm text-base-content/60">{@page.count} results</span>
+            <% end %>
+            <button
+              type="button"
+              phx-click="bulk_re_enrich"
+              data-confirm="This will queue all enriched/verified businesses matching the current filters for re-enrichment. Continue?"
+              class="btn btn-outline btn-warning btn-xs"
+            >
+              <span class="hero-arrow-path w-3 h-3"></span>
+              Re-enrich filtered
+            </button>
+          </div>
         </div>
 
         <!-- Business Table -->

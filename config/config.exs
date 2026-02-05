@@ -19,7 +19,8 @@ config :galicia_local, Oban,
     business_enrich_pending_no_website: 5,
     scraper: 2,
     research: 3,
-    business_translate_to_spanish: 3
+    business_translate_to_spanish: 3,
+    translations: 5
   ],
   repo: GaliciaLocal.Repo,
   plugins: [{Oban.Plugins.Cron, []}]

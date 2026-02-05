@@ -1,6 +1,6 @@
 defmodule GaliciaLocal.Directory.Business.Changes.TranslateToSpanish do
   @moduledoc """
-  Ash change that translates enriched English content to Spanish using Claude LLM.
+  Ash change that translates enriched English content to Spanish using DeepL.
 
   Translates the following fields when Spanish versions are missing:
   - summary → summary_es
@@ -14,6 +14,8 @@ defmodule GaliciaLocal.Directory.Business.Changes.TranslateToSpanish do
   use Ash.Resource.Change
 
   require Logger
+
+  alias GaliciaLocal.AI.DeepL
 
   @translatable_fields ~w(summary highlights warnings integration_tips cultural_notes)a
 
@@ -59,81 +61,44 @@ defmodule GaliciaLocal.Directory.Business.Changes.TranslateToSpanish do
   defp empty?(_), do: false
 
   defp translate_fields(business, fields) do
-    content_to_translate =
-      Enum.map(fields, fn field ->
-        value = Map.get(business, field)
-        {field, value}
+    # Separate string and array fields
+    {string_fields, array_fields} =
+      Enum.split_with(fields, fn field ->
+        is_binary(Map.get(business, field))
       end)
 
-    prompt = build_translation_prompt(business.name, content_to_translate)
+    string_values = Enum.map(string_fields, fn f -> Map.get(business, f) end)
+    array_meta = Enum.map(array_fields, fn f -> {f, length(Map.get(business, f, []))} end)
+    array_values = Enum.flat_map(array_fields, fn f -> Map.get(business, f, []) end)
 
-    case GaliciaLocal.AI.Claude.complete(prompt, max_tokens: 2048, model: "claude-sonnet-4-20250514") do
-      {:ok, response} ->
-        parse_translation_response(response, fields)
+    all_texts = string_values ++ array_values
 
-      {:error, _} = error ->
-        error
-    end
-  end
+    if Enum.empty?(all_texts) do
+      {:ok, %{}}
+    else
+      case DeepL.translate_batch(all_texts, "es", source_lang: "en") do
+        {:ok, translated_all} ->
+          {translated_strings, translated_arrays_flat} =
+            Enum.split(translated_all, length(string_values))
 
-  defp build_translation_prompt(business_name, content) do
-    fields_json =
-      content
-      |> Enum.map(fn {field, value} ->
-        json_value = if is_list(value), do: Jason.encode!(value), else: Jason.encode!(value)
-        ~s("#{field}": #{json_value})
-      end)
-      |> Enum.join(",\n  ")
+          # Build _es string fields
+          string_result =
+            Enum.zip(string_fields, translated_strings)
+            |> Enum.map(fn {field, text} -> {:"#{field}_es", text} end)
+            |> Map.new()
 
-    """
-    Translate the following business content from English to Spanish.
-    This is for "#{business_name}", a business listing in Galicia, Spain.
+          # Build _es array fields
+          {array_result, _rest} =
+            Enum.reduce(array_meta, {%{}, translated_arrays_flat}, fn {field, count}, {acc, remaining} ->
+              {items, rest} = Enum.split(remaining, count)
+              {Map.put(acc, :"#{field}_es", items), rest}
+            end)
 
-    IMPORTANT GUIDELINES:
-    - Use natural, conversational Spanish (Castilian, as used in Galicia)
-    - Keep the same tone and style as the original
-    - For arrays, translate each element individually, maintaining the same number of items
-    - For strings, provide a direct translation
-    - Preserve any specific names, addresses, or technical terms
+          {:ok, Map.merge(string_result, array_result)}
 
-    Content to translate:
-    {
-      #{fields_json}
-    }
-
-    Respond ONLY with valid JSON containing the translated fields with "_es" suffix:
-    For example: {"summary_es": "...", "highlights_es": ["...", "..."]}
-
-    Respond ONLY with valid JSON. No markdown code blocks.
-    """
-  end
-
-  defp parse_translation_response(response, expected_fields) do
-    cleaned =
-      response
-      |> String.replace(~r/^```json\s*/m, "")
-      |> String.replace(~r/\s*```$/m, "")
-      |> String.trim()
-
-    case Jason.decode(cleaned) do
-      {:ok, data} ->
-        translations =
-          expected_fields
-          |> Enum.reduce(%{}, fn field, acc ->
-            es_key = "#{field}_es"
-            es_atom = :"#{field}_es"
-
-            case Map.get(data, es_key) do
-              nil -> acc
-              value -> Map.put(acc, es_atom, value)
-            end
-          end)
-
-        {:ok, translations}
-
-      {:error, error} ->
-        Logger.error("Failed to parse translation response: #{inspect(error)}\nResponse: #{cleaned}")
-        {:error, :invalid_json}
+        {:error, reason} ->
+          {:error, reason}
+      end
     end
   end
 end

@@ -52,6 +52,18 @@ defmodule GaliciaLocal.Directory.BusinessTranslation do
       default []
     end
 
+    attribute :content_source, :string do
+      public? true
+      default "ai_generated"
+      description "Origin of this translation: ai_generated, owner_edited, community_verified, admin_curated"
+    end
+
+    attribute :source_locale, :string do
+      public? true
+      default "en"
+      description "Which locale this translation was generated from"
+    end
+
     create_timestamp :inserted_at
     update_timestamp :updated_at
   end
@@ -72,18 +84,18 @@ defmodule GaliciaLocal.Directory.BusinessTranslation do
 
     create :create do
       primary? true
-      accept [:business_id, :locale, :description, :summary, :highlights, :warnings, :integration_tips, :cultural_notes]
+      accept [:business_id, :locale, :description, :summary, :highlights, :warnings, :integration_tips, :cultural_notes, :content_source, :source_locale]
     end
 
     create :upsert do
       upsert? true
       upsert_identity :unique_business_locale
-      accept [:business_id, :locale, :description, :summary, :highlights, :warnings, :integration_tips, :cultural_notes]
+      accept [:business_id, :locale, :description, :summary, :highlights, :warnings, :integration_tips, :cultural_notes, :content_source, :source_locale]
     end
 
     update :update do
       primary? true
-      accept [:description, :summary, :highlights, :warnings, :integration_tips, :cultural_notes]
+      accept [:description, :summary, :highlights, :warnings, :integration_tips, :cultural_notes, :content_source, :source_locale]
     end
 
     read :for_business_locale do
