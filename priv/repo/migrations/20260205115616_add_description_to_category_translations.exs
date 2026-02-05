@@ -1,4 +1,4 @@
-defmodule GaliciaLocal.Repo.Migrations.AddDescriptionNlToCities do
+defmodule GaliciaLocal.Repo.Migrations.AddDescriptionToCategoryTranslations do
   @moduledoc """
   Updates resources based on their most recent snapshots.
 
@@ -8,14 +8,14 @@ defmodule GaliciaLocal.Repo.Migrations.AddDescriptionNlToCities do
   use Ecto.Migration
 
   def up do
-    alter table(:cities) do
-      add :description_nl, :text
+    alter table(:category_translations) do
+      add :description, :text
     end
   end
 
   def down do
-    alter table(:cities) do
-      remove :description_nl
+    alter table(:category_translations) do
+      remove :description
     end
   end
 end
