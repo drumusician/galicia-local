@@ -168,9 +168,17 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   end
 
   @impl true
-  def handle_event("save_translation", %{"translation" => %{"description" => description}}, socket) do
+  def handle_event("update_translation_input", %{"translation_description" => description}, socket) do
+    locale = socket.assigns.active_locale
+    translations_map = Map.put(socket.assigns.translations_map, locale, %{description: description})
+    {:noreply, assign(socket, :translations_map, translations_map)}
+  end
+
+  @impl true
+  def handle_event("save_translation", _params, socket) do
     city = socket.assigns.editing
     locale = socket.assigns.active_locale
+    description = get_translation_description(socket.assigns.translations_map, locale)
 
     # English description stays in the city itself
     if locale == "en" do
@@ -1028,8 +1036,8 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
               <% end %>
             </div>
 
-            <!-- Translation Form -->
-            <form phx-submit="save_translation" class="space-y-4">
+            <!-- Translation Editor (not a form to avoid nesting) -->
+            <div class="space-y-4">
               <div>
                 <div class="flex items-center justify-between mb-1.5">
                   <label class="block text-sm font-medium">{locale_name(@active_locale)} Description</label>
@@ -1044,18 +1052,25 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
                   </button>
                 </div>
                 <textarea
-                  name="translation[description]"
+                  id={"translation-description-#{@active_locale}"}
+                  name="translation_description"
+                  phx-change="update_translation_input"
+                  phx-debounce="300"
                   rows="3"
                   class="textarea textarea-bordered w-full text-sm"
                   placeholder={translation_placeholder(@active_locale)}
                 >{get_translation_description(@translations_map, @active_locale)}</textarea>
               </div>
               <div class="flex justify-end">
-                <button type="submit" class="btn btn-sm btn-secondary">
+                <button
+                  type="button"
+                  phx-click="save_translation"
+                  class="btn btn-sm btn-secondary"
+                >
                   Save {locale_name(@active_locale)} Translation
                 </button>
               </div>
-            </form>
+            </div>
           <% end %>
 
           <div class="modal-action">
