@@ -7,10 +7,16 @@ defmodule GaliciaLocal.Repo.Migrations.AddCategoryFitFields do
 
   use Ecto.Migration
 
+  # Increase lock timeout for large businesses table on production
+  @disable_ddl_transaction true
+  @disable_migration_lock true
+
   def up do
+    execute "SET lock_timeout TO '10s'"
+
     alter table(:businesses) do
-      add :category_fit_score, :decimal
-      add :suggested_category_slug, :text
+      add_if_not_exists :category_fit_score, :decimal
+      add_if_not_exists :suggested_category_slug, :text
     end
   end
 

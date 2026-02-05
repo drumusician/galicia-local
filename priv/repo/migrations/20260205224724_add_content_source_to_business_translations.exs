@@ -7,10 +7,15 @@ defmodule GaliciaLocal.Repo.Migrations.AddContentSourceToBusinessTranslations do
 
   use Ecto.Migration
 
+  @disable_ddl_transaction true
+  @disable_migration_lock true
+
   def up do
+    execute "SET lock_timeout TO '10s'"
+
     alter table(:business_translations) do
-      add :content_source, :text, default: "ai_generated"
-      add :source_locale, :text, default: "en"
+      add_if_not_exists :content_source, :text, default: "ai_generated"
+      add_if_not_exists :source_locale, :text, default: "en"
     end
   end
 
