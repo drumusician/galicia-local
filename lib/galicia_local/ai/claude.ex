@@ -120,6 +120,50 @@ defmodule GaliciaLocal.AI.Claude do
     end
   end
 
+  @doc """
+  Generate a city description for a specific locale.
+  Returns {:ok, description_text} or {:error, reason}
+  """
+  def generate_city_description_for_locale(city_name, province, locale, opts \\ []) do
+    region_name = Keyword.get(opts, :region_name, "Galicia")
+    country = Keyword.get(opts, :country, "Spain")
+
+    location = if region_name == country, do: region_name, else: "#{region_name}, #{country}"
+    province_part = if province && province != "", do: " in #{province},", else: " in"
+
+    {language, language_instruction} = case locale do
+      "en" -> {"English", "Write in English."}
+      "es" -> {"Spanish", "Write in Spanish (Español)."}
+      "nl" -> {"Dutch", "Write in Dutch (Nederlands)."}
+      _ -> {"English", "Write in English."}
+    end
+
+    prompt = """
+    Write a brief description (2-3 sentences) for the city of #{city_name}#{province_part} #{location}.
+    This is for an expat guide website helping foreigners settle in the area.
+
+    #{language_instruction}
+
+    Focus on: what makes the city interesting, quality of life, notable features, and relevance to expats.
+
+    Respond ONLY with the description text in #{language}. No JSON, no formatting, just the plain text description.
+    """
+
+    case complete(prompt, max_tokens: 256) do
+      {:ok, text} ->
+        # Clean up any quotes or extra formatting
+        description = text
+        |> String.trim()
+        |> String.trim("\"")
+        |> String.trim()
+
+        {:ok, description}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
   defp get_api_key do
     System.get_env("ANTHROPIC_API_KEY")
   end

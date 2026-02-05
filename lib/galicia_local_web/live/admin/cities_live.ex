@@ -9,8 +9,8 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   alias GaliciaLocal.AI.Claude
   alias GaliciaLocalWeb.Layouts
 
-  @supported_locales [
-    {"en", "English", "🇬🇧"},
+  # Non-English locales for translation tabs (English is shown separately in main form)
+  @translation_locales [
     {"es", "Español", "🇪🇸"},
     {"nl", "Nederlands", "🇳🇱"}
   ]
@@ -31,8 +31,8 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:loading, false)
      |> assign(:form_data, %{})
      |> assign(:inline_error, nil)
-     |> assign(:supported_locales, @supported_locales)
-     |> assign(:active_locale, "en")
+     |> assign(:translation_locales, @translation_locales)
+     |> assign(:active_locale, "es")
      |> assign(:translations_map, %{})
      |> reload_cities()}
   end
@@ -90,7 +90,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:editing, city)
      |> assign(:form_data, city_to_form_data(city))
      |> assign(:translations_map, translations_map)
-     |> assign(:active_locale, "en")
+     |> assign(:active_locale, "es")
      |> assign(:lookup_results, [])}
   end
 
@@ -131,7 +131,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:lookup_results, [])
      |> assign(:form_data, %{})
      |> assign(:translations_map, %{})
-     |> assign(:active_locale, "en")
+     |> assign(:active_locale, "es")
      |> assign(:loading, false)
      |> assign(:inline_error, nil)}
   end
@@ -139,6 +139,32 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   @impl true
   def handle_event("switch_locale", %{"locale" => locale}, socket) do
     {:noreply, assign(socket, :active_locale, locale)}
+  end
+
+  @impl true
+  def handle_event("generate_translation", _params, socket) do
+    city = socket.assigns.editing
+    locale = socket.assigns.active_locale
+
+    if city do
+      socket = assign(socket, :loading, true)
+      pid = self()
+      region = socket.assigns[:current_region]
+      region_opts = if region do
+        [region_name: region.name, country: region_country(region)]
+      else
+        []
+      end
+
+      Task.start(fn ->
+        result = Claude.generate_city_description_for_locale(city.name, city.province, locale, region_opts)
+        send(pid, {:translation_result, result, locale})
+      end)
+
+      {:noreply, socket}
+    else
+      {:noreply, put_flash(socket, :error, "No city selected")}
+    end
   end
 
   @impl true
@@ -426,6 +452,24 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:inline_error, "Failed to generate descriptions")}
   end
 
+  def handle_info({:translation_result, {:ok, description}, locale}, socket) do
+    # Update translations_map with the generated description
+    translations_map = Map.put(socket.assigns.translations_map, locale, %{description: description})
+
+    {:noreply,
+     socket
+     |> assign(:translations_map, translations_map)
+     |> assign(:loading, false)
+     |> put_flash(:info, "#{locale_name(locale)} description generated")}
+  end
+
+  def handle_info({:translation_result, {:error, _}, _locale}, socket) do
+    {:noreply,
+     socket
+     |> assign(:loading, false)
+     |> put_flash(:error, "Failed to generate translation")}
+  end
+
   def handle_info({:enrich_result, lookup, descriptions}, socket) do
     form_data = socket.assigns.form_data
 
@@ -491,12 +535,10 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     end)
   end
 
-  defp locale_name(code) do
-    case Enum.find(@supported_locales, fn {c, _, _} -> c == code end) do
-      {_, name, _} -> name
-      _ -> code
-    end
-  end
+  defp locale_name("en"), do: "English"
+  defp locale_name("es"), do: "Español"
+  defp locale_name("nl"), do: "Nederlands"
+  defp locale_name(code), do: code
 
   defp get_translation_description(translations_map, locale) do
     case Map.get(translations_map, locale) do
@@ -728,7 +770,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             loading={@loading}
             inline_error={@inline_error}
             region={@current_region}
-            supported_locales={@supported_locales}
+            translation_locales={@translation_locales}
             active_locale={@active_locale}
             translations_map={@translations_map}
           />
@@ -746,7 +788,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             loading={@loading}
             inline_error={@inline_error}
             region={@current_region}
-            supported_locales={@supported_locales}
+            translation_locales={@translation_locales}
             active_locale={@active_locale}
             translations_map={@translations_map}
           />
@@ -765,7 +807,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   attr :loading, :boolean, default: false
   attr :inline_error, :string, default: nil
   attr :region, :map, default: nil
-  attr :supported_locales, :list, default: []
+  attr :translation_locales, :list, default: []
   attr :active_locale, :string, default: "en"
   attr :translations_map, :map, default: %{}
 
@@ -969,7 +1011,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
 
             <!-- Locale Tabs -->
             <div role="tablist" class="tabs tabs-boxed bg-base-200 mb-4">
-              <%= for {code, name, flag} <- @supported_locales do %>
+              <%= for {code, name, flag} <- @translation_locales do %>
                 <button
                   type="button"
                   phx-click="switch_locale"
@@ -989,7 +1031,18 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             <!-- Translation Form -->
             <form phx-submit="save_translation" class="space-y-4">
               <div>
-                <label class="block text-sm font-medium mb-1.5">{locale_name(@active_locale)} Description</label>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-sm font-medium">{locale_name(@active_locale)} Description</label>
+                  <button
+                    type="button"
+                    phx-click="generate_translation"
+                    class="btn btn-xs btn-outline btn-secondary"
+                    disabled={@loading}
+                  >
+                    <span class="hero-sparkles w-3 h-3"></span>
+                    Generate with AI
+                  </button>
+                </div>
                 <textarea
                   name="translation[description]"
                   rows="3"
