@@ -4,10 +4,16 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   """
   use GaliciaLocalWeb, :live_view
 
-  alias GaliciaLocal.Directory.City
+  alias GaliciaLocal.Directory.{City, CityTranslation}
   alias GaliciaLocal.Scraper.GooglePlaces
   alias GaliciaLocal.AI.Claude
   alias GaliciaLocalWeb.Layouts
+
+  @supported_locales [
+    {"en", "English", "🇬🇧"},
+    {"es", "Español", "🇪🇸"},
+    {"nl", "Nederlands", "🇳🇱"}
+  ]
 
   @impl true
   def mount(_params, _session, socket) do
@@ -25,6 +31,9 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:loading, false)
      |> assign(:form_data, %{})
      |> assign(:inline_error, nil)
+     |> assign(:supported_locales, @supported_locales)
+     |> assign(:active_locale, "en")
+     |> assign(:translations_map, %{})
      |> reload_cities()}
   end
 
@@ -73,10 +82,15 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   @impl true
   def handle_event("edit", %{"id" => id}, socket) do
     city = Enum.find(socket.assigns.cities, &(&1.id == id))
+    # Load translations for editing
+    city = Ash.load!(city, [:translations])
+    translations_map = build_translations_map(city)
     {:noreply,
      socket
      |> assign(:editing, city)
      |> assign(:form_data, city_to_form_data(city))
+     |> assign(:translations_map, translations_map)
+     |> assign(:active_locale, "en")
      |> assign(:lookup_results, [])}
   end
 
@@ -116,8 +130,59 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:creating, false)
      |> assign(:lookup_results, [])
      |> assign(:form_data, %{})
+     |> assign(:translations_map, %{})
+     |> assign(:active_locale, "en")
      |> assign(:loading, false)
      |> assign(:inline_error, nil)}
+  end
+
+  @impl true
+  def handle_event("switch_locale", %{"locale" => locale}, socket) do
+    {:noreply, assign(socket, :active_locale, locale)}
+  end
+
+  @impl true
+  def handle_event("save_translation", %{"translation" => %{"description" => description}}, socket) do
+    city = socket.assigns.editing
+    locale = socket.assigns.active_locale
+
+    # English description stays in the city itself
+    if locale == "en" do
+      case Ash.update(city, %{description: description}) do
+        {:ok, updated} ->
+          updated = Ash.load!(updated, [:translations, :business_count])
+          {:noreply,
+           socket
+           |> assign(:editing, updated)
+           |> assign(:translations_map, build_translations_map(updated))
+           |> put_flash(:info, "English description saved")}
+
+        {:error, _} ->
+          {:noreply, put_flash(socket, :error, "Failed to save")}
+      end
+    else
+      # Upsert to translation table
+      translation_params = %{
+        city_id: city.id,
+        locale: locale,
+        description: description
+      }
+
+      case CityTranslation.upsert(translation_params) do
+        {:ok, _} ->
+          # Reload city with translations
+          {:ok, updated} = City.get_by_id(city.id)
+          updated = Ash.load!(updated, [:translations, :business_count])
+          {:noreply,
+           socket
+           |> assign(:editing, updated)
+           |> assign(:translations_map, build_translations_map(updated))
+           |> put_flash(:info, "#{locale_name(locale)} description saved")}
+
+        {:error, _} ->
+          {:noreply, put_flash(socket, :error, "Failed to save translation")}
+      end
+    end
   end
 
   @impl true
@@ -408,10 +473,49 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
       "longitude" => if(city.longitude, do: to_string(city.longitude), else: ""),
       "image_url" => city.image_url || "",
       "description" => city.description || "",
-      "description_es" => city.description_es || "",
       "featured" => city.featured
     }
   end
+
+  defp build_translations_map(city) do
+    # Start with English from the city itself
+    base = %{
+      "en" => %{description: city.description || ""}
+    }
+
+    # Add translations from the translations table
+    Enum.reduce(city.translations || [], base, fn translation, acc ->
+      Map.put(acc, translation.locale, %{
+        description: translation.description || ""
+      })
+    end)
+  end
+
+  defp locale_name(code) do
+    case Enum.find(@supported_locales, fn {c, _, _} -> c == code end) do
+      {_, name, _} -> name
+      _ -> code
+    end
+  end
+
+  defp get_translation_description(translations_map, locale) do
+    case Map.get(translations_map, locale) do
+      %{description: desc} -> desc || ""
+      _ -> ""
+    end
+  end
+
+  defp has_translation?(translations_map, locale) do
+    case Map.get(translations_map, locale) do
+      nil -> false
+      %{description: desc} -> desc && desc != ""
+      _ -> false
+    end
+  end
+
+  defp translation_placeholder("es"), do: "Una breve descripción de la ciudad..."
+  defp translation_placeholder("nl"), do: "Een korte beschrijving van de stad..."
+  defp translation_placeholder(_), do: "A brief description of the city..."
 
   defp process_params(params) do
     params
@@ -463,11 +567,6 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   defp region_country(%{country_code: "NL"}), do: "Netherlands"
   defp region_country(%{country_code: code}), do: code
   defp region_country(_), do: "Spain"
-
-  # Get the correct local description field based on region
-  defp local_description_field(%{country_code: "NL"}), do: %{field: "description_nl", label: "Dutch", placeholder: "Een korte beschrijving van de stad..."}
-  defp local_description_field(%{country_code: "ES"}), do: %{field: "description_es", label: "Spanish", placeholder: "Una breve descripción de la ciudad..."}
-  defp local_description_field(_), do: %{field: "description_es", label: "Spanish", placeholder: "Una breve descripción de la ciudad..."}
 
   defp detect_province(nil), do: nil
   defp detect_province(address) do
@@ -629,6 +728,9 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             loading={@loading}
             inline_error={@inline_error}
             region={@current_region}
+            supported_locales={@supported_locales}
+            active_locale={@active_locale}
+            translations_map={@translations_map}
           />
         <% end %>
 
@@ -644,6 +746,9 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             loading={@loading}
             inline_error={@inline_error}
             region={@current_region}
+            supported_locales={@supported_locales}
+            active_locale={@active_locale}
+            translations_map={@translations_map}
           />
         <% end %>
       </main>
@@ -660,10 +765,11 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   attr :loading, :boolean, default: false
   attr :inline_error, :string, default: nil
   attr :region, :map, default: nil
+  attr :supported_locales, :list, default: []
+  attr :active_locale, :string, default: "en"
+  attr :translations_map, :map, default: %{}
 
   defp city_modal(assigns) do
-    # Determine which locale description to show based on region
-    assigns = assign(assigns, :local_description_field, local_description_field(assigns.region))
     ~H"""
     <div class="modal modal-open">
       <div class="modal-box max-w-2xl">
@@ -833,7 +939,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
 
           <div class="divider text-xs text-base-content/40 my-1">DESCRIPTIONS</div>
 
-          <!-- Descriptions -->
+          <!-- English description (always shown in main form) -->
           <div class="space-y-3">
             <div class="flex justify-end">
               <button
@@ -847,7 +953,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
               </button>
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1.5">English</label>
+              <label class="block text-sm font-medium mb-1.5">English Description</label>
               <textarea
                 name="city[description]"
                 rows="2"
@@ -855,16 +961,49 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
                 placeholder="A brief description of the city..."
               >{@form_data["description"] || (@city && @city.description)}</textarea>
             </div>
-            <div>
-              <label class="block text-sm font-medium mb-1.5">{@local_description_field.label}</label>
-              <textarea
-                name={"city[#{@local_description_field.field}]"}
-                rows="2"
-                class="textarea textarea-bordered w-full text-sm"
-                placeholder={@local_description_field.placeholder}
-              >{@form_data[@local_description_field.field] || (@city && Map.get(@city, String.to_existing_atom(@local_description_field.field)))}</textarea>
-            </div>
           </div>
+
+          <!-- Translation tabs (only shown when editing an existing city) -->
+          <%= if @city do %>
+            <div class="divider text-xs text-base-content/40 my-1">TRANSLATIONS</div>
+
+            <!-- Locale Tabs -->
+            <div role="tablist" class="tabs tabs-boxed bg-base-200 mb-4">
+              <%= for {code, name, flag} <- @supported_locales do %>
+                <button
+                  type="button"
+                  phx-click="switch_locale"
+                  phx-value-locale={code}
+                  role="tab"
+                  class={["tab", if(@active_locale == code, do: "tab-active", else: "")]}
+                >
+                  <span class="mr-1">{flag}</span>
+                  {name}
+                  <%= if has_translation?(@translations_map, code) do %>
+                    <span class="ml-1 w-2 h-2 bg-success rounded-full inline-block"></span>
+                  <% end %>
+                </button>
+              <% end %>
+            </div>
+
+            <!-- Translation Form -->
+            <form phx-submit="save_translation" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium mb-1.5">{locale_name(@active_locale)} Description</label>
+                <textarea
+                  name="translation[description]"
+                  rows="3"
+                  class="textarea textarea-bordered w-full text-sm"
+                  placeholder={translation_placeholder(@active_locale)}
+                >{get_translation_description(@translations_map, @active_locale)}</textarea>
+              </div>
+              <div class="flex justify-end">
+                <button type="submit" class="btn btn-sm btn-secondary">
+                  Save {locale_name(@active_locale)} Translation
+                </button>
+              </div>
+            </form>
+          <% end %>
 
           <div class="modal-action">
             <button type="button" phx-click="cancel" class="btn btn-ghost btn-sm">Cancel</button>
