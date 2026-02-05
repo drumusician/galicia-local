@@ -123,7 +123,7 @@ const CitiesMap = {
         `<strong style="font-size:14px">${city.name}</strong><br>` +
         `<span style="color:#666">${city.province}</span><br>` +
         `<span style="color:#888;font-size:12px">${city.business_count} listings</span><br>` +
-        `<a href="/cities/${city.slug}" style="color:#6419e6;font-weight:600;font-size:13px">Explore →</a>` +
+        `<a href="/${region}/cities/${city.slug}" style="color:#6419e6;font-weight:600;font-size:13px">Explore →</a>` +
         `</div>`
       )
 
@@ -166,6 +166,7 @@ const BusinessesMap = {
   },
 
   updateMarkers(businesses) {
+    const region = this.el.dataset.region || 'galicia'
     this.markersLayer.clearLayers()
     const bounds = []
 
@@ -179,7 +180,7 @@ const BusinessesMap = {
         `<strong style="font-size:13px">${biz.name}</strong><br>` +
         `<span style="color:#666;font-size:12px">${biz.city}</span><br>` +
         (biz.address ? `<span style="color:#888;font-size:11px">${biz.address}</span><br>` : '') +
-        `<a href="/businesses/${biz.id}" style="color:#6419e6;font-weight:600;font-size:12px">View details →</a>` +
+        `<a href="/${region}/businesses/${biz.id}" style="color:#6419e6;font-weight:600;font-size:12px">View details →</a>` +
         `</div>`
       )
 
@@ -255,7 +256,7 @@ const BusinessesMap = {
         `<strong style="font-size:13px">${biz.name}</strong><br>` +
         `<span style="color:#666;font-size:12px">${biz.city}</span><br>` +
         (biz.address ? `<span style="color:#888;font-size:11px">${biz.address}</span><br>` : '') +
-        `<a href="/businesses/${biz.id}" style="color:#6419e6;font-weight:600;font-size:12px">View details →</a>` +
+        `<a href="/${region}/businesses/${biz.id}" style="color:#6419e6;font-weight:600;font-size:12px">View details →</a>` +
         `</div>`
       )
 
