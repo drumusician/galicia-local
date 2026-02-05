@@ -202,10 +202,16 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     if name != "" and province != "" do
       socket = assign(socket, :loading, true)
       pid = self()
+      region = socket.assigns[:current_region]
+      region_opts = if region do
+        [region_name: region.name, country: region_country(region)]
+      else
+        []
+      end
 
       Task.start(fn ->
-        result = Claude.generate_city_descriptions(name, province)
-        send(pid, {:descriptions_result, result})
+        result = Claude.generate_city_descriptions(name, province, region_opts)
+        send(pid, {:descriptions_result, result, region})
       end)
 
       {:noreply, socket}
@@ -304,6 +310,29 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:inline_error, "City lookup failed")}
   end
 
+  def handle_info({:descriptions_result, {:ok, result}, _region}, socket) do
+    form_data =
+      socket.assigns.form_data
+      |> Map.put("description", result[:description])
+      |> then(fn fd ->
+        # Set the correct locale description field based on region
+        cond do
+          result[:description_nl] -> Map.put(fd, "description_nl", result[:description_nl])
+          result[:description_es] -> Map.put(fd, "description_es", result[:description_es])
+          result[:description_local] -> Map.put(fd, "description_local", result[:description_local])
+          true -> fd
+        end
+      end)
+      |> then(fn fd -> if result[:population], do: Map.put(fd, "population", to_string(result[:population])), else: fd end)
+
+    {:noreply,
+     socket
+     |> assign(:form_data, form_data)
+     |> assign(:loading, false)
+     |> assign(:inline_error, nil)}
+  end
+
+  # Legacy handler without region (backward compat)
   def handle_info({:descriptions_result, {:ok, %{description: desc, description_es: desc_es} = result}}, socket) do
     form_data =
       socket.assigns.form_data
@@ -316,6 +345,13 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
      |> assign(:form_data, form_data)
      |> assign(:loading, false)
      |> assign(:inline_error, nil)}
+  end
+
+  def handle_info({:descriptions_result, {:error, _}, _region}, socket) do
+    {:noreply,
+     socket
+     |> assign(:loading, false)
+     |> assign(:inline_error, "Failed to generate descriptions")}
   end
 
   def handle_info({:descriptions_result, {:error, _}}, socket) do
@@ -427,6 +463,11 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   defp region_country(%{country_code: "NL"}), do: "Netherlands"
   defp region_country(%{country_code: code}), do: code
   defp region_country(_), do: "Spain"
+
+  # Get the correct local description field based on region
+  defp local_description_field(%{country_code: "NL"}), do: %{field: "description_nl", label: "Dutch", placeholder: "Een korte beschrijving van de stad..."}
+  defp local_description_field(%{country_code: "ES"}), do: %{field: "description_es", label: "Spanish", placeholder: "Una breve descripción de la ciudad..."}
+  defp local_description_field(_), do: %{field: "description_es", label: "Spanish", placeholder: "Una breve descripción de la ciudad..."}
 
   defp detect_province(nil), do: nil
   defp detect_province(address) do
@@ -587,6 +628,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             lookup_results={@lookup_results}
             loading={@loading}
             inline_error={@inline_error}
+            region={@current_region}
           />
         <% end %>
 
@@ -601,6 +643,7 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
             lookup_results={@lookup_results}
             loading={@loading}
             inline_error={@inline_error}
+            region={@current_region}
           />
         <% end %>
       </main>
@@ -616,8 +659,11 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
   attr :lookup_results, :list, default: []
   attr :loading, :boolean, default: false
   attr :inline_error, :string, default: nil
+  attr :region, :map, default: nil
 
   defp city_modal(assigns) do
+    # Determine which locale description to show based on region
+    assigns = assign(assigns, :local_description_field, local_description_field(assigns.region))
     ~H"""
     <div class="modal modal-open">
       <div class="modal-box max-w-2xl">
@@ -810,13 +856,13 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
               >{@form_data["description"] || (@city && @city.description)}</textarea>
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1.5">Spanish</label>
+              <label class="block text-sm font-medium mb-1.5">{@local_description_field.label}</label>
               <textarea
-                name="city[description_es]"
+                name={"city[#{@local_description_field.field}]"}
                 rows="2"
                 class="textarea textarea-bordered w-full text-sm"
-                placeholder="Una breve descripción de la ciudad..."
-              >{@form_data["description_es"] || (@city && @city.description_es)}</textarea>
+                placeholder={@local_description_field.placeholder}
+              >{@form_data[@local_description_field.field] || (@city && Map.get(@city, String.to_existing_atom(@local_description_field.field)))}</textarea>
             </div>
           </div>
 
