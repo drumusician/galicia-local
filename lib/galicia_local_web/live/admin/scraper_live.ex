@@ -40,6 +40,8 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
      |> assign(:scrape_source, "google_places")
      |> assign(:scraping, false)
      |> assign(:message, nil)
+     |> assign(:bounds, nil)
+     |> assign(:show_bounds_map, false)
      |> load_scraper_data(costs: true)}
   end
 
@@ -69,6 +71,7 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
     city = socket.assigns.selected_city
     category = socket.assigns.selected_category
     source = socket.assigns.scrape_source
+    bounds = socket.assigns.bounds
 
     cond do
       is_nil(city) ->
@@ -78,21 +81,31 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
         {:noreply, assign(socket, :message, {:error, "Please select a category"})}
 
       true ->
+        # Build bounds tuple if present
+        bounds_tuple =
+          if bounds do
+            {bounds.south, bounds.west, bounds.north, bounds.east}
+          else
+            nil
+          end
+
         result =
           case source do
             "google_places" ->
-              Scraper.search_google_places(city, category)
+              Scraper.search_google_places(city, category, bounds: bounds_tuple)
 
             "paginas_amarillas" ->
               Scraper.scrape_city_category(city, category, :paginas_amarillas)
           end
+
+        bounds_msg = if bounds, do: " (with bounds)", else: ""
 
         case result do
           {:ok, _} ->
             {:noreply,
              socket
              |> assign(:scraping, true)
-             |> assign(:message, {:success, "Started #{source} search for #{category.name} in #{city.name}"})}
+             |> assign(:message, {:success, "Started #{source} search for #{category.name} in #{city.name}#{bounds_msg}"})}
 
           {:error, :already_running} ->
             {:noreply, assign(socket, :message, {:warning, "Already running"})}
@@ -106,16 +119,26 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
   @impl true
   def handle_event("scrape_all_city", _params, socket) do
     city = socket.assigns.selected_city
+    bounds = socket.assigns.bounds
 
     if is_nil(city) do
       {:noreply, assign(socket, :message, {:error, "Please select a city"})}
     else
-      {:ok, jobs} = Scraper.search_google_places_city(city)
+      # Build bounds tuple if present
+      bounds_tuple =
+        if bounds do
+          {bounds.south, bounds.west, bounds.north, bounds.east}
+        else
+          nil
+        end
 
+      {:ok, jobs} = Scraper.search_google_places_city(city, bounds: bounds_tuple)
+
+      bounds_msg = if bounds, do: " (with bounds)", else: ""
       {:noreply,
        socket
        |> assign(:scraping, true)
-       |> assign(:message, {:success, "Queued #{length(jobs)} category searches for #{city.name}"})}
+       |> assign(:message, {:success, "Queued #{length(jobs)} category searches for #{city.name}#{bounds_msg}"})}
     end
   end
 
@@ -131,6 +154,22 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
   @impl true
   def handle_event("dismiss_message", _params, socket) do
     {:noreply, assign(socket, :message, nil)}
+  end
+
+  @impl true
+  def handle_event("toggle_bounds_map", _params, socket) do
+    {:noreply, assign(socket, :show_bounds_map, !socket.assigns.show_bounds_map)}
+  end
+
+  @impl true
+  def handle_event("set_bounds", %{"south" => s, "west" => w, "north" => n, "east" => e}, socket) do
+    bounds = %{south: s, west: w, north: n, east: e}
+    {:noreply, assign(socket, :bounds, bounds)}
+  end
+
+  @impl true
+  def handle_event("clear_bounds", _params, socket) do
+    {:noreply, assign(socket, :bounds, nil)}
   end
 
   defp load_scraper_data(socket, opts \\ []) do
@@ -350,12 +389,65 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
                   </select>
                 </div>
 
+                <!-- Bounding Box Map -->
+                <%= if @scrape_source == "google_places" do %>
+                  <div class="form-control mt-4">
+                    <label class="label">
+                      <span class="label-text font-medium">Geographic Area (Optional)</span>
+                    </label>
+                    <div class="flex gap-2 mb-2">
+                      <button
+                        type="button"
+                        phx-click="toggle_bounds_map"
+                        class={["btn btn-sm", @show_bounds_map && "btn-primary" || "btn-outline"]}
+                      >
+                        <span class="hero-map-pin w-4 h-4"></span>
+                        <%= if @show_bounds_map, do: "Hide Map", else: "Draw Search Area" %>
+                      </button>
+                      <%= if @bounds do %>
+                        <button type="button" phx-click="clear_bounds" class="btn btn-sm btn-ghost text-error">
+                          <span class="hero-x-mark w-4 h-4"></span>
+                          Clear Area
+                        </button>
+                      <% end %>
+                    </div>
+
+                    <%= if @show_bounds_map do %>
+                      <div
+                        id="bounds-draw-map"
+                        class="h-64 bg-base-300 rounded-lg"
+                        phx-hook="BoundsDrawMap"
+                        phx-update="ignore"
+                        data-region={@current_region && @current_region.slug || "galicia"}
+                        data-bounds={@bounds && Jason.encode!(@bounds)}
+                      >
+                        <div class="flex items-center justify-center h-full text-base-content/40">
+                          Loading map...
+                        </div>
+                      </div>
+                    <% end %>
+
+                    <%= if @bounds do %>
+                      <div class="alert alert-success mt-2">
+                        <span class="hero-check-circle w-5 h-5"></span>
+                        <span class="text-sm">
+                          Search area: {Float.round(@bounds.south, 3)}°N to {Float.round(@bounds.north, 3)}°N,
+                          {Float.round(@bounds.west, 3)}°W to {Float.round(@bounds.east, 3)}°E
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+
                 <%= if @selected_city && @selected_category do %>
                   <div class="alert alert-info mt-4">
                     <span class="hero-information-circle w-5 h-5"></span>
                     <span>
                       Will search for:
                       <strong>"{Scraper.translate_category(@selected_category.slug)} {@selected_city.name}"</strong>
+                      <%= if @bounds do %>
+                        <span class="badge badge-success badge-sm ml-2">with bounds</span>
+                      <% end %>
                     </span>
                   </div>
                 <% end %>

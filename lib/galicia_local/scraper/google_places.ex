@@ -16,13 +16,21 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
   Search for businesses in a specific location.
 
   ## Options
-    - :location - {lat, lng} tuple for the search center
-    - :radius - Search radius in meters (default: 10000)
+    - :location - {lat, lng} tuple for the search center (used with locationBias)
+    - :radius - Search radius in meters (default: 10000, used with locationBias)
+    - :bounds - {south, west, north, east} tuple for strict bounding box (uses locationRestriction)
     - :language - Language code (default: "es")
     - :max_results - Maximum results to return (default: 20, max: 20 per request)
 
-  ## Example
+  When :bounds is provided, it takes precedence over :location/:radius and uses
+  Google's locationRestriction (strict) instead of locationBias (preference).
+
+  ## Examples
+      # Circle-based search (locationBias)
       GooglePlaces.search("lawyers", location: {42.3396, -7.8642}, radius: 5000)
+
+      # Rectangle-based search (locationRestriction)
+      GooglePlaces.search("lawyers", bounds: {42.0, -9.0, 43.5, -7.0})
   """
   def search(query, opts \\ []) do
     case api_key() do
@@ -82,6 +90,7 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
   defp do_search(query, api_key, opts) do
     location = Keyword.get(opts, :location)
     radius = Keyword.get(opts, :radius, 10_000)
+    bounds = Keyword.get(opts, :bounds)
     language = Keyword.get(opts, :language, "es")
 
     body =
@@ -90,6 +99,7 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
         languageCode: language,
         maxResultCount: 20
       }
+      |> maybe_add_location_restriction(bounds)
       |> maybe_add_location_bias(location, radius)
 
     # Fields to request - comprehensive list
@@ -178,6 +188,8 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
     end
   end
 
+  # locationRestriction takes precedence - if bounds are set, don't add locationBias
+  defp maybe_add_location_bias(body, _location, _radius) when is_map_key(body, :locationRestriction), do: body
   defp maybe_add_location_bias(body, nil, _radius), do: body
 
   defp maybe_add_location_bias(body, {lat, lng}, radius) do
@@ -185,6 +197,17 @@ defmodule GaliciaLocal.Scraper.GooglePlaces do
       circle: %{
         center: %{latitude: lat, longitude: lng},
         radius: radius
+      }
+    })
+  end
+
+  defp maybe_add_location_restriction(body, nil), do: body
+
+  defp maybe_add_location_restriction(body, {south, west, north, east}) do
+    Map.put(body, :locationRestriction, %{
+      rectangle: %{
+        low: %{latitude: south, longitude: west},
+        high: %{latitude: north, longitude: east}
       }
     })
   end

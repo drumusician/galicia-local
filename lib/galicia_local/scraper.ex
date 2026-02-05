@@ -210,30 +210,42 @@ defmodule GaliciaLocal.Scraper do
   3. Analyze reviews for language detection
   4. Queue website scraping (if website exists)
 
+  ## Options
+    - :bounds - {south, west, north, east} tuple for geographic restriction
+
   ## Example
 
       city = City.get_by_slug!("ourense")
       category = Category.get_by_slug!("lawyers")
       {:ok, job} = Scraper.search_google_places(city, category)
+
+      # With bounding box restriction
+      {:ok, job} = Scraper.search_google_places(city, category, bounds: {42.0, -9.0, 43.5, -7.0})
   """
-  def search_google_places(%City{} = city, %Category{} = category) do
+  def search_google_places(%City{} = city, %Category{} = category, opts \\ []) do
     # Load region for locale detection
     city = Ash.load!(city, [:region])
     locale = get_search_locale(city.region)
+    bounds = Keyword.get(opts, :bounds)
 
     # Get localized queries from CategoryTranslation table
     queries = get_localized_queries(category, locale, city.name)
 
-    Logger.info("Queuing #{length(queries)} Google Places searches for #{category.name} in #{city.name} (locale: #{locale})")
+    Logger.info("Queuing #{length(queries)} Google Places searches for #{category.name} in #{city.name} (locale: #{locale})" <>
+      if(bounds, do: " with bounds", else: ""))
 
     jobs =
       Enum.map(queries, fn query ->
-        {:ok, job} =
+        job_args =
           %{
             query: query,
             city_id: city.id,
             category_id: category.id
           }
+          |> maybe_add_bounds(bounds)
+
+        {:ok, job} =
+          job_args
           |> GooglePlacesWorker.new()
           |> Oban.insert()
 
@@ -241,6 +253,16 @@ defmodule GaliciaLocal.Scraper do
       end)
 
     {:ok, jobs}
+  end
+
+  defp maybe_add_bounds(args, nil), do: args
+  defp maybe_add_bounds(args, {south, west, north, east}) do
+    Map.merge(args, %{
+      bounds_south: south,
+      bounds_west: west,
+      bounds_north: north,
+      bounds_east: east
+    })
   end
 
   @doc """
@@ -262,13 +284,17 @@ defmodule GaliciaLocal.Scraper do
   @doc """
   Search all categories in a city via Google Places.
   Creates multiple Oban jobs.
+
+  ## Options
+    - :bounds - {south, west, north, east} tuple for geographic restriction
   """
-  def search_google_places_city(%City{} = city) do
+  def search_google_places_city(%City{} = city, opts \\ []) do
     categories = Category.list!()
+    bounds = Keyword.get(opts, :bounds)
 
     jobs =
       Enum.flat_map(categories, fn category ->
-        {:ok, category_jobs} = search_google_places(city, category)
+        {:ok, category_jobs} = search_google_places(city, category, bounds: bounds)
         Enum.map(category_jobs, fn job -> {category.name, job.id} end)
       end)
 

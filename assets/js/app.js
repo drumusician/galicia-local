@@ -282,6 +282,144 @@ const BusinessesMap = {
   }
 }
 
+// BoundsDrawMap Hook - draw bounding box for scraper
+const BoundsDrawMap = {
+  mounted() {
+    this.loadLeafletDraw(() => this.initMap())
+  },
+
+  loadLeafletDraw(callback) {
+    // Load Leaflet CSS
+    if (!document.querySelector('link[href*="leaflet.css"]')) {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+      document.head.appendChild(link)
+    }
+
+    // Load Leaflet Draw CSS
+    if (!document.querySelector('link[href*="leaflet.draw.css"]')) {
+      const drawCss = document.createElement('link')
+      drawCss.rel = 'stylesheet'
+      drawCss.href = 'https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css'
+      document.head.appendChild(drawCss)
+    }
+
+    // Load Leaflet JS
+    const loadLeaflet = (cb) => {
+      if (window.L) return cb()
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+      script.onload = cb
+      document.head.appendChild(script)
+    }
+
+    // Load Leaflet Draw JS
+    const loadDraw = (cb) => {
+      if (window.L && window.L.Draw) return cb()
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js'
+      script.onload = cb
+      document.head.appendChild(script)
+    }
+
+    loadLeaflet(() => loadDraw(callback))
+  },
+
+  initMap() {
+    const region = this.el.dataset.region || 'galicia'
+    const regionCenters = {
+      'galicia': [42.6, -8.0],
+      'netherlands': [52.3, 4.9]
+    }
+    const defaultCenter = regionCenters[region] || [42.6, -8.0]
+    const defaultZoom = region === 'netherlands' ? 7 : 8
+
+    this.el.innerHTML = ""
+    this.map = L.map(this.el).setView(defaultCenter, defaultZoom)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.map)
+
+    // Layer for drawn items
+    this.drawnItems = new L.FeatureGroup()
+    this.map.addLayer(this.drawnItems)
+
+    // Initialize draw control with only rectangle
+    const drawControl = new L.Control.Draw({
+      draw: {
+        polyline: false,
+        polygon: false,
+        circle: false,
+        marker: false,
+        circlemarker: false,
+        rectangle: {
+          shapeOptions: {
+            color: '#6419e6',
+            fillOpacity: 0.2
+          }
+        }
+      },
+      edit: {
+        featureGroup: this.drawnItems,
+        remove: true
+      }
+    })
+    this.map.addControl(drawControl)
+
+    // Handle draw created
+    this.map.on(L.Draw.Event.CREATED, (e) => {
+      // Clear previous rectangles
+      this.drawnItems.clearLayers()
+      this.drawnItems.addLayer(e.layer)
+
+      // Push bounds to LiveView
+      const bounds = e.layer.getBounds()
+      this.pushEvent('set_bounds', {
+        south: bounds.getSouth(),
+        west: bounds.getWest(),
+        north: bounds.getNorth(),
+        east: bounds.getEast()
+      })
+    })
+
+    // Handle draw deleted
+    this.map.on(L.Draw.Event.DELETED, () => {
+      this.pushEvent('clear_bounds', {})
+    })
+
+    // Handle draw edited
+    this.map.on(L.Draw.Event.EDITED, (e) => {
+      e.layers.eachLayer((layer) => {
+        const bounds = layer.getBounds()
+        this.pushEvent('set_bounds', {
+          south: bounds.getSouth(),
+          west: bounds.getWest(),
+          north: bounds.getNorth(),
+          east: bounds.getEast()
+        })
+      })
+    })
+
+    // Load existing bounds if present
+    const existingBounds = this.el.dataset.bounds
+    if (existingBounds) {
+      try {
+        const b = JSON.parse(existingBounds)
+        const rect = L.rectangle([[b.south, b.west], [b.north, b.east]], {
+          color: '#6419e6',
+          fillOpacity: 0.2
+        })
+        this.drawnItems.addLayer(rect)
+        this.map.fitBounds(rect.getBounds(), { padding: [20, 20] })
+      } catch (e) {
+        console.error('Failed to parse existing bounds:', e)
+      }
+    }
+  }
+}
+
 // GeoLocate Hook - browser geolocation
 const GeoLocate = {
   mounted() {
@@ -315,7 +453,7 @@ const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks, LeafletMap, CitiesMap, BusinessesMap, GeoLocate},
+  hooks: {...colocatedHooks, LeafletMap, CitiesMap, BusinessesMap, BoundsDrawMap, GeoLocate},
 })
 
 // Show progress bar on live navigation and form submits

@@ -36,7 +36,10 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
     city_id = args["city_id"]
     category_id = args["category_id"]
 
-    Logger.info("Starting Google Places search: #{query}")
+    # Extract bounds if provided
+    bounds = extract_bounds(args)
+
+    Logger.info("Starting Google Places search: #{query}" <> if(bounds, do: " (with bounds)", else: ""))
 
     # Load city for location context (includes region)
     city = if city_id, do: City.get_by_id!(city_id), else: nil
@@ -45,17 +48,21 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
     # Get region_id from city
     region_id = city && city.region_id
 
-    # Create scrape job record
+    # Create scrape job record with bounds
     {:ok, scrape_job} =
       ScrapeJob.create(%{
         source: :google_maps,
         query: query,
         city_id: city_id,
         category_id: category_id,
-        region_id: region_id
+        region_id: region_id,
+        bounds_south: bounds && elem(bounds, 0),
+        bounds_west: bounds && elem(bounds, 1),
+        bounds_north: bounds && elem(bounds, 2),
+        bounds_east: bounds && elem(bounds, 3)
       })
 
-    # Build location from city
+    # Build location from city (used as fallback if no bounds)
     location =
       if city && city.latitude && city.longitude do
         {Decimal.to_float(city.latitude), Decimal.to_float(city.longitude)}
@@ -63,8 +70,16 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
         nil
       end
 
+    # Build search options - bounds takes precedence over location
+    search_opts =
+      if bounds do
+        [bounds: bounds]
+      else
+        [location: location]
+      end
+
     # Search with full details (includes reviews)
-    case GooglePlaces.search_with_details(query, location: location) do
+    case GooglePlaces.search_with_details(query, search_opts) do
       {:ok, places} ->
         Logger.info("Found #{length(places)} places for: #{query}")
 
@@ -234,4 +249,12 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
     |> WebsiteCrawlWorker.new()
     |> Oban.insert()
   end
+
+  # Extract bounds tuple from job args
+  defp extract_bounds(%{"bounds_south" => s, "bounds_west" => w, "bounds_north" => n, "bounds_east" => e})
+       when is_number(s) and is_number(w) and is_number(n) and is_number(e) do
+    {s, w, n, e}
+  end
+
+  defp extract_bounds(_), do: nil
 end

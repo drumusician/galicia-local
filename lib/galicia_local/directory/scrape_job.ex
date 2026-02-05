@@ -32,7 +32,7 @@ defmodule GaliciaLocal.Directory.ScrapeJob do
 
     create :create do
       primary? true
-      accept [:source, :query, :city_id, :category_id, :region_id]
+      accept [:source, :query, :city_id, :category_id, :region_id, :bounds_south, :bounds_west, :bounds_north, :bounds_east]
       change set_attribute(:status, :pending)
       change set_attribute(:started_at, &DateTime.utc_now/0)
     end
@@ -98,6 +98,27 @@ defmodule GaliciaLocal.Directory.ScrapeJob do
 
     attribute :completed_at, :utc_datetime do
       public? true
+    end
+
+    # Bounding box for geographic restriction
+    attribute :bounds_south, :decimal do
+      public? true
+      description "Southern boundary latitude"
+    end
+
+    attribute :bounds_west, :decimal do
+      public? true
+      description "Western boundary longitude"
+    end
+
+    attribute :bounds_north, :decimal do
+      public? true
+      description "Northern boundary latitude"
+    end
+
+    attribute :bounds_east, :decimal do
+      public? true
+      description "Eastern boundary longitude"
     end
 
     create_timestamp :inserted_at
