@@ -11,7 +11,7 @@ defmodule GaliciaLocalWeb.CityLive do
   def mount(%{"slug" => slug}, _session, socket) do
     region = socket.assigns[:current_region]
     region_slug = if region, do: region.slug, else: "galicia"
-    region_name = if region, do: region.name, else: "Galicia"
+    region_name = if region, do: Gettext.gettext(GaliciaLocalWeb.Gettext, region.name), else: gettext("Galicia")
     tenant_opts = if region, do: [tenant: region.id], else: []
 
     case City.get_by_slug(slug, tenant_opts) do

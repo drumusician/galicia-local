@@ -10,7 +10,7 @@ defmodule GaliciaLocalWeb.CategoriesLive do
   def mount(_params, _session, socket) do
     region = socket.assigns[:current_region]
     region_slug = if region, do: region.slug, else: "galicia"
-    region_name = if region, do: region.name, else: "Galicia"
+    region_name = if region, do: Gettext.gettext(GaliciaLocalWeb.Gettext, region.name), else: gettext("Galicia")
     locale = socket.assigns[:locale] || "en"
 
     # Get business counts per category for this region

@@ -2174,3 +2174,10 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "settling in?"
 msgstr ""
+
+#: Region names
+msgid "Netherlands"
+msgstr "Países Bajos"
+
+msgid "Galicia"
+msgstr "Galicia"

@@ -13,7 +13,7 @@ defmodule GaliciaLocalWeb.SearchLive do
     region = socket.assigns[:current_region]
     tenant_opts = if region, do: [tenant: region.id], else: []
     region_slug = if region, do: region.slug, else: "galicia"
-    region_name = if region, do: region.name, else: "Galicia"
+    region_name = if region, do: Gettext.gettext(GaliciaLocalWeb.Gettext, region.name), else: gettext("Galicia")
 
     cities = City.list!(tenant_opts) |> Enum.sort_by(& &1.name)
     categories = Category.list!() |> Enum.sort_by(& &1.priority)

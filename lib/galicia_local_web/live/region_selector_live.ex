@@ -48,7 +48,7 @@ defmodule GaliciaLocalWeb.RegionSelectorLive do
                     {region_flag(region.country_code)}
                   </div>
                   <h2 class="text-2xl font-bold text-base-content mb-2 group-hover:text-primary transition-colors">
-                    {region.name}
+                    {Gettext.gettext(GaliciaLocalWeb.Gettext, region.name)}
                   </h2>
                   <p class="text-base-content/50 text-sm mb-6 leading-relaxed">
                     {region_tagline(region.slug)}

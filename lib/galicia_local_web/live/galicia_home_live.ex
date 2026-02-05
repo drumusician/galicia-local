@@ -68,7 +68,7 @@ defmodule GaliciaLocalWeb.GaliciaHomeLive do
     random_phrase = Enum.random(galician_phrases())
     random_tips = Enum.take_random(cultural_tips(), 3)
 
-    region_name = if region, do: region.name, else: "Galicia"
+    region_name = if region, do: Gettext.gettext(GaliciaLocalWeb.Gettext, region.name), else: gettext("Galicia")
     region_slug = if region, do: region.slug, else: "galicia"
 
     {:ok,

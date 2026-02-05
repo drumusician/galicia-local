@@ -2174,3 +2174,10 @@ msgstr "bijv. Vigo, Ourense, Pontevedra"
 #, elixir-autogen, elixir-format
 msgid "settling in?"
 msgstr "wonen?"
+
+#: Region names
+msgid "Netherlands"
+msgstr "Nederland"
+
+msgid "Galicia"
+msgstr "Galicië"
