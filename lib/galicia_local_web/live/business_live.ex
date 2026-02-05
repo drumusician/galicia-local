@@ -18,7 +18,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
     case Business.get_by_id(id) do
       {:ok, business} ->
         business = Ash.load!(business, [:city, :category])
-        if connected?(socket), do: Tracker.track_async("business", business.id)
+        if connected?(socket) and region, do: Tracker.track_async("business", business.id, region.id)
         current_user = socket.assigns[:current_user]
 
         reviews =

@@ -8,42 +8,38 @@ defmodule GaliciaLocalWeb.Admin.AnalyticsLive do
   def mount(_params, _session, socket) do
     region = socket.assigns[:current_region]
     region_slug = if region, do: region.slug, else: "galicia"
+    region_id = if region, do: region.id
     days = 30
-    summary = Tracker.summary(days)
-    top_businesses = enrich_top("business", days, &load_business/1)
-    top_cities = enrich_top("city", days, &load_city/1)
-    top_categories = enrich_top("category", days, &load_category/1)
 
     {:ok,
      socket
      |> assign(:page_title, "Analytics")
      |> assign(:region_slug, region_slug)
+     |> assign(:region_id, region_id)
      |> assign(:days, days)
-     |> assign(:summary, summary)
-     |> assign(:top_businesses, top_businesses)
-     |> assign(:top_cities, top_cities)
-     |> assign(:top_categories, top_categories)}
+     |> load_analytics(days, region_id)}
   end
 
   @impl true
   def handle_event("change_period", %{"days" => days_str}, socket) do
     days = String.to_integer(days_str)
-    summary = Tracker.summary(days)
-    top_businesses = enrich_top("business", days, &load_business/1)
-    top_cities = enrich_top("city", days, &load_city/1)
-    top_categories = enrich_top("category", days, &load_category/1)
 
     {:noreply,
      socket
      |> assign(:days, days)
-     |> assign(:summary, summary)
-     |> assign(:top_businesses, top_businesses)
-     |> assign(:top_cities, top_cities)
-     |> assign(:top_categories, top_categories)}
+     |> load_analytics(days, socket.assigns.region_id)}
   end
 
-  defp enrich_top(page_type, days, loader) do
-    Tracker.top(page_type, days, 10)
+  defp load_analytics(socket, days, region_id) do
+    socket
+    |> assign(:summary, Tracker.summary(days: days, region_id: region_id))
+    |> assign(:top_businesses, enrich_top("business", days, region_id, &load_business/1))
+    |> assign(:top_cities, enrich_top("city", days, region_id, &load_city/1))
+    |> assign(:top_categories, enrich_top("category", days, region_id, &load_category/1))
+  end
+
+  defp enrich_top(page_type, days, region_id, loader) do
+    Tracker.top(page_type, days: days, limit: 10, region_id: region_id)
     |> Enum.map(fn %{resource_id: id, views: views} ->
       case loader.(id) do
         {:ok, resource} -> %{resource: resource, views: views}
@@ -66,12 +62,14 @@ defmodule GaliciaLocalWeb.Admin.AnalyticsLive do
     <div class="min-h-screen bg-base-200">
       <div class="container mx-auto max-w-6xl px-4 py-8">
         <div class="flex items-center justify-between mb-8">
-          <div>
-            <h1 class="text-3xl font-bold flex items-center gap-3">
-              <span class="hero-chart-bar w-8 h-8 text-primary"></span>
-              Analytics
-            </h1>
-            <p class="text-base-content/60 mt-1">Page view statistics for your directory.</p>
+          <div class="flex items-center gap-4">
+            <.link navigate={~p"/admin"} class="btn btn-ghost btn-square btn-sm">
+              <span class="hero-arrow-left w-5 h-5"></span>
+            </.link>
+            <div>
+              <h1 class="text-3xl font-bold">Analytics</h1>
+              <p class="text-base-content/60 mt-1">Page view statistics for your directory.</p>
+            </div>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-sm text-base-content/60">Period:</span>

@@ -17,7 +17,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
     case Category.get_by_slug(slug) do
       {:ok, category} ->
         category = Ash.load!(category, [:translations])
-        if connected?(socket), do: Tracker.track_async("category", category.id)
+        if connected?(socket) and region, do: Tracker.track_async("category", category.id, region.id)
 
         businesses =
           Business.by_category!(category.id, tenant_opts)

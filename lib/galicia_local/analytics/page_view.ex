@@ -32,7 +32,7 @@ defmodule GaliciaLocal.Analytics.PageView do
   end
 
   identities do
-    identity :unique_page_day, [:page_type, :resource_id, :date]
+    identity :unique_page_day, [:page_type, :resource_id, :date, :region_id]
   end
 
   attributes do
@@ -44,6 +44,11 @@ defmodule GaliciaLocal.Analytics.PageView do
     end
 
     attribute :resource_id, :uuid do
+      allow_nil? false
+      public? true
+    end
+
+    attribute :region_id, :uuid do
       allow_nil? false
       public? true
     end
