@@ -272,6 +272,30 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
   end
 
   @impl true
+  def handle_event("move_to_category", %{"business_id" => id, "category_id" => category_id}, socket) do
+    if category_id == "" do
+      {:noreply, socket}
+    else
+      with {:ok, business} <- Business.get_by_id(id),
+           {:ok, category} <- Category.get_by_id(category_id) do
+        case Ash.update(business, %{category_id: category.id, suggested_category_slug: nil, category_fit_score: nil}) do
+          {:ok, _} ->
+            {:noreply,
+             socket
+             |> put_flash(:info, "#{business.name} moved to #{category.name}")
+             |> load_page()}
+
+          {:error, _} ->
+            {:noreply, put_flash(socket, :error, "Failed to move business")}
+        end
+      else
+        _ ->
+          {:noreply, put_flash(socket, :error, "Could not find business or category")}
+      end
+    end
+  end
+
+  @impl true
   def handle_event("bulk_move_to_suggested", _params, socket) do
     region = socket.assigns[:current_region]
 
@@ -551,16 +575,23 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                               Enrich
                             </button>
                           <% end %>
-                          <%= if business.suggested_category_slug do %>
-                            <button
-                              type="button"
-                              phx-click="move_to_suggested"
-                              phx-value-id={business.id}
-                              data-confirm={"Move to #{business.suggested_category_slug}?"}
-                              class="btn btn-accent btn-xs"
-                            >
-                              Move
-                            </button>
+                          <%= if business.category_fit_score && Decimal.compare(business.category_fit_score, Decimal.new("0.5")) == :lt do %>
+                            <form phx-change="move_to_category">
+                              <input type="hidden" name="business_id" value={business.id} />
+                              <select name="category_id" class="select select-xs select-bordered w-28">
+                                <option value="">Move to...</option>
+                                <%= if business.suggested_category_slug do %>
+                                  <option value="" disabled class="font-bold">— Suggested —</option>
+                                  <%= for cat <- @categories, cat.slug == business.suggested_category_slug do %>
+                                    <option value={cat.id}>{cat.name} ✓</option>
+                                  <% end %>
+                                  <option value="" disabled class="font-bold">— All —</option>
+                                <% end %>
+                                <%= for cat <- @categories, cat.id != business.category_id do %>
+                                  <option value={cat.id}>{cat.name}</option>
+                                <% end %>
+                              </select>
+                            </form>
                           <% end %>
                           <button
                             type="button"

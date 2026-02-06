@@ -241,9 +241,10 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
       // How well does this business fit the category "#{get_category_name(business)}"?
       // 0.9-1.0: Perfect fit. 0.5-0.8: Reasonable fit. Below 0.5: Wrong category.
 
-      "suggested_category_slug": null
-      // If category_fit_score < 0.5, suggest a better category slug from: #{all_category_slugs}
-      // Otherwise null
+      "suggested_category_slug": null or "slug-string"
+      // IMPORTANT: If category_fit_score < 0.5, you MUST set this to the best matching slug from: #{all_category_slugs}
+      // If category_fit_score >= 0.5, set to null.
+      // If no category fits at all, pick the closest match anyway.
     }
     ```
 
