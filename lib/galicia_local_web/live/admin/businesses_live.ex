@@ -68,6 +68,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
   defp maybe_filter_status(query, "enriched"), do: Ash.Query.filter(query, status == :enriched)
   defp maybe_filter_status(query, "verified"), do: Ash.Query.filter(query, status == :verified)
   defp maybe_filter_status(query, "rejected"), do: Ash.Query.filter(query, status == :rejected)
+  defp maybe_filter_status(query, "low_fit"), do: Ash.Query.filter(query, not is_nil(category_fit_score) and category_fit_score < 0.5)
   defp maybe_filter_status(query, _), do: query
 
   defp maybe_filter_city(query, nil), do: query
@@ -250,6 +251,65 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
   end
 
   @impl true
+  def handle_event("move_to_suggested", %{"id" => id}, socket) do
+    with {:ok, business} <- Business.get_by_id(id),
+         slug when not is_nil(slug) <- business.suggested_category_slug,
+         {:ok, category} <- Category.get_by_slug(slug) do
+      case Ash.update(business, %{category_id: category.id, suggested_category_slug: nil, category_fit_score: nil}) do
+        {:ok, _} ->
+          {:noreply,
+           socket
+           |> put_flash(:info, "#{business.name} moved to #{category.name}")
+           |> load_page()}
+
+        {:error, _} ->
+          {:noreply, put_flash(socket, :error, "Failed to move business")}
+      end
+    else
+      _ ->
+        {:noreply, put_flash(socket, :error, "Could not find suggested category")}
+    end
+  end
+
+  @impl true
+  def handle_event("bulk_move_to_suggested", _params, socket) do
+    region = socket.assigns[:current_region]
+
+    businesses =
+      Business
+      |> Ash.Query.filter(not is_nil(category_fit_score) and category_fit_score < 0.5 and not is_nil(suggested_category_slug))
+      |> maybe_filter_city(socket.assigns.filter_city)
+      |> maybe_filter_category(socket.assigns.filter_category)
+      |> then(fn q -> if region, do: Ash.Query.set_tenant(q, region.id), else: q end)
+      |> Ash.read!()
+
+    {moved, failed} =
+      Enum.reduce(businesses, {0, 0}, fn business, {ok, err} ->
+        case Category.get_by_slug(business.suggested_category_slug) do
+          {:ok, category} ->
+            case Ash.update(business, %{category_id: category.id, suggested_category_slug: nil, category_fit_score: nil}) do
+              {:ok, _} -> {ok + 1, err}
+              _ -> {ok, err + 1}
+            end
+
+          _ ->
+            {ok, err + 1}
+        end
+      end)
+
+    msg =
+      case {moved, failed} do
+        {m, 0} -> "Moved #{m} businesses to suggested categories"
+        {m, f} -> "Moved #{m} businesses, #{f} failed (category not found)"
+      end
+
+    {:noreply,
+     socket
+     |> put_flash(:info, msg)
+     |> load_page()}
+  end
+
+  @impl true
   def handle_event("bulk_re_enrich", _params, socket) do
     region = socket.assigns[:current_region]
 
@@ -370,6 +430,12 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
             >
               Rejected
             </button>
+            <button
+              type="button" phx-click="filter" phx-value-status="low_fit"
+              class={["btn btn-sm", if(@filter_status == "low_fit", do: "btn-accent", else: "btn-ghost")]}
+            >
+              Low fit
+            </button>
           </div>
 
           <form phx-change="filter_city">
@@ -403,6 +469,16 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
               <span class="hero-arrow-path w-3 h-3"></span>
               Re-enrich filtered
             </button>
+            <%= if @filter_status == "low_fit" do %>
+              <button
+                type="button"
+                phx-click="bulk_move_to_suggested"
+                data-confirm="Move all displayed businesses to their suggested categories?"
+                class="btn btn-outline btn-accent btn-xs"
+              >
+                Move all to suggested
+              </button>
+            <% end %>
           </div>
         </div>
 
@@ -418,7 +494,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                     <th>Category</th>
                     <th>Status</th>
                     <th>Rating</th>
-                    <th>English</th>
+                    <th>Fit</th>
                     <th>Added</th>
                     <th></th>
                   </tr>
@@ -442,10 +518,15 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                         <% end %>
                       </td>
                       <td>
-                        <%= if business.speaks_english do %>
-                          <span class="badge badge-success badge-xs">Yes</span>
-                        <% else %>
-                          <span class="badge badge-ghost badge-xs">No</span>
+                        <%= cond do %>
+                          <% is_nil(business.category_fit_score) -> %>
+                            <span class="text-base-content/30">-</span>
+                          <% Decimal.compare(business.category_fit_score, Decimal.new("0.5")) == :lt -> %>
+                            <span class="tooltip" data-tip={business.suggested_category_slug}>
+                              <span class="badge badge-error badge-xs">{Decimal.round(business.category_fit_score, 2)}</span>
+                            </span>
+                          <% true -> %>
+                            <span class="badge badge-success badge-xs">{Decimal.round(business.category_fit_score, 2)}</span>
                         <% end %>
                       </td>
                       <td class="text-xs text-base-content/60">
@@ -468,6 +549,17 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                               class="btn btn-primary btn-xs"
                             >
                               Enrich
+                            </button>
+                          <% end %>
+                          <%= if business.suggested_category_slug do %>
+                            <button
+                              type="button"
+                              phx-click="move_to_suggested"
+                              phx-value-id={business.id}
+                              data-confirm={"Move to #{business.suggested_category_slug}?"}
+                              class="btn btn-accent btn-xs"
+                            >
+                              Move
                             </button>
                           <% end %>
                           <button

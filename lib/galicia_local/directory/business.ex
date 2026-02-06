@@ -111,7 +111,8 @@ defmodule GaliciaLocal.Directory.Business do
         :cultural_notes, :cultural_notes_es,
         :expat_friendly_score, :expat_tips, :service_specialties, :languages_taught, :sentiment_summary, :review_insights,
         :status, :source, :raw_data, :quality_score, :photo_urls,
-        :city_id, :category_id, :region_id, :last_enriched_at
+        :city_id, :category_id, :region_id, :last_enriched_at,
+        :category_fit_score, :suggested_category_slug
       ]
     end
 
