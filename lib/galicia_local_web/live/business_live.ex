@@ -427,7 +427,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                   <span class="hero-globe-alt w-5 h-5 text-primary mt-0.5"></span>
                   <div>
                     <p class="font-medium">{gettext("Website")}</p>
-                    <a href={@business.website} target="_blank" class="text-primary hover:underline">
+                    <a href={@business.website} target="_blank" rel="nofollow noopener noreferrer" class="text-primary hover:underline">
                       {URI.parse(@business.website).host || @business.website}
                     </a>
                   </div>
@@ -533,7 +533,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
             <!-- External Links -->
             <div class="card-actions justify-end mt-8">
               <%= if @business.google_maps_url do %>
-                <a href={@business.google_maps_url} target="_blank" class="btn btn-outline">
+                <a href={@business.google_maps_url} target="_blank" rel="noopener noreferrer" class="btn btn-outline">
                   <span class="hero-map w-5 h-5"></span>
                   {gettext("View on Google Maps")}
                 </a>
@@ -542,6 +542,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
                 <a
                   href={"https://www.google.com/maps/dir/?api=1&destination=#{@business.latitude},#{@business.longitude}"}
                   target="_blank"
+                  rel="noopener noreferrer"
                   class="btn btn-primary"
                 >
                   <span class="hero-arrow-top-right-on-square w-5 h-5"></span>
