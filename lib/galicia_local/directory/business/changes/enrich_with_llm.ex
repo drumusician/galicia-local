@@ -139,6 +139,7 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
     enrichment_hints = get_enrichment_hints(business)
     website_content = format_website_research(research_data.website)
     search_content = format_search_research(research_data.search)
+    all_category_slugs = get_all_category_slugs()
 
     # Get region-specific context
     region = get_region_context(business)
@@ -241,7 +242,7 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
       // 0.9-1.0: Perfect fit. 0.5-0.8: Reasonable fit. Below 0.5: Wrong category.
 
       "suggested_category_slug": null
-      // If category_fit_score < 0.5, suggest a better category slug from: restaurants, cafes, bars, bakeries, butchers, supermarkets, markets, hair-salons, dentists, doctors, lawyers, accountants, real-estate-agents, plumbers, electricians, car-services, language-schools, veterinarians, wineries, cider-houses
+      // If category_fit_score < 0.5, suggest a better category slug from: #{all_category_slugs}
       // Otherwise null
     }
     ```
@@ -422,6 +423,13 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
       _ ->
         nil
     end
+  end
+
+  defp get_all_category_slugs do
+    GaliciaLocal.Directory.Category
+    |> Ash.read!()
+    |> Enum.map(& &1.slug)
+    |> Enum.join(", ")
   end
 
   defp get_place_types(business) do
