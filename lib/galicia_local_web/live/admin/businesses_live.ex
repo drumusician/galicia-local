@@ -296,6 +296,25 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
   end
 
   @impl true
+  def handle_event("reject", %{"id" => id}, socket) do
+    with {:ok, business} <- Business.get_by_id(id) do
+      case Ash.update(business, %{status: :rejected, category_fit_score: nil, suggested_category_slug: nil}) do
+        {:ok, _} ->
+          {:noreply,
+           socket
+           |> put_flash(:info, "#{business.name} rejected")
+           |> load_page()}
+
+        {:error, _} ->
+          {:noreply, put_flash(socket, :error, "Failed to reject business")}
+      end
+    else
+      _ ->
+        {:noreply, put_flash(socket, :error, "Business not found")}
+    end
+  end
+
+  @impl true
   def handle_event("bulk_move_to_suggested", _params, socket) do
     region = socket.assigns[:current_region]
 
@@ -330,6 +349,32 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
     {:noreply,
      socket
      |> put_flash(:info, msg)
+     |> load_page()}
+  end
+
+  @impl true
+  def handle_event("bulk_reject", _params, socket) do
+    region = socket.assigns[:current_region]
+
+    businesses =
+      Business
+      |> Ash.Query.filter(not is_nil(category_fit_score) and category_fit_score < 0.5)
+      |> maybe_filter_city(socket.assigns.filter_city)
+      |> maybe_filter_category(socket.assigns.filter_category)
+      |> then(fn q -> if region, do: Ash.Query.set_tenant(q, region.id), else: q end)
+      |> Ash.read!()
+
+    count =
+      Enum.reduce(businesses, 0, fn business, acc ->
+        case Ash.update(business, %{status: :rejected, category_fit_score: nil, suggested_category_slug: nil}) do
+          {:ok, _} -> acc + 1
+          _ -> acc
+        end
+      end)
+
+    {:noreply,
+     socket
+     |> put_flash(:info, "Rejected #{count} businesses")
      |> load_page()}
   end
 
@@ -502,6 +547,14 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
               >
                 Move all to suggested
               </button>
+              <button
+                type="button"
+                phx-click="bulk_reject"
+                data-confirm="Reject ALL low-fit businesses matching the current filters? This cannot be undone."
+                class="btn btn-outline btn-error btn-xs"
+              >
+                Reject all filtered
+              </button>
             <% end %>
           </div>
         </div>
@@ -578,20 +631,27 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                           <%= if business.category_fit_score && Decimal.compare(business.category_fit_score, Decimal.new("0.5")) == :lt do %>
                             <form phx-change="move_to_category">
                               <input type="hidden" name="business_id" value={business.id} />
+                              <% suggested_cat = Enum.find(@categories, & &1.slug == business.suggested_category_slug) %>
                               <select name="category_id" class="select select-xs select-bordered w-28">
                                 <option value="">Move to...</option>
-                                <%= if business.suggested_category_slug do %>
-                                  <option value="" disabled class="font-bold">— Suggested —</option>
-                                  <%= for cat <- @categories, cat.slug == business.suggested_category_slug do %>
-                                    <option value={cat.id}>{cat.name} ✓</option>
-                                  <% end %>
-                                  <option value="" disabled class="font-bold">— All —</option>
+                                <%= if suggested_cat do %>
+                                  <option value={suggested_cat.id}>{suggested_cat.name} ✓</option>
+                                  <option value="" disabled>———</option>
                                 <% end %>
                                 <%= for cat <- @categories, cat.id != business.category_id do %>
                                   <option value={cat.id}>{cat.name}</option>
                                 <% end %>
                               </select>
                             </form>
+                            <button
+                              type="button"
+                              phx-click="reject"
+                              phx-value-id={business.id}
+                              data-confirm={"Reject #{business.name}?"}
+                              class="btn btn-error btn-xs"
+                            >
+                              Reject
+                            </button>
                           <% end %>
                           <button
                             type="button"
