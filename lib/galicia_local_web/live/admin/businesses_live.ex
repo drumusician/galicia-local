@@ -629,20 +629,20 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                             </button>
                           <% end %>
                           <%= if business.category_fit_score && Decimal.compare(business.category_fit_score, Decimal.new("0.5")) == :lt do %>
-                            <form phx-change="move_to_category">
-                              <input type="hidden" name="business_id" value={business.id} />
-                              <% suggested_cat = Enum.find(@categories, & &1.slug == business.suggested_category_slug) %>
-                              <select name="category_id" class="select select-xs select-bordered w-28">
-                                <option value="">Move to...</option>
-                                <%= if suggested_cat do %>
+                            <% suggested_cat = Enum.find(@categories, & &1.slug == business.suggested_category_slug) %>
+                            <%= if suggested_cat do %>
+                              <form phx-change="move_to_category">
+                                <input type="hidden" name="business_id" value={business.id} />
+                                <select name="category_id" class="select select-xs select-bordered w-28">
+                                  <option value="">Move to...</option>
                                   <option value={suggested_cat.id}>{suggested_cat.name} ✓</option>
                                   <option value="" disabled>———</option>
-                                <% end %>
-                                <%= for cat <- @categories, cat.id != business.category_id do %>
-                                  <option value={cat.id}>{cat.name}</option>
-                                <% end %>
-                              </select>
-                            </form>
+                                  <%= for cat <- @categories, cat.id != business.category_id do %>
+                                    <option value={cat.id}>{cat.name}</option>
+                                  <% end %>
+                                </select>
+                              </form>
+                            <% end %>
                             <button
                               type="button"
                               phx-click="reject"
