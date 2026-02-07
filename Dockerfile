@@ -89,6 +89,11 @@ ENV LC_ALL=en_US.UTF-8
 WORKDIR "/app"
 RUN chown nobody /app
 
+# Claude CLI auth is stored in HOME/.claude — mount a Fly volume at /data/claude
+# so credentials persist across deploys
+ENV HOME="/data/claude"
+RUN mkdir -p /data/claude && chown nobody:root /data/claude
+
 # set runner ENV
 ENV MIX_ENV="prod"
 

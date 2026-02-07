@@ -32,6 +32,10 @@ kill_signal = 'SIGTERM'
     hard_limit = 1000
     soft_limit = 1000
 
+[mounts]
+  source = 'claude_data'
+  destination = '/data/claude'
+
 [[vm]]
   memory = '1gb'
   cpus = 2
