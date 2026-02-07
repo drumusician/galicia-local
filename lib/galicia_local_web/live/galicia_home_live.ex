@@ -44,6 +44,7 @@ defmodule GaliciaLocalWeb.GaliciaHomeLive do
 
     categories_by_priority =
       Category.list!()
+      |> Ash.load!(:translations)
       |> Enum.group_by(& &1.priority)
       |> Enum.sort_by(fn {priority, _} -> priority end)
 
@@ -299,8 +300,12 @@ defmodule GaliciaLocalWeb.GaliciaHomeLive do
                       <div class={"w-12 h-12 rounded-full flex items-center justify-center mb-2 #{priority_bg_class(priority)} group-hover:scale-110 transition-transform"}>
                         <.dynamic_icon name={category.icon || "building-storefront"} class="w-6 h-6" />
                       </div>
-                      <span class="font-medium text-sm">{localized_name(category, @locale)}</span>
-                      <span class="text-xs text-base-content/60">{category.name_es}</span>
+                      <% primary = localized_name(category, @locale) %>
+                      <% secondary = localized_name(category, "es") %>
+                      <span class="font-medium text-sm">{primary}</span>
+                      <%= if secondary != primary do %>
+                        <span class="text-xs text-base-content/60">{secondary}</span>
+                      <% end %>
                     </div>
                   </.link>
                 <% end %>

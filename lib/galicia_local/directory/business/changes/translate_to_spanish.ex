@@ -2,20 +2,17 @@ defmodule GaliciaLocal.Directory.Business.Changes.TranslateToSpanish do
   @moduledoc """
   Ash change that translates enriched English content to Spanish using DeepL.
 
-  Translates the following fields when Spanish versions are missing:
-  - summary → summary_es
-  - highlights → highlights_es
-  - warnings → warnings_es
-  - integration_tips → integration_tips_es
-  - cultural_notes → cultural_notes_es
+  Translates the following fields into the business_translations table:
+  - summary, highlights, warnings, integration_tips, cultural_notes
 
-  Skips fields that already have Spanish content, or where the English source is empty.
+  Skips fields that already have Spanish translations, or where the English source is empty.
   """
   use Ash.Resource.Change
 
   require Logger
 
   alias GaliciaLocal.AI.DeepL
+  alias GaliciaLocal.Directory.BusinessTranslation
 
   @translatable_fields ~w(summary highlights warnings integration_tips cultural_notes)a
 
@@ -32,7 +29,23 @@ defmodule GaliciaLocal.Directory.Business.Changes.TranslateToSpanish do
       else
         case translate_fields(business, fields_to_translate) do
           {:ok, translations} ->
-            Ash.Changeset.force_change_attributes(changeset, translations)
+            # Upsert into business_translations table
+            params = Map.merge(translations, %{
+              business_id: business.id,
+              locale: "es",
+              content_source: "ai_generated",
+              source_locale: "en"
+            })
+
+            case BusinessTranslation.upsert(params) do
+              {:ok, _translation} ->
+                Logger.info("Business #{business.id}: translated #{length(fields_to_translate)} fields to Spanish")
+                changeset
+
+              {:error, reason} ->
+                Logger.error("Business #{business.id}: failed to save Spanish translation: #{inspect(reason)}")
+                changeset
+            end
 
           {:error, reason} ->
             Logger.error("Failed to translate business #{business.id}: #{inspect(reason)}")
@@ -43,10 +56,15 @@ defmodule GaliciaLocal.Directory.Business.Changes.TranslateToSpanish do
   end
 
   defp fields_needing_translation(business) do
+    # Load existing Spanish translation if any
+    existing_es = case BusinessTranslation.get_for_business_locale(business.id, "es") do
+      {:ok, translation} -> translation
+      _ -> nil
+    end
+
     Enum.filter(@translatable_fields, fn field ->
       english_value = Map.get(business, field)
-      spanish_field = :"#{field}_es"
-      spanish_value = Map.get(business, spanish_field)
+      spanish_value = if existing_es, do: Map.get(existing_es, field), else: nil
 
       has_english = not empty?(english_value)
       missing_spanish = empty?(spanish_value)
@@ -81,17 +99,16 @@ defmodule GaliciaLocal.Directory.Business.Changes.TranslateToSpanish do
           {translated_strings, translated_arrays_flat} =
             Enum.split(translated_all, length(string_values))
 
-          # Build _es string fields
+          # Build string fields
           string_result =
             Enum.zip(string_fields, translated_strings)
-            |> Enum.map(fn {field, text} -> {:"#{field}_es", text} end)
             |> Map.new()
 
-          # Build _es array fields
+          # Build array fields
           {array_result, _rest} =
             Enum.reduce(array_meta, {%{}, translated_arrays_flat}, fn {field, count}, {acc, remaining} ->
               {items, rest} = Enum.split(remaining, count)
-              {Map.put(acc, :"#{field}_es", items), rest}
+              {Map.put(acc, field, items), rest}
             end)
 
           {:ok, Map.merge(string_result, array_result)}

@@ -31,12 +31,12 @@ defmodule GaliciaLocal.Directory.City do
 
     create :create do
       primary? true
-      accept [:name, :slug, :province, :description, :description_es, :description_nl, :latitude, :longitude, :population, :featured, :image_url, :region_id]
+      accept [:name, :slug, :province, :description, :latitude, :longitude, :population, :featured, :image_url, :region_id]
     end
 
     update :update do
       primary? true
-      accept [:name, :slug, :province, :description, :description_es, :description_nl, :latitude, :longitude, :population, :featured, :image_url, :region_id]
+      accept [:name, :slug, :province, :description, :latitude, :longitude, :population, :featured, :image_url, :region_id]
     end
 
     read :get_by_id do
@@ -79,16 +79,6 @@ defmodule GaliciaLocal.Directory.City do
     attribute :description, :string do
       public? true
       description "English description of the city"
-    end
-
-    attribute :description_es, :string do
-      public? true
-      description "Spanish description of the city"
-    end
-
-    attribute :description_nl, :string do
-      public? true
-      description "Dutch description of the city"
     end
 
     attribute :latitude, :decimal do

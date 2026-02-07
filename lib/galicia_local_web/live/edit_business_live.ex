@@ -70,7 +70,7 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
   @days ~w(monday tuesday wednesday thursday friday saturday sunday)
 
   defp parse_array_fields(params) do
-    ~w(highlights highlights_es service_specialties photo_urls)
+    ~w(highlights service_specialties photo_urls)
     |> Enum.reduce(params, fn key, acc ->
       case acc[key] do
         nil -> acc
@@ -147,11 +147,6 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
               </fieldset>
 
               <fieldset class="fieldset">
-                <legend class="fieldset-legend">{gettext("Descripción (Español)")}</legend>
-                <textarea name={@form[:description_es].name} class="textarea textarea-bordered w-full h-32">{@form[:description_es].value}</textarea>
-              </fieldset>
-
-              <fieldset class="fieldset">
                 <legend class="fieldset-legend">{gettext("Short Summary")}</legend>
                 <input type="text" name={@form[:summary].name} value={@form[:summary].value} class="input input-bordered w-full" />
                 <p class="fieldset-label">{gettext("A brief one-liner about your business")}</p>
@@ -181,26 +176,13 @@ defmodule GaliciaLocalWeb.EditBusinessLive do
                 </fieldset>
               </div>
 
-              <fieldset class="fieldset">
-                <legend class="fieldset-legend">{gettext("Short Summary (Spanish)")}</legend>
-                <input type="text" name={@form[:summary_es].name} value={@form[:summary_es].value} class="input input-bordered w-full" />
-              </fieldset>
-
               <div class="divider">{gettext("Highlights & Specialties")}</div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <fieldset class="fieldset">
-                  <legend class="fieldset-legend">{gettext("Highlights (English)")}</legend>
-                  <textarea name="business[highlights]" class="textarea textarea-bordered w-full font-mono text-sm" rows="4">{format_array(@business.highlights)}</textarea>
-                  <p class="fieldset-label">{gettext("One per line")}</p>
-                </fieldset>
-
-                <fieldset class="fieldset">
-                  <legend class="fieldset-legend">{gettext("Highlights (Spanish)")}</legend>
-                  <textarea name="business[highlights_es]" class="textarea textarea-bordered w-full font-mono text-sm" rows="4">{format_array(@business.highlights_es)}</textarea>
-                  <p class="fieldset-label">{gettext("One per line")}</p>
-                </fieldset>
-              </div>
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">{gettext("Highlights")}</legend>
+                <textarea name="business[highlights]" class="textarea textarea-bordered w-full font-mono text-sm" rows="4">{format_array(@business.highlights)}</textarea>
+                <p class="fieldset-label">{gettext("One per line")}</p>
+              </fieldset>
 
               <fieldset class="fieldset">
                 <legend class="fieldset-legend">{gettext("Service Specialties")}</legend>

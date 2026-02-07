@@ -137,7 +137,6 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
       review_count: place[:review_count] || length(reviews),
       price_level: place[:price_level],
       opening_hours: place[:opening_hours],
-      description_es: place[:editorial_summary],
       speaks_english: english_detected,
       speaks_english_confidence: english_confidence,
       status: :pending,
@@ -164,6 +163,7 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
         case Business.create(attrs) do
           {:ok, business} ->
             Logger.info("Created business: #{business.name}")
+            maybe_upsert_spanish_description(business, place[:editorial_summary])
             if business.website, do: queue_website_scrape(business)
             {:created, business}
 
@@ -257,4 +257,19 @@ defmodule GaliciaLocal.Scraper.Workers.GooglePlacesWorker do
   end
 
   defp extract_bounds(_), do: nil
+
+  defp maybe_upsert_spanish_description(_business, nil), do: :ok
+  defp maybe_upsert_spanish_description(_business, ""), do: :ok
+
+  defp maybe_upsert_spanish_description(business, description) do
+    alias GaliciaLocal.Directory.BusinessTranslation
+
+    BusinessTranslation.upsert(%{
+      business_id: business.id,
+      locale: "es",
+      description: description,
+      content_source: "scraped",
+      source_locale: "es"
+    })
+  end
 end

@@ -45,7 +45,6 @@ defmodule GaliciaLocal.Scraper.Pipelines.SaveToDatabase do
       review_count: item[:review_count] || 0,
       price_level: item[:price_level],
       opening_hours: item[:opening_hours],
-      description_es: item[:description],
       status: :pending,
       source: item[:source] || :web_scrape,
       raw_data: %{
@@ -58,6 +57,28 @@ defmodule GaliciaLocal.Scraper.Pipelines.SaveToDatabase do
       category_id: item[:category_id]
     }
 
-    Business.create(attrs)
+    case Business.create(attrs) do
+      {:ok, business} = result ->
+        maybe_upsert_spanish_description(business, item[:description])
+        result
+
+      error ->
+        error
+    end
+  end
+
+  defp maybe_upsert_spanish_description(_business, nil), do: :ok
+  defp maybe_upsert_spanish_description(_business, ""), do: :ok
+
+  defp maybe_upsert_spanish_description(business, description) do
+    alias GaliciaLocal.Directory.BusinessTranslation
+
+    BusinessTranslation.upsert(%{
+      business_id: business.id,
+      locale: "es",
+      description: description,
+      content_source: "scraped",
+      source_locale: "es"
+    })
   end
 end

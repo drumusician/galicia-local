@@ -11,6 +11,7 @@ defmodule GaliciaLocal.Directory.Types.Language do
       de: [description: "German (Deutsch)", label: "German"],
       fr: [description: "French (Français)", label: "French"],
       nl: [description: "Dutch (Nederlands)", label: "Dutch"],
-      it: [description: "Italian (Italiano)", label: "Italian"]
+      it: [description: "Italian (Italiano)", label: "Italian"],
+      he: [description: "Hebrew (עברית)", label: "Hebrew"]
     ]
 end

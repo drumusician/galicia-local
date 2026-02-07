@@ -310,8 +310,8 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
   # Form parsing helpers
 
   defp parse_array_fields(params) do
-    array_keys = ~w(highlights highlights_es warnings warnings_es
-      integration_tips integration_tips_es cultural_notes cultural_notes_es
+    array_keys = ~w(highlights warnings
+      integration_tips cultural_notes
       service_specialties languages_taught expat_tips photo_urls)
 
     Enum.reduce(array_keys, params, fn key, acc ->

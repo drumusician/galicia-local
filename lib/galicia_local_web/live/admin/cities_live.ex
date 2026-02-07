@@ -421,20 +421,24 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     form_data =
       socket.assigns.form_data
       |> Map.put("description", result[:description])
-      |> then(fn fd ->
-        # Set the correct locale description field based on region
+      |> then(fn fd -> if result[:population], do: Map.put(fd, "population", to_string(result[:population])), else: fd end)
+
+    # Store local-language description in translations_map
+    translations_map =
+      socket.assigns.translations_map
+      |> then(fn tm ->
         cond do
-          result[:description_nl] -> Map.put(fd, "description_nl", result[:description_nl])
-          result[:description_es] -> Map.put(fd, "description_es", result[:description_es])
-          result[:description_local] -> Map.put(fd, "description_local", result[:description_local])
-          true -> fd
+          result[:description_nl] -> Map.put(tm, "nl", %{description: result[:description_nl]})
+          result[:description_es] -> Map.put(tm, "es", %{description: result[:description_es]})
+          result[:description_local] -> tm
+          true -> tm
         end
       end)
-      |> then(fn fd -> if result[:population], do: Map.put(fd, "population", to_string(result[:population])), else: fd end)
 
     {:noreply,
      socket
      |> assign(:form_data, form_data)
+     |> assign(:translations_map, translations_map)
      |> assign(:loading, false)
      |> assign(:inline_error, nil)}
   end
@@ -444,12 +448,14 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
     form_data =
       socket.assigns.form_data
       |> Map.put("description", desc)
-      |> Map.put("description_es", desc_es)
       |> then(fn fd -> if result[:population], do: Map.put(fd, "population", to_string(result[:population])), else: fd end)
+
+    translations_map = Map.put(socket.assigns.translations_map, "es", %{description: desc_es})
 
     {:noreply,
      socket
      |> assign(:form_data, form_data)
+     |> assign(:translations_map, translations_map)
      |> assign(:loading, false)
      |> assign(:inline_error, nil)}
   end
@@ -505,21 +511,31 @@ defmodule GaliciaLocalWeb.Admin.CitiesLive do
       end
 
     # Apply descriptions
-    form_data =
+    {form_data, translations_map} =
       case descriptions do
-        {:ok, %{description: desc, description_es: desc_es} = result} ->
-          form_data
-          |> Map.put("description", desc)
-          |> Map.put("description_es", desc_es)
-          |> then(fn fd -> if result[:population], do: Map.put(fd, "population", to_string(result[:population])), else: fd end)
+        {:ok, %{description: desc} = result} ->
+          fd =
+            form_data
+            |> Map.put("description", desc)
+            |> then(fn fd -> if result[:population], do: Map.put(fd, "population", to_string(result[:population])), else: fd end)
+
+          tm =
+            cond do
+              result[:description_es] -> Map.put(socket.assigns.translations_map, "es", %{description: result[:description_es]})
+              result[:description_nl] -> Map.put(socket.assigns.translations_map, "nl", %{description: result[:description_nl]})
+              true -> socket.assigns.translations_map
+            end
+
+          {fd, tm}
 
         _ ->
-          form_data
+          {form_data, socket.assigns.translations_map}
       end
 
     {:noreply,
      socket
      |> assign(:form_data, form_data)
+     |> assign(:translations_map, translations_map)
      |> assign(:loading, false)}
   end
 

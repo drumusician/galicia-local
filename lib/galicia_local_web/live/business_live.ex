@@ -276,13 +276,15 @@ defmodule GaliciaLocalWeb.BusinessLive do
             <!-- Description -->
             <div class="prose max-w-none mb-8">
               <p>{localized(@business, :description, @locale)}</p>
-              <%= if @business.description_es && @business.description_es != @business.description do %>
+              <% alt_locale = if @locale == "es", do: "en", else: "es" %>
+              <% alt_description = localized(@business, :description, alt_locale) %>
+              <%= if alt_description && alt_description != localized(@business, :description, @locale) do %>
                 <details class="mt-4">
                   <summary class="cursor-pointer text-sm text-base-content/60">
                     {if @locale == "es", do: gettext("View in English"), else: gettext("Ver en español")}
                   </summary>
                   <p class="mt-2 text-base-content/70 italic">
-                    {if @locale == "es", do: @business.description, else: @business.description_es}
+                    {alt_description}
                   </p>
                 </details>
               <% end %>

@@ -26,7 +26,7 @@ defmodule GaliciaLocal.Directory.Business do
     triggers do
       # Enrich businesses that have completed research
       trigger :enrich_researched do
-        scheduler_cron "*/5 * * * *"
+        scheduler_cron Application.compile_env(:galicia_local, :enrich_scheduler_cron, false)
         action :enrich_with_llm
         where expr(status == :researched)
         read_action :read
@@ -38,7 +38,7 @@ defmodule GaliciaLocal.Directory.Business do
       # Fallback: enrich pending businesses that don't have websites
       # (they skip the research phase)
       trigger :enrich_pending_no_website do
-        scheduler_cron "*/10 * * * *"
+        scheduler_cron Application.compile_env(:galicia_local, :enrich_scheduler_cron, false)
         action :enrich_with_llm
         where expr(status == :pending and is_nil(website))
         read_action :read
@@ -53,8 +53,7 @@ defmodule GaliciaLocal.Directory.Business do
         action :translate_to_spanish
         where expr(
           status in [:enriched, :verified] and
-          not is_nil(summary) and
-          is_nil(summary_es)
+          not is_nil(summary)
         )
         read_action :read
         max_attempts 3
@@ -86,13 +85,13 @@ defmodule GaliciaLocal.Directory.Business do
     create :create do
       primary? true
       accept [
-        :name, :slug, :description, :description_es, :summary, :summary_es,
+        :name, :slug, :description, :summary,
         :address, :phone, :email, :website, :google_maps_url,
         :latitude, :longitude, :languages_spoken, :speaks_english, :speaks_english_confidence,
         :rating, :review_count, :price_level,
-        :opening_hours, :highlights, :highlights_es, :warnings, :warnings_es,
-        :newcomer_friendly_score, :local_gem_score, :integration_tips, :integration_tips_es,
-        :cultural_notes, :cultural_notes_es,
+        :opening_hours, :highlights, :warnings,
+        :newcomer_friendly_score, :local_gem_score, :integration_tips,
+        :cultural_notes,
         :expat_friendly_score, :expat_tips, :service_specialties, :languages_taught, :sentiment_summary, :review_insights,
         :status, :source, :raw_data, :quality_score, :photo_urls,
         :city_id, :category_id, :region_id
@@ -102,13 +101,13 @@ defmodule GaliciaLocal.Directory.Business do
     update :update do
       primary? true
       accept [
-        :name, :slug, :description, :description_es, :summary, :summary_es,
+        :name, :slug, :description, :summary,
         :address, :phone, :email, :website, :google_maps_url,
         :latitude, :longitude, :languages_spoken, :speaks_english, :speaks_english_confidence,
         :rating, :review_count, :price_level,
-        :opening_hours, :highlights, :highlights_es, :warnings, :warnings_es,
-        :newcomer_friendly_score, :local_gem_score, :integration_tips, :integration_tips_es,
-        :cultural_notes, :cultural_notes_es,
+        :opening_hours, :highlights, :warnings,
+        :newcomer_friendly_score, :local_gem_score, :integration_tips,
+        :cultural_notes,
         :expat_friendly_score, :expat_tips, :service_specialties, :languages_taught, :sentiment_summary, :review_insights,
         :status, :source, :raw_data, :quality_score, :photo_urls,
         :city_id, :category_id, :region_id, :last_enriched_at,
@@ -176,10 +175,10 @@ defmodule GaliciaLocal.Directory.Business do
 
     update :owner_update do
       accept [
-        :name, :description, :description_es, :summary, :summary_es,
+        :name, :description, :summary,
         :address, :phone, :email, :website,
         :opening_hours, :photo_urls,
-        :highlights, :highlights_es, :service_specialties
+        :highlights, :service_specialties
       ]
     end
 
@@ -213,19 +212,9 @@ defmodule GaliciaLocal.Directory.Business do
       description "English description (LLM-generated from reviews)"
     end
 
-    attribute :description_es, :string do
-      public? true
-      description "Original Spanish description"
-    end
-
     attribute :summary, :string do
       public? true
       description "Short LLM-generated summary"
-    end
-
-    attribute :summary_es, :string do
-      public? true
-      description "Spanish short summary"
     end
 
     # Contact info
@@ -307,22 +296,10 @@ defmodule GaliciaLocal.Directory.Business do
       description "LLM-extracted highlights from reviews"
     end
 
-    attribute :highlights_es, {:array, :string} do
-      public? true
-      default []
-      description "Spanish highlights"
-    end
-
     attribute :warnings, {:array, :string} do
       public? true
       default []
       description "LLM-extracted warnings (cash only, etc.)"
-    end
-
-    attribute :warnings_es, {:array, :string} do
-      public? true
-      default []
-      description "Spanish warnings"
     end
 
     # Newcomer & Integration insights (LLM-extracted)
@@ -344,22 +321,10 @@ defmodule GaliciaLocal.Directory.Business do
       description "Tips for newcomers to integrate and connect with locals"
     end
 
-    attribute :integration_tips_es, {:array, :string} do
-      public? true
-      default []
-      description "Spanish integration tips"
-    end
-
     attribute :cultural_notes, {:array, :string} do
       public? true
       default []
       description "Galician cultural context and local customs to know"
-    end
-
-    attribute :cultural_notes_es, {:array, :string} do
-      public? true
-      default []
-      description "Spanish cultural notes"
     end
 
     attribute :service_specialties, {:array, :string} do

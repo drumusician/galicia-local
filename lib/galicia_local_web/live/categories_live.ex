@@ -137,7 +137,12 @@ defmodule GaliciaLocalWeb.CategoriesLive do
     end
   end
 
-  defp secondary_name(category, "en"), do: category.name_es || ""
+  defp secondary_name(category, "en") do
+    case get_translation(category, "es") do
+      %{name: name} when is_binary(name) and name != "" -> name
+      _ -> ""
+    end
+  end
   defp secondary_name(category, _locale), do: category.name
 
   defp category_description(category, locale) do

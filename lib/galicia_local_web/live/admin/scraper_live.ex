@@ -23,7 +23,7 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
       |> Ash.read!()
       |> Enum.sort_by(& &1.name)
 
-    categories = Category.list!() |> Enum.sort_by(& &1.priority)
+    categories = Category.list!() |> Ash.load!(:translations) |> Enum.sort_by(& &1.priority)
 
     {:ok,
      socket
@@ -94,6 +94,9 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
             "google_places" ->
               Scraper.search_google_places(city, category, bounds: bounds_tuple)
 
+            "openstreetmap" ->
+              Scraper.search_overpass(city, category)
+
             "paginas_amarillas" ->
               Scraper.scrape_city_category(city, category, :paginas_amarillas)
           end
@@ -132,7 +135,16 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
           nil
         end
 
-      {:ok, jobs} = Scraper.search_google_places_city(city, bounds: bounds_tuple)
+      source = socket.assigns.scrape_source
+
+      {:ok, jobs} =
+        case source do
+          "openstreetmap" ->
+            Scraper.search_overpass_city(city)
+
+          _ ->
+            Scraper.search_google_places_city(city, bounds: bounds_tuple)
+        end
 
       bounds_msg = if bounds, do: " (with bounds)", else: ""
       {:noreply,
@@ -256,7 +268,10 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
         """
         SELECT
           COUNT(*) FILTER (WHERE status IN ('enriched', 'verified')),
-          COUNT(*) FILTER (WHERE summary_es IS NOT NULL AND summary_es != ''),
+          COUNT(*) FILTER (WHERE id IN (
+            SELECT business_id FROM business_translations
+            WHERE locale = 'es' AND summary IS NOT NULL AND summary != ''
+          )),
           COUNT(*) FILTER (WHERE status NOT IN ('pending'))
         FROM businesses
         WHERE updated_at >= $1 #{region_filter}
@@ -340,6 +355,19 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
                       <input
                         type="radio"
                         name="source"
+                        value="openstreetmap"
+                        class="radio radio-success"
+                        checked={@scrape_source == "openstreetmap"}
+                      />
+                      <span class="label-text">
+                        OpenStreetMap
+                        <span class="badge badge-success badge-xs ml-1">Free</span>
+                      </span>
+                    </label>
+                    <label class="label cursor-pointer gap-2">
+                      <input
+                        type="radio"
+                        name="source"
                         value="paginas_amarillas"
                         class="radio"
                         checked={@scrape_source == "paginas_amarillas"}
@@ -383,7 +411,7 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
                         value={category.id}
                         selected={@selected_category && @selected_category.id == category.id}
                       >
-                        {category.name} ({category.name_es || Scraper.translate_category(category.slug)})
+                        {category.name} ({localized_name(category, "es")})
                       </option>
                     <% end %>
                   </select>
@@ -466,7 +494,7 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
                     Start Import
                   </button>
 
-                  <%= if @selected_city && @scrape_source == "google_places" do %>
+                  <%= if @selected_city && @scrape_source in ["google_places", "openstreetmap"] do %>
                     <button
                       type="button"
                       phx-click="scrape_all_city"
@@ -705,10 +733,14 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
   defp status_badge_class(_), do: "badge-ghost"
 
   defp source_badge_class(:google_places), do: "badge-primary"
+  defp source_badge_class(:google_maps), do: "badge-primary"
+  defp source_badge_class(:openstreetmap), do: "badge-success"
   defp source_badge_class(:paginas_amarillas), do: "badge-secondary"
   defp source_badge_class(_), do: "badge-ghost"
 
   defp format_source(:google_places), do: "Google"
+  defp format_source(:google_maps), do: "Google"
+  defp format_source(:openstreetmap), do: "OSM"
   defp format_source(:paginas_amarillas), do: "P. Amarillas"
   defp format_source(other), do: to_string(other)
 

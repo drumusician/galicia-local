@@ -41,3 +41,5 @@ dets_simple_storage
 .DS_Store
 
 priv/research/
+.mcp.json
+supabase/

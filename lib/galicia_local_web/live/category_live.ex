@@ -250,7 +250,10 @@ defmodule GaliciaLocalWeb.CategoryLive do
             </div>
             <div>
               <h1 class="text-3xl font-bold text-base-content">{localized_name(@category, @locale)}</h1>
-              <p class="text-base-content/60">{@category.name_es}</p>
+              <% secondary = localized_name(@category, "es") %>
+              <%= if secondary != localized_name(@category, @locale) do %>
+                <p class="text-base-content/60">{secondary}</p>
+              <% end %>
             </div>
           </div>
           <%= if @category.description do %>

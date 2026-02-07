@@ -113,7 +113,6 @@ defmodule GaliciaLocal.Scraper.ScrapeWorker do
       review_count: place[:review_count] || 0,
       price_level: place[:price_level],
       opening_hours: place[:opening_hours],
-      description_es: place[:editorial_summary],
       status: :pending,
       source: :google_places,
       raw_data: %{
@@ -130,6 +129,7 @@ defmodule GaliciaLocal.Scraper.ScrapeWorker do
     case Business.create(attrs) do
       {:ok, business} ->
         Logger.info("Created business: #{business.name}")
+        maybe_upsert_spanish_description(business, place[:editorial_summary])
         {:ok, business}
 
       {:error, %Ash.Error.Invalid{errors: errors}} = error ->
@@ -146,5 +146,20 @@ defmodule GaliciaLocal.Scraper.ScrapeWorker do
         Logger.warning("Failed to create business #{place.name}: #{inspect(error)}")
         error
     end
+  end
+
+  defp maybe_upsert_spanish_description(_business, nil), do: :ok
+  defp maybe_upsert_spanish_description(_business, ""), do: :ok
+
+  defp maybe_upsert_spanish_description(business, description) do
+    alias GaliciaLocal.Directory.BusinessTranslation
+
+    BusinessTranslation.upsert(%{
+      business_id: business.id,
+      locale: "es",
+      description: description,
+      content_source: "scraped",
+      source_locale: "es"
+    })
   end
 end

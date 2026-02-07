@@ -31,11 +31,12 @@ defmodule GaliciaLocal.Scraper do
   require Logger
 
   alias GaliciaLocal.Directory.{City, Category, CategoryTranslation}
-  alias GaliciaLocal.Scraper.Spiders.PaginasAmarillas
-  alias GaliciaLocal.Scraper.Workers.GooglePlacesWorker
+  alias GaliciaLocal.Scraper.Spiders.{PaginasAmarillas, DiscoverySpider}
+  alias GaliciaLocal.Scraper.Workers.{GooglePlacesWorker, OverpassWorker}
 
   @spiders %{
-    paginas_amarillas: PaginasAmarillas
+    paginas_amarillas: PaginasAmarillas,
+    discovery: DiscoverySpider
   }
 
   # Spanish translations for common categories
@@ -131,7 +132,7 @@ defmodule GaliciaLocal.Scraper do
   """
   def scrape_city_category(%City{} = city, %Category{} = category, spider \\ :paginas_amarillas) do
     city_search = Map.get(@city_translations, city.slug, city.slug)
-    category_search = Map.get(@category_translations, category.slug, category.name_es || category.slug)
+    category_search = Map.get(@category_translations, category.slug, get_category_es_name(category))
 
     scrape(spider,
       city: city_search,
@@ -194,6 +195,57 @@ defmodule GaliciaLocal.Scraper do
   """
   def translate_category(slug) do
     Map.get(@category_translations, slug, slug)
+  end
+
+  # =============================================================================
+  # Discovery Spider — Crawl + Claude Code Extraction
+  # =============================================================================
+
+  @doc """
+  Start a discovery crawl on the given seed URLs.
+  Pages are saved to `tmp/discovery_crawls/<crawl_id>/` for later
+  processing by Claude Code.
+
+  ## Options
+    - :crawl_id - Custom crawl ID (default: auto-generated)
+    - :city_id - UUID of target city
+    - :category_id - UUID of target category
+    - :region_id - UUID of target region
+    - :max_pages - Max pages to crawl (default: 200)
+
+  ## Example
+
+      Scraper.crawl_directory(["https://example.nl/bedrijven"],
+        city_id: city.id, category_id: category.id, max_pages: 100)
+  """
+  def crawl_directory(seed_urls, opts \\ []) when is_list(seed_urls) do
+    crawl_id = Keyword.get(opts, :crawl_id, generate_crawl_id())
+
+    spider_opts = [
+      seed_urls: seed_urls,
+      crawl_id: crawl_id,
+      max_pages: Keyword.get(opts, :max_pages, 200),
+      city_id: Keyword.get(opts, :city_id),
+      category_id: Keyword.get(opts, :category_id),
+      region_id: Keyword.get(opts, :region_id)
+    ]
+
+    case Crawly.Engine.start_spider(DiscoverySpider, spider_opts) do
+      :ok ->
+        Logger.info("Discovery crawl started: #{crawl_id}")
+        {:ok, crawl_id}
+
+      {:error, :spider_already_started} ->
+        Logger.warning("Discovery spider is already running")
+        {:error, :already_running}
+
+      error ->
+        error
+    end
+  end
+
+  defp generate_crawl_id do
+    :crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)
   end
 
   # =============================================================================
@@ -301,6 +353,95 @@ defmodule GaliciaLocal.Scraper do
     {:ok, jobs}
   end
 
+  # =============================================================================
+  # OpenStreetMap / Overpass API Integration (Free)
+  # =============================================================================
+
+  @doc """
+  Search OpenStreetMap via Overpass API for businesses in a city.
+  Free alternative to Google Places.
+
+  Calculates a bounding box from the city's coordinates and queues
+  an Oban job for the Overpass API search.
+
+  ## Options
+    - :radius_km - Search radius in km (default: 10)
+
+  ## Example
+
+      city = City.get_by_slug!("ourense")
+      category = Category.get_by_slug!("restaurants")
+      {:ok, job} = Scraper.search_overpass(city, category)
+  """
+  def search_overpass(%City{} = city, %Category{} = category, opts \\ []) do
+    alias GaliciaLocal.Scraper.Overpass
+
+    unless Overpass.has_tags?(category.slug) do
+      Logger.warning("No OSM tags for category: #{category.slug}")
+      {:error, :no_osm_tags}
+    else
+      radius_km = Keyword.get(opts, :radius_km, 10)
+      {south, west, north, east} = bbox_from_city(city, radius_km)
+
+      Logger.info("Queuing Overpass search for #{category.name} in #{city.name} (#{radius_km}km radius)")
+
+      job_args = %{
+        category_slug: category.slug,
+        city_id: city.id,
+        category_id: category.id,
+        bbox_south: south,
+        bbox_west: west,
+        bbox_north: north,
+        bbox_east: east
+      }
+
+      {:ok, job} =
+        job_args
+        |> OverpassWorker.new()
+        |> Oban.insert()
+
+      {:ok, [job]}
+    end
+  end
+
+  @doc """
+  Search all categories with OSM tags for a city via Overpass API.
+
+  ## Options
+    - :radius_km - Search radius in km (default: 10)
+  """
+  def search_overpass_city(%City{} = city, opts \\ []) do
+    alias GaliciaLocal.Scraper.Overpass
+
+    categories = Category.list!()
+
+    jobs =
+      categories
+      |> Enum.filter(fn cat -> Overpass.has_tags?(cat.slug) end)
+      |> Enum.flat_map(fn category ->
+        case search_overpass(city, category, opts) do
+          {:ok, category_jobs} ->
+            Enum.map(category_jobs, fn job -> {category.name, job.id} end)
+          {:error, _} ->
+            []
+        end
+      end)
+
+    {:ok, jobs}
+  end
+
+  # Calculate bounding box from city lat/lon + radius in km
+  defp bbox_from_city(city, radius_km) do
+    lat = Decimal.to_float(city.latitude)
+    lon = Decimal.to_float(city.longitude)
+
+    # ~111km per degree latitude, ~85km per degree longitude at ~40°N
+    lat_offset = radius_km / 111.0
+    lon_offset = radius_km / (111.0 * :math.cos(lat * :math.pi() / 180))
+
+    {lat - lat_offset, lon - lon_offset, lat + lat_offset, lon + lon_offset}
+  end
+
   @doc """
   Get Oban job status for scraper queue.
   """
@@ -358,9 +499,16 @@ defmodule GaliciaLocal.Scraper do
       true ->
         category_es =
           category.search_translation ||
-            Map.get(@category_translations, category.slug, category.name_es || category.slug)
+            Map.get(@category_translations, category.slug, get_category_es_name(category))
 
         ["#{category_es} #{city_name}"]
+    end
+  end
+
+  defp get_category_es_name(category) do
+    case GaliciaLocal.Directory.CategoryTranslation.get_for_category_locale(category.id, "es") do
+      {:ok, %{name: name}} when is_binary(name) and name != "" -> name
+      _ -> category.slug
     end
   end
 end
