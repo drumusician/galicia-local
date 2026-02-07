@@ -43,3 +43,5 @@ dets_simple_storage
 priv/research/
 .mcp.json
 supabase/
+lib/galicia_local/ai/.expert/expert.log
+priv/repo/migrations/.expert/expert.log
