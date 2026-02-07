@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Content.TranslateBatch do
-  @shortdoc "Batch-translate missing business translations via DeepL"
+  @shortdoc "Batch-translate missing business and city translations via DeepL"
   @moduledoc """
-  Finds businesses missing translations for a given locale and translates them
+  Finds businesses and cities missing translations for a given locale and translates them
   using DeepL in controlled batches.
 
   Uses the existing `TranslateWorker` logic to translate content fields
@@ -13,14 +13,17 @@ defmodule Mix.Tasks.Content.TranslateBatch do
       mix content.translate_batch --locale nl --limit 100
       mix content.translate_batch --locale es --limit 50 --sleep 2
       mix content.translate_batch --locale nl --dry-run
+      mix content.translate_batch --locale nl --type cities
+      mix content.translate_batch --locale nl --type businesses
 
   Options:
 
       --locale LOCALE   Target locale (required: "es" or "nl")
-      --limit N         Max businesses to process (default: all)
+      --limit N         Max items to process (default: all)
       --sleep SECONDS   Delay between batches of 10 (default: 1)
       --dry-run         Show what would be translated without making API calls
       --region REGION   Filter by region slug ("galicia" or "netherlands")
+      --type TYPE       Entity type to translate: "businesses", "cities", or "all" (default: "all")
   """
 
   use Mix.Task
@@ -31,11 +34,12 @@ defmodule Mix.Tasks.Content.TranslateBatch do
   def run(argv) do
     {:ok, _} = Application.ensure_all_started(:postgrex)
     {:ok, _} = Application.ensure_all_started(:ecto_sql)
+    {:ok, _} = Application.ensure_all_started(:req)
     {:ok, _} = GaliciaLocal.Repo.start_link()
 
     {opts, _, _} =
       OptionParser.parse(argv,
-        switches: [locale: :string, limit: :integer, sleep: :integer, dry_run: :boolean, region: :string]
+        switches: [locale: :string, limit: :integer, sleep: :integer, dry_run: :boolean, region: :string, type: :string]
       )
 
     locale = opts[:locale] || Mix.raise("--locale is required (es or nl)")
@@ -43,13 +47,66 @@ defmodule Mix.Tasks.Content.TranslateBatch do
     sleep_seconds = opts[:sleep] || 1
     dry_run? = opts[:dry_run] || false
     region_slug = opts[:region]
+    entity_type = opts[:type] || "all"
 
     unless locale in ["es", "nl"] do
       Mix.raise("--locale must be 'es' or 'nl', got: #{locale}")
     end
 
-    region_id = resolve_region_id(region_slug)
+    unless entity_type in ["all", "businesses", "cities"] do
+      Mix.raise("--type must be 'all', 'businesses', or 'cities', got: #{entity_type}")
+    end
 
+    region_id = resolve_region_id(region_slug)
+    locale_name = %{"es" => "Spanish", "nl" => "Dutch"}[locale]
+
+    if entity_type in ["all", "cities"] do
+      translate_cities(locale, locale_name, region_id, limit, sleep_seconds, dry_run?)
+    end
+
+    if entity_type in ["all", "businesses"] do
+      translate_businesses(locale, locale_name, region_id, limit, sleep_seconds, dry_run?)
+    end
+  end
+
+  defp translate_cities(locale, locale_name, region_id, limit, sleep_seconds, dry_run?) do
+    missing_ids = GaliciaLocal.Directory.TranslationStatus.missing_city_ids(locale, region_id)
+
+    missing_ids =
+      if limit do
+        Enum.take(missing_ids, limit)
+      else
+        missing_ids
+      end
+
+    total = length(missing_ids)
+
+    Mix.shell().info("")
+    Mix.shell().info("=== Cities ===")
+    Mix.shell().info("Found #{total} cities missing #{locale_name} translations")
+
+    if dry_run? do
+      Mix.shell().info("[DRY RUN] Would translate #{total} cities to #{locale_name}")
+      estimate_cost(total, :city)
+    else
+      if total == 0 do
+        Mix.shell().info("Nothing to translate!")
+      else
+        estimate_cost(total, :city)
+        Mix.shell().info("Starting city translation...")
+
+        results = process_city_translations(missing_ids, locale, sleep_seconds)
+
+        successes = Enum.count(results, fn {_, status} -> status == :ok end)
+        failures = Enum.count(results, fn {_, status} -> status != :ok end)
+
+        Mix.shell().info("")
+        Mix.shell().info("Cities done! #{successes} translated, #{failures} failed out of #{total}")
+      end
+    end
+  end
+
+  defp translate_businesses(locale, locale_name, region_id, limit, sleep_seconds, dry_run?) do
     missing_ids = GaliciaLocal.Directory.TranslationStatus.missing_business_ids(locale, region_id)
 
     missing_ids =
@@ -60,8 +117,9 @@ defmodule Mix.Tasks.Content.TranslateBatch do
       end
 
     total = length(missing_ids)
-    locale_name = %{"es" => "Spanish", "nl" => "Dutch"}[locale]
 
+    Mix.shell().info("")
+    Mix.shell().info("=== Businesses ===")
     Mix.shell().info("Found #{total} businesses missing #{locale_name} translations")
 
     if dry_run? do
@@ -83,7 +141,7 @@ defmodule Mix.Tasks.Content.TranslateBatch do
         Mix.shell().info("Nothing to translate!")
       else
         estimate_cost(total)
-        Mix.shell().info("Starting translation...")
+        Mix.shell().info("Starting business translation...")
         Mix.shell().info("")
 
         results = process_translations(missing_ids, locale, sleep_seconds)
@@ -92,8 +150,67 @@ defmodule Mix.Tasks.Content.TranslateBatch do
         failures = Enum.count(results, fn {_, status} -> status != :ok end)
 
         Mix.shell().info("")
-        Mix.shell().info("Done! #{successes} translated, #{failures} failed out of #{total}")
+        Mix.shell().info("Businesses done! #{successes} translated, #{failures} failed out of #{total}")
       end
+    end
+  end
+
+  defp process_city_translations(ids, locale, sleep_seconds) do
+    total = length(ids)
+
+    ids
+    |> Enum.with_index(1)
+    |> Enum.map(fn {id, index} ->
+      if rem(index, 10) == 1 and index > 1 do
+        Mix.shell().info("  (sleeping #{sleep_seconds}s between batches...)")
+        Process.sleep(sleep_seconds * 1000)
+      end
+
+      result = translate_one_city(id, locale)
+
+      status_char = if result == :ok, do: ".", else: "x"
+
+      if rem(index, 50) == 0 or index == total do
+        Mix.shell().info("  [#{index}/#{total}] #{status_char}")
+      else
+        IO.write(status_char)
+      end
+
+      {id, result}
+    end)
+  end
+
+  defp translate_one_city(city_id, locale) do
+    alias GaliciaLocal.AI.DeepL
+    alias GaliciaLocal.Directory.{City, CityTranslation}
+
+    case City.get_by_id(city_id) do
+      {:ok, city} ->
+        if non_empty?(city.description) do
+          case DeepL.translate(city.description, locale, source_lang: "en") do
+            {:ok, translated} ->
+              case CityTranslation.upsert(%{
+                city_id: city.id,
+                locale: locale,
+                description: translated
+              }) do
+                {:ok, _} -> :ok
+                {:error, reason} ->
+                  Logger.error("Failed to save city translation for #{city_id}: #{inspect(reason)}")
+                  {:error, reason}
+              end
+
+            {:error, reason} ->
+              Logger.error("DeepL failed for city #{city_id}: #{inspect(reason)}")
+              {:error, reason}
+          end
+        else
+          :ok
+        end
+
+      {:error, _} ->
+        Logger.warning("City not found: #{city_id}")
+        {:error, :not_found}
     end
   end
 
@@ -226,13 +343,14 @@ defmodule Mix.Tasks.Content.TranslateBatch do
     end
   end
 
-  defp estimate_cost(count) do
-    # ~1000 chars per business average for DeepL
-    chars = count * 1000
+  defp estimate_cost(count, type \\ :business) do
+    # ~1000 chars per business, ~200 chars per city description
+    chars_per_item = if type == :city, do: 200, else: 1000
+    chars = count * chars_per_item
     cost = chars / 1_000_000 * 20
 
     Mix.shell().info(
-      "Estimated DeepL cost: ~#{count * 1000 |> format_chars()} chars = ~$#{Float.round(cost, 2)}"
+      "Estimated DeepL cost: ~#{chars |> format_chars()} chars = ~$#{Float.round(cost, 2)}"
     )
   end
 

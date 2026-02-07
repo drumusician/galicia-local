@@ -1,8 +1,8 @@
 defmodule Mix.Tasks.ProdSync.Export do
   @shortdoc "Export local enrichment changes as SQL since last sync"
   @moduledoc """
-  Reads the last sync timestamp and exports changed businesses and
-  business_translations as SQL statements.
+  Reads the last sync timestamp and exports changed businesses,
+  business_translations, and city_translations as SQL statements.
 
   Output goes to stdout so you can redirect to a file:
 
@@ -55,13 +55,24 @@ defmodule Mix.Tasks.ProdSync.Export do
     :integration_tips,
     :cultural_notes,
     :content_source,
-    :source_locale
+    :source_locale,
+    :inserted_at,
+    :updated_at
+  ]
+
+  @city_translation_fields [
+    :city_id,
+    :locale,
+    :description,
+    :inserted_at,
+    :updated_at
   ]
 
   @impl Mix.Task
   def run(argv) do
     {:ok, _} = Application.ensure_all_started(:postgrex)
     {:ok, _} = Application.ensure_all_started(:ecto_sql)
+    Logger.configure(level: :warning)
     {:ok, _} = GaliciaLocal.Repo.start_link()
 
     {opts, _, _} =
@@ -71,12 +82,14 @@ defmodule Mix.Tasks.ProdSync.Export do
 
     businesses = fetch_businesses(since, opts[:all])
     translations = fetch_translations(since, opts[:all])
+    city_translations = fetch_city_translations(since, opts[:all])
 
     Mix.shell().info("-- Prod sync export")
     Mix.shell().info("-- Generated: #{DateTime.utc_now() |> DateTime.to_iso8601()}")
     Mix.shell().info("-- Since: #{since || "all time"}")
     Mix.shell().info("-- Businesses: #{length(businesses)}")
-    Mix.shell().info("-- Translations: #{length(translations)}")
+    Mix.shell().info("-- Business translations: #{length(translations)}")
+    Mix.shell().info("-- City translations: #{length(city_translations)}")
     Mix.shell().info("")
     Mix.shell().info("BEGIN;")
     Mix.shell().info("")
@@ -91,6 +104,14 @@ defmodule Mix.Tasks.ProdSync.Export do
 
     for translation <- translations do
       Mix.shell().info(translation_upsert_sql(translation))
+    end
+
+    if city_translations != [] do
+      Mix.shell().info("")
+    end
+
+    for ct <- city_translations do
+      Mix.shell().info(city_translation_upsert_sql(ct))
     end
 
     Mix.shell().info("")
@@ -127,7 +148,7 @@ defmodule Mix.Tasks.ProdSync.Export do
   end
 
   @business_select_fields [:id | @business_fields]
-  @translation_select_fields @translation_fields ++ [:updated_at]
+  @translation_select_fields @translation_fields
 
   defp fetch_businesses(since, all?) do
     fields = @business_select_fields
@@ -164,6 +185,25 @@ defmodule Mix.Tasks.ProdSync.Export do
     GaliciaLocal.Repo.all(query)
   end
 
+  @city_translation_select_fields @city_translation_fields ++ [:updated_at]
+
+  defp fetch_city_translations(since, all?) do
+    fields = @city_translation_select_fields
+
+    query =
+      "city_translations"
+      |> select([t], map(t, ^fields))
+
+    query =
+      if all? || is_nil(since) do
+        query
+      else
+        where(query, [t], t.updated_at > ^since)
+      end
+
+    GaliciaLocal.Repo.all(query)
+  end
+
   defp business_update_sql(business) do
     id = encode_uuid(business.id)
 
@@ -188,7 +228,7 @@ defmodule Mix.Tasks.ProdSync.Export do
         sql_value(field, value)
       end)
 
-    update_fields = fields -- [:business_id, :locale]
+    update_fields = fields -- [:business_id, :locale, :inserted_at]
 
     update_sets =
       Enum.map_join(update_fields, ", ", fn field ->
@@ -202,15 +242,39 @@ defmodule Mix.Tasks.ProdSync.Export do
     """
   end
 
+  defp city_translation_upsert_sql(ct) do
+    fields = @city_translation_fields
+    columns = Enum.map_join(fields, ", ", &to_string/1)
+
+    values =
+      Enum.map_join(fields, ", ", fn field ->
+        value = Map.get(ct, field)
+        sql_value(field, value)
+      end)
+
+    update_fields = fields -- [:city_id, :locale, :inserted_at]
+
+    update_sets =
+      Enum.map_join(update_fields, ", ", fn field ->
+        "#{field} = EXCLUDED.#{field}"
+      end)
+
+    """
+    INSERT INTO city_translations (#{columns})
+    VALUES (#{values})
+    ON CONFLICT (city_id, locale) DO UPDATE SET #{update_sets};
+    """
+  end
+
   defp sql_value(_field, nil), do: "NULL"
   defp sql_value(_field, true), do: "TRUE"
   defp sql_value(_field, false), do: "FALSE"
 
-  defp sql_value(field, %DateTime{} = dt) when field in [:last_enriched_at, :updated_at] do
+  defp sql_value(field, %DateTime{} = dt) when field in [:last_enriched_at, :updated_at, :inserted_at] do
     sql_literal(DateTime.to_iso8601(dt))
   end
 
-  defp sql_value(field, value) when field in [:id, :business_id] do
+  defp sql_value(field, value) when field in [:id, :business_id, :city_id] do
     sql_literal(encode_uuid(value))
   end
 

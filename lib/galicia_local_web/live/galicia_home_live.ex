@@ -40,7 +40,7 @@ defmodule GaliciaLocalWeb.GaliciaHomeLive do
 
     featured_cities =
       City.featured!(tenant_opts)
-      |> Ash.load!([:business_count], tenant_opts)
+      |> Ash.load!([:business_count, :translations], tenant_opts)
 
     categories_by_priority =
       Category.list!()

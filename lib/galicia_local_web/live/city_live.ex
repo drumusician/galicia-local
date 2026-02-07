@@ -16,7 +16,7 @@ defmodule GaliciaLocalWeb.CityLive do
 
     case City.get_by_slug(slug, tenant_opts) do
       {:ok, city} ->
-        city = Ash.load!(city, [:business_count])
+        city = Ash.load!(city, [:business_count, :translations])
         if connected?(socket) and region, do: Tracker.track_async("city", city.id, region.id)
 
         businesses =

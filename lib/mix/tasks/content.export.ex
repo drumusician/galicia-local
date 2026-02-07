@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Content.Export do
-  @shortdoc "Export businesses as JSON for processing by Claude Code"
+  @shortdoc "Export businesses/cities as JSON for processing by Claude Code"
   @moduledoc """
-  Exports business data as JSON files for translation or enrichment
+  Exports business and city data as JSON files for translation or enrichment
   by Claude Code agents (no API calls needed — uses your Max plan).
 
   ## Translation Export
@@ -9,8 +9,10 @@ defmodule Mix.Tasks.Content.Export do
       mix content.export translations --locale es
       mix content.export translations --locale nl --limit 50
       mix content.export translations --locale es --region galicia --batch-size 25
+      mix content.export translations --locale nl --type cities
+      mix content.export translations --locale nl --type all
 
-  Exports enriched businesses missing translations for the given locale.
+  Exports enriched businesses and/or cities missing translations for the given locale.
 
   ## Enrichment Export
 
@@ -22,10 +24,11 @@ defmodule Mix.Tasks.Content.Export do
   ## Options
 
       --locale LOCALE       Target locale for translations (es or nl)
-      --limit N             Max businesses total
-      --batch-size N        Businesses per output file (default: 25 for translations, 10 for enrichments)
+      --limit N             Max items total
+      --batch-size N        Items per output file (default: 25 for translations, 10 for enrichments)
       --region REGION       Filter by region slug (galicia or netherlands)
       --output-dir DIR      Output directory (default: tmp/content_batches)
+      --type TYPE           For translations: "businesses", "cities", or "all" (default: "all")
   """
 
   use Mix.Task
@@ -52,7 +55,7 @@ defmodule Mix.Tasks.Content.Export do
   defp export_translations(argv) do
     {opts, _, _} =
       OptionParser.parse(argv,
-        switches: [locale: :string, limit: :integer, batch_size: :integer, region: :string, output_dir: :string]
+        switches: [locale: :string, limit: :integer, batch_size: :integer, region: :string, output_dir: :string, type: :string]
       )
 
     locale = opts[:locale] || Mix.raise("--locale is required (es or nl)")
@@ -60,18 +63,75 @@ defmodule Mix.Tasks.Content.Export do
     batch_size = opts[:batch_size] || 25
     region_slug = opts[:region]
     output_dir = opts[:output_dir] || @output_dir
+    entity_type = opts[:type] || "all"
 
     unless locale in ["es", "nl"] do
       Mix.raise("--locale must be 'es' or 'nl'")
     end
 
-    region_id = resolve_region_id(region_slug)
-    missing_ids = GaliciaLocal.Directory.TranslationStatus.missing_business_ids(locale, region_id)
+    unless entity_type in ["all", "businesses", "cities"] do
+      Mix.raise("--type must be 'all', 'businesses', or 'cities'")
+    end
 
+    region_id = resolve_region_id(region_slug)
+    locale_name = %{"es" => "Spanish", "nl" => "Dutch"}[locale]
+
+    if entity_type in ["all", "cities"] do
+      export_city_translations(locale, locale_name, region_id, limit, batch_size, output_dir)
+    end
+
+    if entity_type in ["all", "businesses"] do
+      export_business_translations(locale, locale_name, region_id, limit, batch_size, output_dir)
+    end
+  end
+
+  defp export_city_translations(locale, locale_name, region_id, limit, _batch_size, output_dir) do
+    missing_ids = GaliciaLocal.Directory.TranslationStatus.missing_city_ids(locale, region_id)
     missing_ids = if limit, do: Enum.take(missing_ids, limit), else: missing_ids
     total = length(missing_ids)
 
-    locale_name = %{"es" => "Spanish", "nl" => "Dutch"}[locale]
+    Mix.shell().info("")
+    Mix.shell().info("=== Cities ===")
+    Mix.shell().info("Found #{total} cities missing #{locale_name} translations")
+
+    if total == 0 do
+      Mix.shell().info("Nothing to export!")
+    else
+      cities = load_cities_for_translation(missing_ids)
+
+      # Cities are few enough to put in a single file
+      batch_dir = Path.join(output_dir, "translate_cities_#{locale}")
+      File.mkdir_p!(batch_dir)
+      batch_dir |> File.ls!() |> Enum.each(&File.rm!(Path.join(batch_dir, &1)))
+
+      data = %{
+        type: "city_translation",
+        target_locale: locale,
+        batch: 1,
+        total_batches: 1,
+        count: length(cities),
+        cities: cities
+      }
+
+      file = Path.join(batch_dir, "batch_001.json")
+      File.write!(file, Jason.encode!(data, pretty: true))
+      Mix.shell().info("  Wrote #{file} (#{length(cities)} cities)")
+
+      Mix.shell().info("")
+      Mix.shell().info("Exported #{total} cities to #{batch_dir}/")
+      Mix.shell().info("")
+      Mix.shell().info("Next: Process with Claude Code agents, then import with:")
+      Mix.shell().info("  mix content.import city_translations --dir #{batch_dir}")
+    end
+  end
+
+  defp export_business_translations(locale, locale_name, region_id, limit, batch_size, output_dir) do
+    missing_ids = GaliciaLocal.Directory.TranslationStatus.missing_business_ids(locale, region_id)
+    missing_ids = if limit, do: Enum.take(missing_ids, limit), else: missing_ids
+    total = length(missing_ids)
+
+    Mix.shell().info("")
+    Mix.shell().info("=== Businesses ===")
     Mix.shell().info("Found #{total} businesses missing #{locale_name} translations")
 
     if total == 0 do
@@ -131,6 +191,27 @@ defmodule Mix.Tasks.Content.Export do
         warnings: warnings || [],
         integration_tips: tips || [],
         cultural_notes: notes || []
+      }
+    end)
+  end
+
+  defp load_cities_for_translation(ids) do
+    placeholders = ids |> Enum.with_index(1) |> Enum.map_join(", ", fn {_, i} -> "$#{i}::uuid" end)
+    params = Enum.map(ids, &Ecto.UUID.dump!/1)
+
+    %{rows: rows} =
+      GaliciaLocal.Repo.query!("""
+      SELECT c.id::text, c.name, c.description, c.province
+      FROM cities c
+      WHERE c.id IN (#{placeholders})
+      """, params)
+
+    Enum.map(rows, fn [id, name, description, province] ->
+      %{
+        id: id,
+        name: name,
+        description: description,
+        province: province
       }
     end)
   end

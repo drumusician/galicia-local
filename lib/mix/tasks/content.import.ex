@@ -80,8 +80,9 @@ defmodule Mix.Tasks.Content.Import do
 
     case argv do
       ["translations" | rest] -> import_translations(rest)
+      ["city_translations" | rest] -> import_city_translations(rest)
       ["enrichments" | rest] -> import_enrichments(rest)
-      _ -> Mix.raise("Usage: mix content.import [translations|enrichments] [--dir DIR | --file FILE]")
+      _ -> Mix.raise("Usage: mix content.import [translations|city_translations|enrichments] [--dir DIR | --file FILE]")
     end
   end
 
@@ -152,6 +153,70 @@ defmodule Mix.Tasks.Content.Import do
       {:ok, _} -> :ok
       {:error, reason} ->
         Logger.error("Failed to upsert translation for #{t["business_id"]}: #{inspect(reason)}")
+        :error
+    end
+  end
+
+  # --- City Translation Import ---
+
+  defp import_city_translations(argv) do
+    {opts, _, _} =
+      OptionParser.parse(argv, switches: [dir: :string, file: :string, dry_run: :boolean])
+
+    dry_run? = opts[:dry_run] || false
+    files = resolve_result_files(opts)
+
+    Mix.shell().info("Processing #{length(files)} city translation result file(s)")
+
+    {total_ok, total_fail} =
+      Enum.reduce(files, {0, 0}, fn file, {ok, fail} ->
+        Mix.shell().info("")
+        Mix.shell().info("Reading #{file}...")
+
+        data = file |> File.read!() |> Jason.decode!()
+        locale = data["target_locale"]
+        translations = data["translations"] || []
+
+        Mix.shell().info("  #{length(translations)} city translations for locale '#{locale}'")
+
+        if dry_run? do
+          Enum.each(Enum.take(translations, 3), fn t ->
+            Mix.shell().info("    #{t["city_id"]}: #{String.slice(t["description"] || "", 0, 60)}...")
+          end)
+
+          {ok + length(translations), fail}
+        else
+          {batch_ok, batch_fail} =
+            Enum.reduce(translations, {0, 0}, fn t, {s, f} ->
+              case upsert_city_translation(t, locale) do
+                :ok -> {s + 1, f}
+                :error -> {s, f + 1}
+              end
+            end)
+
+          Mix.shell().info("  Done: #{batch_ok} saved, #{batch_fail} failed")
+          {ok + batch_ok, fail + batch_fail}
+        end
+      end)
+
+    Mix.shell().info("")
+    prefix = if dry_run?, do: "[DRY RUN] Would import", else: "Imported"
+    Mix.shell().info("#{prefix} #{total_ok} city translations (#{total_fail} failures)")
+  end
+
+  defp upsert_city_translation(t, locale) do
+    alias GaliciaLocal.Directory.CityTranslation
+
+    params = %{
+      city_id: t["city_id"],
+      locale: locale,
+      description: t["description"]
+    }
+
+    case CityTranslation.upsert(params) do
+      {:ok, _} -> :ok
+      {:error, reason} ->
+        Logger.error("Failed to upsert city translation for #{t["city_id"]}: #{inspect(reason)}")
         :error
     end
   end

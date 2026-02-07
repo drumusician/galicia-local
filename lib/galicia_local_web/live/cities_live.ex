@@ -15,7 +15,7 @@ defmodule GaliciaLocalWeb.CitiesLive do
 
     cities =
       City.list!(tenant_opts)
-      |> Ash.load!([:business_count], tenant_opts)
+      |> Ash.load!([:business_count, :translations], tenant_opts)
       |> Enum.sort_by(& &1.population, :desc)
 
     {:ok,
