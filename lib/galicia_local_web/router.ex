@@ -102,30 +102,12 @@ defmodule GaliciaLocalWeb.Router do
       live "/admin/translations", Admin.TranslationsLive, :index
       live "/admin/claims", Admin.ClaimsLive, :index
       live "/admin/users", Admin.UsersLive, :index
+      live "/admin/pipeline", Admin.PipelineLive, :index
     end
 
     # Region switching (for admin)
     post "/region", PageController, :set_region
     get "/region", PageController, :set_region
-  end
-
-  # Region-specific home pages
-  scope "/galicia", GaliciaLocalWeb do
-    pipe_through [:browser, :with_region]
-
-    ash_authentication_live_session :galicia_home,
-      on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_optional}] do
-      live "/", GaliciaHomeLive, :index
-    end
-  end
-
-  scope "/netherlands", GaliciaLocalWeb do
-    pipe_through [:browser, :with_region]
-
-    ash_authentication_live_session :netherlands_home,
-      on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_optional}] do
-      live "/", NetherlandsHomeLive, :index
-    end
   end
 
   # Region-scoped public routes (shared across all regions)
@@ -134,6 +116,7 @@ defmodule GaliciaLocalWeb.Router do
 
     ash_authentication_live_session :region_public_routes,
       on_mount: [{GaliciaLocalWeb.LiveUserAuth, :live_user_optional}] do
+      live "/", RegionHomeLive, :index
       live "/search", SearchLive, :index
       live "/cities", CitiesLive, :index
       live "/cities/:slug", CityLive, :show

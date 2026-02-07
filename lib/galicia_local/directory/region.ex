@@ -27,12 +27,12 @@ defmodule GaliciaLocal.Directory.Region do
 
     create :create do
       primary? true
-      accept [:name, :slug, :country_code, :default_locale, :supported_locales, :timezone, :active, :settings]
+      accept [:name, :slug, :country_code, :default_locale, :supported_locales, :timezone, :active, :settings, :tagline, :hero_image_url]
     end
 
     update :update do
       primary? true
-      accept [:name, :default_locale, :supported_locales, :timezone, :active, :settings]
+      accept [:name, :default_locale, :supported_locales, :timezone, :active, :settings, :tagline, :hero_image_url]
     end
 
     read :get_by_id do
@@ -98,10 +98,20 @@ defmodule GaliciaLocal.Directory.Region do
       description "Whether this region is currently active/visible"
     end
 
+    attribute :tagline, :string do
+      public? true
+      description "Short tagline for region selector (e.g., 'Celtic heritage, incredible seafood')"
+    end
+
+    attribute :hero_image_url, :string do
+      public? true
+      description "URL for hero background image on the region home page"
+    end
+
     attribute :settings, :map do
       default %{}
       public? true
-      description "Region-specific configuration settings"
+      description "Region-specific configuration: phrases, cultural_tips, enrichment_context"
     end
 
     create_timestamp :inserted_at

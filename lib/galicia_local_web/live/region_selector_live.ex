@@ -45,13 +45,13 @@ defmodule GaliciaLocalWeb.RegionSelectorLive do
                 <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div class="relative p-8 text-center">
                   <div class="text-7xl mb-5 transform group-hover:scale-110 transition-transform duration-300">
-                    {region_flag(region.country_code)}
+                    {country_flag(region.country_code)}
                   </div>
                   <h2 class="text-2xl font-bold text-base-content mb-2 group-hover:text-primary transition-colors">
                     {Gettext.gettext(GaliciaLocalWeb.Gettext, region.name)}
                   </h2>
                   <p class="text-base-content/50 text-sm mb-6 leading-relaxed">
-                    {region_tagline(region.slug)}
+                    {region_tagline(region)}
                   </p>
                   <span class="inline-flex items-center gap-2 text-primary font-medium">
                     {gettext("Explore")}
@@ -71,11 +71,23 @@ defmodule GaliciaLocalWeb.RegionSelectorLive do
     """
   end
 
-  defp region_flag("ES"), do: "🇪🇸"
-  defp region_flag("NL"), do: "🇳🇱"
-  defp region_flag(_), do: "🌍"
+  @doc """
+  Convert an ISO 3166-1 alpha-2 country code to a flag emoji.
+  Works for any country code by converting letters to regional indicator symbols.
+  """
+  def country_flag(code) when is_binary(code) and byte_size(code) == 2 do
+    code
+    |> String.upcase()
+    |> String.to_charlist()
+    |> Enum.map(&(&1 - ?A + 0x1F1E6))
+    |> List.to_string()
+  end
 
-  defp region_tagline("galicia"), do: gettext("Celtic heritage, incredible seafood, warm communities")
-  defp region_tagline("netherlands"), do: gettext("Cycling culture, canals, welcoming expat scene")
+  def country_flag(_), do: "\u{1F30D}"
+
+  defp region_tagline(%{tagline: tagline}) when is_binary(tagline) and tagline != "" do
+    Gettext.gettext(GaliciaLocalWeb.Gettext, tagline)
+  end
+
   defp region_tagline(_), do: ""
 end

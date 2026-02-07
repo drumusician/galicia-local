@@ -274,6 +274,21 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
             </div>
           </.link>
 
+          <!-- Content Pipeline -->
+          <.link navigate={~p"/admin/pipeline"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <div class="card-body">
+              <div class="flex items-center gap-4">
+                <div class="bg-accent/10 rounded-xl p-3">
+                  <span class="hero-queue-list w-8 h-8 text-accent"></span>
+                </div>
+                <div>
+                  <h3 class="card-title">{gettext("Content Pipeline")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Monitor enrichment and translation progress")}</p>
+                </div>
+              </div>
+            </div>
+          </.link>
+
           <!-- Business Claims -->
           <.link navigate={~p"/admin/claims"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
             <div class="card-body">

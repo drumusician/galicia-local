@@ -6,9 +6,24 @@ defmodule GaliciaLocal.Directory.TranslationStatus do
 
   alias GaliciaLocal.Repo
 
-  @target_locales ["es", "nl"]
+  @doc """
+  Returns the list of target locales derived from all active regions' supported_locales.
+  English is excluded since it's the source language.
+  Falls back to ["es", "nl"] if no regions are found.
+  """
+  def target_locales do
+    case GaliciaLocal.Directory.Region.list_active!() do
+      regions when is_list(regions) and length(regions) > 0 ->
+        regions
+        |> Enum.flat_map(& &1.supported_locales)
+        |> Enum.reject(&(&1 == "en"))
+        |> Enum.uniq()
+        |> Enum.sort()
 
-  def target_locales, do: @target_locales
+      _ ->
+        ["es", "nl"]
+    end
+  end
 
   @doc """
   Get translation status for all entity types.
@@ -115,7 +130,7 @@ defmodule GaliciaLocal.Directory.TranslationStatus do
       """, base_params)
 
     locale_counts =
-      for locale <- @target_locales, into: %{} do
+      for locale <- target_locales(), into: %{} do
         params =
           if region_id do
             [Ecto.UUID.dump!(region_id), locale]
@@ -150,7 +165,7 @@ defmodule GaliciaLocal.Directory.TranslationStatus do
       Repo.query!("SELECT COUNT(*)::integer FROM categories WHERE name IS NOT NULL AND name != ''")
 
     locale_counts =
-      for locale <- @target_locales, into: %{} do
+      for locale <- target_locales(), into: %{} do
         %{rows: [[count]]} =
           Repo.query!("""
           SELECT COUNT(*)::integer
@@ -186,7 +201,7 @@ defmodule GaliciaLocal.Directory.TranslationStatus do
       """, base_params)
 
     locale_counts =
-      for locale <- @target_locales, into: %{} do
+      for locale <- target_locales(), into: %{} do
         params =
           if region_id do
             [Ecto.UUID.dump!(region_id), locale]
