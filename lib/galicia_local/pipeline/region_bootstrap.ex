@@ -13,7 +13,7 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
   require Logger
 
   alias GaliciaLocal.AI.ClaudeCLI
-  alias GaliciaLocal.Directory.{Region, City, Category}
+  alias GaliciaLocal.Directory.{Region, Category}
 
   @doc """
   Generate region attributes and settings from a region name using Claude.
