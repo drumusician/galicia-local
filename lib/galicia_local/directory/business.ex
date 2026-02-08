@@ -47,42 +47,7 @@ defmodule GaliciaLocal.Directory.Business do
         scheduler_module_name __MODULE__.EnrichPendingScheduler
       end
 
-      # CLI-based enrichment (uses claude --print via Max plan, no API cost)
-      trigger :enrich_researched_cli do
-        scheduler_cron Application.compile_env(:galicia_local, :enrich_cli_scheduler_cron, false)
-        action :enrich_with_cli
-        where expr(status == :researched)
-        read_action :read
-        max_attempts 3
-        worker_module_name __MODULE__.EnrichResearchedCLIWorker
-        scheduler_module_name __MODULE__.EnrichResearchedCLIScheduler
-      end
-
-      trigger :enrich_pending_no_website_cli do
-        scheduler_cron Application.compile_env(:galicia_local, :enrich_cli_scheduler_cron, false)
-        action :enrich_with_cli
-        where expr(status == :pending and is_nil(website))
-        read_action :read
-        max_attempts 3
-        worker_module_name __MODULE__.EnrichPendingCLIWorker
-        scheduler_module_name __MODULE__.EnrichPendingCLIScheduler
-      end
-
-      # Translate enriched content to Spanish (legacy, kept for backward compat)
-      trigger :translate_to_spanish do
-        scheduler_cron Application.compile_env(:galicia_local, :translate_scheduler_cron, false)
-        action :translate_to_spanish
-        where expr(
-          status in [:enriched, :verified] and
-          not is_nil(summary)
-        )
-        read_action :read
-        max_attempts 3
-        worker_module_name __MODULE__.TranslateSpanishWorker
-        scheduler_module_name __MODULE__.TranslateSpanishScheduler
-      end
-
-      # Translate enriched content to all region locales via DeepL
+      # Translate enriched content to all region locales
       trigger :translate_all_locales do
         scheduler_cron Application.compile_env(:galicia_local, :translate_all_scheduler_cron, false)
         action :translate_all_locales
@@ -106,9 +71,7 @@ defmodule GaliciaLocal.Directory.Business do
     define :by_category, args: [:category_id]
     define :create
     define :enrich_with_llm
-    define :enrich_with_cli
     define :enrich_with_google_places, args: [:google_place_id]
-    define :translate_to_spanish
     define :translate_all_locales
     define :queue_re_enrichment
     define :update
@@ -159,23 +122,11 @@ defmodule GaliciaLocal.Directory.Business do
       change GaliciaLocal.Directory.Business.Changes.EnrichWithLLM
     end
 
-    update :enrich_with_cli do
-      require_atomic? false
-      accept []
-      change GaliciaLocal.Directory.Business.Changes.EnrichWithCLI
-    end
-
     update :enrich_with_google_places do
       require_atomic? false
       accept []
       argument :google_place_id, :string, allow_nil?: false
       change GaliciaLocal.Directory.Business.Changes.EnrichWithGooglePlaces
-    end
-
-    update :translate_to_spanish do
-      require_atomic? false
-      accept []
-      change GaliciaLocal.Directory.Business.Changes.TranslateToSpanish
     end
 
     update :translate_all_locales do

@@ -1,9 +1,10 @@
 defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
   @moduledoc """
-  Ash change that enriches business data using Claude API.
+  Ash change that enriches business data using Claude.
 
-  Uses the shared `Enrichment` module for prompt building and response parsing.
-  For the CLI-based alternative (using Max plan), see `EnrichWithCLI`.
+  Uses the CLI (`claude --print` via Max plan) when available, falling back
+  to the API. Both paths share the `Enrichment` module for prompt building
+  and response parsing.
   """
   use Ash.Resource.Change
 
@@ -37,9 +38,31 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
     prompt = Enrichment.build_prompt(business, research_data)
     max_tokens = if Enrichment.has_research_data?(research_data), do: 3000, else: 2048
 
+    if cli_enrichment_enabled?() do
+      case GaliciaLocal.AI.ClaudeCLI.complete(prompt) do
+        {:ok, response} ->
+          Enrichment.parse_response(response)
+
+        {:error, :cli_not_available} ->
+          Logger.info("CLI not available, falling back to API")
+          api_enrich(prompt, max_tokens)
+
+        {:error, _} = error ->
+          error
+      end
+    else
+      api_enrich(prompt, max_tokens)
+    end
+  end
+
+  defp api_enrich(prompt, max_tokens) do
     case GaliciaLocal.AI.Claude.complete(prompt, max_tokens: max_tokens) do
       {:ok, response} -> Enrichment.parse_response(response)
       {:error, _} = error -> error
     end
+  end
+
+  defp cli_enrichment_enabled? do
+    System.get_env("ENABLE_CLI_ENRICHMENT") in ["true", "1"]
   end
 end

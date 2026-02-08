@@ -2,8 +2,7 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
   @moduledoc """
   Shared enrichment logic for building prompts and parsing LLM responses.
 
-  Used by both `EnrichWithLLM` (API-based) and `EnrichWithCLI` (CLI-based)
-  to ensure consistent prompt quality and response parsing.
+  Used by `EnrichWithLLM` which handles both API and CLI enrichment paths.
   """
 
   require Logger
