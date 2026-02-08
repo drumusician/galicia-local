@@ -13,10 +13,19 @@ defmodule GaliciaLocalWeb.CitiesLive do
     region_name = if region, do: Gettext.gettext(GaliciaLocalWeb.Gettext, region.name), else: gettext("Galicia")
     region_slug = if region, do: region.slug, else: "galicia"
 
+    is_admin = is_map(socket.assigns[:current_user]) and socket.assigns.current_user.is_admin == true
+
     cities =
       City.list!(tenant_opts)
       |> Ash.load!([:business_count, :translations], tenant_opts)
       |> Enum.sort_by(& &1.population, :desc)
+
+    cities =
+      if is_admin do
+        cities
+      else
+        Enum.filter(cities, fn city -> (city.business_count || 0) > 0 end)
+      end
 
     {:ok,
      socket
@@ -24,7 +33,8 @@ defmodule GaliciaLocalWeb.CitiesLive do
      |> assign(:meta_description, gettext("Explore all cities in %{region}. Find local businesses and integrate into %{region} life.", region: region_name))
      |> assign(:cities, cities)
      |> assign(:region_name, region_name)
-     |> assign(:region_slug, region_slug)}
+     |> assign(:region_slug, region_slug)
+     |> assign(:is_admin, is_admin)}
   end
 
   @impl true
@@ -77,6 +87,9 @@ defmodule GaliciaLocalWeb.CitiesLive do
                   <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                   <%= if city.featured do %>
                     <span class="absolute top-4 right-4 badge badge-primary">{gettext("Featured")}</span>
+                  <% end %>
+                  <%= if @is_admin and (city.business_count || 0) == 0 do %>
+                    <span class="absolute top-4 left-4 badge badge-warning badge-sm">{gettext("Admin only")}</span>
                   <% end %>
                   <div class="absolute bottom-4 left-4 right-4">
                     <h2 class="text-2xl font-bold text-white">{city.name}</h2>

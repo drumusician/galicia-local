@@ -7,6 +7,8 @@ defmodule GaliciaLocalWeb.CityLive do
   alias GaliciaLocal.Directory.{City, Business, Category}
   alias GaliciaLocal.Analytics.Tracker
 
+  @per_page 24
+
   @impl true
   def mount(%{"slug" => slug}, _session, socket) do
     region = socket.assigns[:current_region]
@@ -14,9 +16,18 @@ defmodule GaliciaLocalWeb.CityLive do
     region_name = if region, do: Gettext.gettext(GaliciaLocalWeb.Gettext, region.name), else: gettext("Galicia")
     tenant_opts = if region, do: [tenant: region.id], else: []
 
+    is_admin = is_map(socket.assigns[:current_user]) and socket.assigns.current_user.is_admin == true
+
     case City.get_by_slug(slug, tenant_opts) do
       {:ok, city} ->
         city = Ash.load!(city, [:business_count, :translations])
+
+        if not is_admin and (city.business_count || 0) == 0 do
+          {:ok,
+           socket
+           |> put_flash(:info, gettext("This city doesn't have any listings yet."))
+           |> push_navigate(to: ~p"/#{region_slug}/cities")}
+        else
         if connected?(socket) and region, do: Tracker.track_async("city", city.id, region.id)
 
         businesses =
@@ -41,7 +52,9 @@ defmodule GaliciaLocalWeb.CityLive do
          |> assign(:businesses_by_category, businesses_by_category)
          |> assign(:selected_category, nil)
          |> assign(:english_only, false)
+         |> assign(:page, 1)
          |> assign(:region_slug, region_slug)}
+        end
 
       {:error, _} ->
         {:ok,
@@ -67,11 +80,29 @@ defmodule GaliciaLocalWeb.CityLive do
       english_only
     )
 
+    displayed = Enum.take(filtered_businesses, @per_page)
+
     {:noreply,
      socket
      |> assign(:selected_category, selected_category)
      |> assign(:english_only, english_only)
-     |> assign(:filtered_businesses, filtered_businesses)}
+     |> assign(:filtered_businesses, filtered_businesses)
+     |> assign(:page, 1)
+     |> assign(:displayed_businesses, displayed)
+     |> assign(:has_more, length(filtered_businesses) > @per_page)}
+  end
+
+  @impl true
+  def handle_event("load-more", _params, socket) do
+    page = socket.assigns.page + 1
+    displayed = Enum.take(socket.assigns.filtered_businesses, page * @per_page)
+    has_more = length(socket.assigns.filtered_businesses) > page * @per_page
+
+    {:noreply,
+     socket
+     |> assign(:page, page)
+     |> assign(:displayed_businesses, displayed)
+     |> assign(:has_more, has_more)}
   end
 
   @impl true
@@ -172,10 +203,15 @@ defmodule GaliciaLocalWeb.CityLive do
         <!-- Business List -->
         <%= if length(@filtered_businesses) > 0 do %>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <%= for business <- @filtered_businesses do %>
+            <%= for business <- @displayed_businesses do %>
               <.business_card business={business} locale={@locale} region_slug={@region_slug} />
             <% end %>
           </div>
+          <%= if @has_more do %>
+            <div id="infinite-scroll-sentinel" phx-hook="InfiniteScroll" class="flex justify-center py-8">
+              <span class="loading loading-spinner loading-md text-primary"></span>
+            </div>
+          <% end %>
         <% else %>
           <div class="text-center py-20">
             <div class="text-6xl mb-4">🔍</div>

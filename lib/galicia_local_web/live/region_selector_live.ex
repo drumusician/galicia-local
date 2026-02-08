@@ -9,12 +9,29 @@ defmodule GaliciaLocalWeb.RegionSelectorLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    regions = Region.list_active!()
+    is_admin = is_map(socket.assigns[:current_user]) and socket.assigns.current_user.is_admin == true
+
+    regions =
+      Region.list_active!()
+      |> Ash.load!(:cities)
+      |> then(fn regions ->
+        # Load business counts for each region's cities
+        regions
+        |> Enum.map(fn region ->
+          cities = Ash.load!(region.cities, :business_count, tenant: region.id)
+          total = Enum.sum(Enum.map(cities, fn c -> c.business_count || 0 end))
+          Map.put(region, :total_business_count, total)
+        end)
+      end)
+      |> then(fn regions ->
+        if is_admin, do: regions, else: Enum.filter(regions, fn r -> r.total_business_count > 0 end)
+      end)
 
     {:ok,
      socket
      |> assign(:page_title, gettext("Choose Your Region"))
-     |> assign(:regions, regions)}
+     |> assign(:regions, regions)
+     |> assign(:is_admin, is_admin)}
   end
 
   @impl true
@@ -53,6 +70,9 @@ defmodule GaliciaLocalWeb.RegionSelectorLive do
                   <p class="text-base-content/50 text-sm mb-6 leading-relaxed">
                     {region_tagline(region)}
                   </p>
+                  <%= if @is_admin and Map.get(region, :total_business_count, 0) == 0 do %>
+                    <span class="badge badge-warning badge-sm mb-2">{gettext("Admin only")}</span>
+                  <% end %>
                   <span class="inline-flex items-center gap-2 text-primary font-medium">
                     {gettext("Explore")}
                     <span class="hero-arrow-right w-4 h-4 group-hover:translate-x-1 transition-transform"></span>

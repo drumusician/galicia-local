@@ -449,11 +449,35 @@ const GeoLocate = {
   }
 }
 
+// InfiniteScroll Hook - triggers "load-more" when sentinel is visible
+const InfiniteScroll = {
+  mounted() {
+    this.observer = new IntersectionObserver((entries) => {
+      const entry = entries[0]
+      if (entry.isIntersecting) {
+        this.pushEvent("load-more", {})
+      }
+    }, { rootMargin: "400px" })
+
+    this.observer.observe(this.el)
+  },
+
+  updated() {
+    // Re-observe in case element was replaced
+    this.observer.disconnect()
+    this.observer.observe(this.el)
+  },
+
+  destroyed() {
+    this.observer.disconnect()
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks, LeafletMap, CitiesMap, BusinessesMap, BoundsDrawMap, GeoLocate},
+  hooks: {...colocatedHooks, LeafletMap, CitiesMap, BusinessesMap, BoundsDrawMap, GeoLocate, InfiniteScroll},
 })
 
 // Show progress bar on live navigation and form submits

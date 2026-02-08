@@ -86,6 +86,7 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
   """
   def build_prompt(business, research_data) do
     reviews_text = extract_reviews_text(business)
+    has_reviews = has_reviews?(business)
     category_name = get_category_name(business)
     city_name = get_city_name(business)
     enrichment_hints = get_enrichment_hints(business)
@@ -104,6 +105,28 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
     typical_biz = region["typical_business"]
 
     location = if region_name == country, do: region_name, else: "#{region_name}, #{country}"
+
+    rating_line =
+      if business.rating,
+        do: "- Rating: #{business.rating}/5 (#{business.review_count || 0} reviews)",
+        else: ""
+
+    reviews_section =
+      if has_reviews do
+        """
+        ## CUSTOMER REVIEWS (from Google)
+        #{reviews_text}
+        """
+      else
+        """
+        ## NO CUSTOMER REVIEWS AVAILABLE
+        This business has no Google reviews yet. This is common for many good local businesses.
+        IMPORTANT: Do NOT mention the absence of reviews in the description, summary, warnings, or highlights.
+        Instead, focus on what you DO know: the business type, location, category, website content, and any other available information.
+        Write the description as if you're describing a real place based on what it IS, not what data is missing.
+        Leave review_insights as null, sentiment_summary as null, and highlights as an empty array [].
+        """
+      end
 
     """
     You are an analyst for a directory helping newcomers INTEGRATE into local life in #{region_name}.
@@ -125,11 +148,10 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
     - Address: #{business.address || "Not provided"}
     - Phone: #{business.phone || "Not provided"}
     - Website: #{business.website || "Not provided"}
-    - Rating: #{business.rating || "Unknown"}/5 (#{business.review_count || 0} reviews)
+    #{rating_line}
     - Place Types: #{get_place_types(business)}
 
-    ## CUSTOMER REVIEWS (from Google)
-    #{reviews_text}
+    #{reviews_section}
     #{website_content}
     #{search_content}
     #{enrichment_hints}
@@ -138,9 +160,9 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
 
     ```json
     {
-      "description": "2-3 sentences in English. Focus on what makes this place valuable - whether that's professional expertise, authentic local character, or both. Don't mention language barriers as negatives.",
+      "description": "2-3 sentences in English. Focus on what makes this place valuable - whether that's professional expertise, authentic local character, or both. Don't mention language barriers as negatives. NEVER mention the absence of reviews or that data is limited - write confidently about what the business IS based on its name, category, location, and any available info.",
 
-      "summary": "One sentence (max 100 chars) capturing the essence",
+      "summary": "One sentence (max 100 chars) capturing the essence. Never reference reviews or lack thereof.",
 
       "local_gem_score": 0.0-1.0,
       "local_gem_reasoning": "How authentically local is this? Family-run? Traditional? Local clientele?",
@@ -171,14 +193,14 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
       ],
 
       "highlights": [
-        "What reviewers consistently praise"
+        "What reviewers consistently praise - leave EMPTY [] if no reviews exist"
       ],
 
       "warnings": [
-        "Practical warnings only (cash only, closed Mondays, etc.) - NOT 'staff don't speak English'"
+        "Practical warnings only (cash only, closed Mondays, etc.) - NOT 'staff don't speak English' and NEVER 'no reviews available' or 'unverified'"
       ],
 
-      "sentiment_summary": "Brief overall sentiment from reviews",
+      "sentiment_summary": "Brief overall sentiment from reviews, or null if no reviews",
 
       "review_insights": {
         "common_praise": ["Theme 1", "Theme 2"],
@@ -186,6 +208,7 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
         "notable_quotes": ["Best illustrative quote"],
         "reviewer_demographics": "Who reviews this? Locals? Visitors? Mix?"
       },
+      // Set review_insights to null if there are no reviews. Do NOT fabricate review data.
 
       "quality_score": 0.0-1.0,
 
@@ -368,6 +391,14 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
       ## EXTERNAL SOURCES (Web Search Results)
       #{results_text}
       """
+    end
+  end
+
+  defp has_reviews?(business) do
+    case business.raw_data do
+      %{"reviews_text" => text} when is_binary(text) and text != "" -> true
+      %{"reviews" => reviews} when is_list(reviews) and length(reviews) > 0 -> true
+      _ -> false
     end
   end
 

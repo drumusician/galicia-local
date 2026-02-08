@@ -14,10 +14,14 @@ defmodule GaliciaLocalWeb.RegionHomeLive do
   def mount(_params, _session, socket) do
     region = socket.assigns[:current_region]
     tenant_opts = if region, do: [tenant: region.id], else: []
+    is_admin = is_map(socket.assigns[:current_user]) and socket.assigns.current_user.is_admin == true
 
     featured_cities =
       City.featured!(tenant_opts)
       |> Ash.load!([:business_count, :translations], tenant_opts)
+      |> then(fn cities ->
+        if is_admin, do: cities, else: Enum.filter(cities, fn c -> (c.business_count || 0) > 0 end)
+      end)
 
     categories_by_priority =
       Category.list!()
@@ -42,7 +46,14 @@ defmodule GaliciaLocalWeb.RegionHomeLive do
       end)
       |> Ash.count!()
 
-    cities_count = Ash.count!(City, tenant_opts)
+    cities_count =
+      if is_admin do
+        Ash.count!(City, tenant_opts)
+      else
+        City.list!(tenant_opts)
+        |> Ash.load!(:business_count, tenant_opts)
+        |> Enum.count(fn c -> (c.business_count || 0) > 0 end)
+      end
 
     settings = (region && region.settings) || %{}
     phrases = settings["phrases"] || []

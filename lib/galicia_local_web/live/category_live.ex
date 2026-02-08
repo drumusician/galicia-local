@@ -7,6 +7,8 @@ defmodule GaliciaLocalWeb.CategoryLive do
   alias GaliciaLocal.Directory.{Category, Business, City}
   alias GaliciaLocal.Analytics.Tracker
 
+  @per_page 24
+
   @impl true
   def mount(%{"slug" => slug}, _session, socket) do
     region = socket.assigns[:current_region]
@@ -39,6 +41,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
          |> assign(:user_location, nil)
          |> assign(:map_bounds, nil)
          |> assign(:filtered_businesses, businesses)
+         |> assign(:page, 1)
          |> assign(:region_slug, region_slug)}
 
       {:error, _} ->
@@ -68,6 +71,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
     filtered = maybe_sort_by_distance(filtered, socket.assigns.user_location)
 
     map_businesses = filter_businesses(socket.assigns.businesses, selected_city, english_only)
+    displayed = Enum.take(filtered, @per_page)
 
     {:noreply,
      socket
@@ -75,7 +79,23 @@ defmodule GaliciaLocalWeb.CategoryLive do
      |> assign(:english_only, english_only)
      |> assign(:map_bounds, nil)
      |> assign(:filtered_businesses, filtered)
+     |> assign(:page, 1)
+     |> assign(:displayed_businesses, displayed)
+     |> assign(:has_more, length(filtered) > @per_page)
      |> push_event("update-markers", %{businesses: businesses_list(map_businesses)})}
+  end
+
+  @impl true
+  def handle_event("load-more", _params, socket) do
+    page = socket.assigns.page + 1
+    displayed = Enum.take(socket.assigns.filtered_businesses, page * @per_page)
+    has_more = length(socket.assigns.filtered_businesses) > page * @per_page
+
+    {:noreply,
+     socket
+     |> assign(:page, page)
+     |> assign(:displayed_businesses, displayed)
+     |> assign(:has_more, has_more)}
   end
 
   @impl true
@@ -102,7 +122,10 @@ defmodule GaliciaLocalWeb.CategoryLive do
     {:noreply,
      socket
      |> assign(:user_location, location)
-     |> assign(:filtered_businesses, filtered)}
+     |> assign(:filtered_businesses, filtered)
+     |> assign(:page, 1)
+     |> assign(:displayed_businesses, Enum.take(filtered, @per_page))
+     |> assign(:has_more, length(filtered) > @per_page)}
   end
 
   @impl true
@@ -121,7 +144,10 @@ defmodule GaliciaLocalWeb.CategoryLive do
     {:noreply,
      socket
      |> assign(:map_bounds, bounds)
-     |> assign(:filtered_businesses, filtered)}
+     |> assign(:filtered_businesses, filtered)
+     |> assign(:page, 1)
+     |> assign(:displayed_businesses, Enum.take(filtered, @per_page))
+     |> assign(:has_more, length(filtered) > @per_page)}
   end
 
   @impl true
@@ -137,7 +163,10 @@ defmodule GaliciaLocalWeb.CategoryLive do
     {:noreply,
      socket
      |> assign(:map_bounds, nil)
-     |> assign(:filtered_businesses, filtered)}
+     |> assign(:filtered_businesses, filtered)
+     |> assign(:page, 1)
+     |> assign(:displayed_businesses, Enum.take(filtered, @per_page))
+     |> assign(:has_more, length(filtered) > @per_page)}
   end
 
   @impl true
@@ -339,10 +368,15 @@ defmodule GaliciaLocalWeb.CategoryLive do
         <!-- Business List -->
         <%= if length(@filtered_businesses) > 0 do %>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <%= for business <- @filtered_businesses do %>
+            <%= for business <- @displayed_businesses do %>
               <.business_card business={business} distance={distance_for(business, @user_location)} region_slug={@region_slug} />
             <% end %>
           </div>
+          <%= if @has_more do %>
+            <div id="infinite-scroll-sentinel" phx-hook="InfiniteScroll" class="flex justify-center py-8">
+              <span class="loading loading-spinner loading-md text-primary"></span>
+            </div>
+          <% end %>
         <% else %>
           <div class="text-center py-20">
             <div class="text-6xl mb-4">🔍</div>
