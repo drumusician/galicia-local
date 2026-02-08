@@ -138,22 +138,29 @@ defmodule GaliciaLocal.Workers.TranslateWorker do
   end
 
   # --- Translation dispatch ---
-
-  defp use_claude_cli? do
-    System.get_env("ENABLE_CLI_ENRICHMENT") in ["true", "1"] and ClaudeCLI.cli_available?()
-  end
+  # Prefers Claude CLI (free via Max plan), falls back to DeepL API.
 
   defp translate_text(text, locale) do
-    if use_claude_cli?() do
-      translate_text_with_claude(text, locale)
+    if ClaudeCLI.cli_available?() do
+      case translate_text_with_claude(text, locale) do
+        {:ok, _} = result -> result
+        {:error, reason} ->
+          Logger.warning("Claude CLI translation failed (#{inspect(reason)}), falling back to DeepL")
+          DeepL.translate(text, locale, source_lang: "en")
+      end
     else
       DeepL.translate(text, locale, source_lang: "en")
     end
   end
 
   defp translate_fields(fields, locale) do
-    if use_claude_cli?() do
-      translate_fields_with_claude(fields, locale)
+    if ClaudeCLI.cli_available?() do
+      case translate_fields_with_claude(fields, locale) do
+        {:ok, _} = result -> result
+        {:error, reason} ->
+          Logger.warning("Claude CLI translation failed (#{inspect(reason)}), falling back to DeepL")
+          translate_fields_with_deepl(fields, locale)
+      end
     else
       translate_fields_with_deepl(fields, locale)
     end

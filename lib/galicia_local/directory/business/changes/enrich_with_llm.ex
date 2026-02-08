@@ -22,9 +22,11 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
 
       case enrich_business(business, research_data) do
         {:ok, enriched_data} ->
+          status = quality_gate(enriched_data, business)
+
           changeset
           |> Ash.Changeset.force_change_attributes(enriched_data)
-          |> Ash.Changeset.force_change_attribute(:status, :enriched)
+          |> Ash.Changeset.force_change_attribute(:status, status)
           |> Ash.Changeset.force_change_attribute(:last_enriched_at, DateTime.utc_now())
 
         {:error, reason} ->
@@ -61,6 +63,19 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithLLM do
       {:error, _} = error -> error
     end
   end
+
+  @quality_threshold Decimal.new("0.4")
+
+  defp quality_gate(%{quality_score: score}, business) when not is_nil(score) do
+    if Decimal.compare(score, @quality_threshold) == :lt do
+      Logger.warning("Business #{business.id} (#{business.name}) below quality threshold (#{score}), keeping as pending")
+      :pending
+    else
+      :enriched
+    end
+  end
+
+  defp quality_gate(_enriched_data, _business), do: :enriched
 
   defp cli_enrichment_enabled? do
     System.get_env("ENABLE_CLI_ENRICHMENT") in ["true", "1"]

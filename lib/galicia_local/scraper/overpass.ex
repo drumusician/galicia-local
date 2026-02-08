@@ -229,11 +229,15 @@ defmodule GaliciaLocal.Scraper.Overpass do
         google_maps_url: element.google_maps_url,
         status: :pending,
         source: :openstreetmap,
-        raw_data: %{
-          osm_id: element.osm_id,
-          osm_tags: element.raw_tags,
-          imported_at: DateTime.utc_now() |> DateTime.to_iso8601()
-        },
+        raw_data:
+          %{
+            osm_id: element.osm_id,
+            osm_tags: element.raw_tags,
+            imported_at: DateTime.utc_now() |> DateTime.to_iso8601()
+          }
+          |> then(fn data ->
+            if element.extracted_hints, do: Map.put(data, "extracted_hints", element.extracted_hints), else: data
+          end),
         city_id: city.id,
         category_id: category_id,
         region_id: region_id
@@ -388,8 +392,59 @@ defmodule GaliciaLocal.Scraper.Overpass do
       opening_hours: parse_opening_hours(tags["opening_hours"]),
       opening_hours_raw: tags["opening_hours"],
       google_maps_url: build_google_maps_url(lat, lon),
-      raw_tags: tags
+      raw_tags: tags,
+      extracted_hints: extract_hints(tags)
     }
+  end
+
+  defp extract_hints(tags) do
+    hints = %{}
+
+    hints = if tags["cuisine"], do: Map.put(hints, "cuisine", tags["cuisine"]), else: hints
+    hints = if tags["description"], do: Map.put(hints, "description", tags["description"]), else: hints
+    hints = if tags["operator"], do: Map.put(hints, "operator", tags["operator"]), else: hints
+    hints = if tags["brand"], do: Map.put(hints, "brand", tags["brand"]), else: hints
+    hints = if tags["wheelchair"], do: Map.put(hints, "wheelchair", tags["wheelchair"]), else: hints
+    hints = if tags["takeaway"], do: Map.put(hints, "takeaway", tags["takeaway"]), else: hints
+    hints = if tags["delivery"], do: Map.put(hints, "delivery", tags["delivery"]), else: hints
+    hints = if tags["outdoor_seating"], do: Map.put(hints, "outdoor_seating", tags["outdoor_seating"]), else: hints
+    hints = if tags["internet_access"], do: Map.put(hints, "internet_access", tags["internet_access"]), else: hints
+
+    # Social media
+    social =
+      Enum.reduce(tags, %{}, fn
+        {"contact:instagram", v}, acc -> Map.put(acc, "instagram", v)
+        {"contact:facebook", v}, acc -> Map.put(acc, "facebook", v)
+        {"contact:twitter", v}, acc -> Map.put(acc, "twitter", v)
+        _, acc -> acc
+      end)
+
+    hints = if map_size(social) > 0, do: Map.put(hints, "social_media", social), else: hints
+
+    # Payment methods
+    payment_cash_only =
+      Enum.any?(tags, fn
+        {"payment:cash", "yes"} -> true
+        _ -> false
+      end) and
+        not Enum.any?(tags, fn
+          {"payment:credit_cards", "yes"} -> true
+          {"payment:debit_cards", "yes"} -> true
+          _ -> false
+        end)
+
+    hints = if payment_cash_only, do: Map.put(hints, "cash_only", true), else: hints
+
+    # Diet options (for restaurants/cafes)
+    diets =
+      Enum.reduce(tags, [], fn
+        {"diet:" <> diet, "yes"}, acc -> [diet | acc]
+        _, acc -> acc
+      end)
+
+    hints = if diets != [], do: Map.put(hints, "diet_options", Enum.reverse(diets)), else: hints
+
+    if map_size(hints) > 0, do: hints, else: nil
   end
 
   defp extract_coordinates(%{"type" => "node", "lat" => lat, "lon" => lon}), do: {lat, lon}

@@ -446,16 +446,56 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
         _ -> nil
       end
 
-    hints = locale_hints || global_hints
+    category_section =
+      case locale_hints || global_hints do
+        nil -> ""
+        hints ->
+          """
 
-    if hints do
-      """
+          ## CATEGORY-SPECIFIC ANALYSIS INSTRUCTIONS
+          #{hints}
+          """
+      end
 
-      ## CATEGORY-SPECIFIC ANALYSIS INSTRUCTIONS
-      #{hints}
-      """
-    else
+    osm_section = format_osm_hints(business)
+
+    category_section <> osm_section
+  end
+
+  defp format_osm_hints(business) do
+    hints = get_in(business.raw_data, ["extracted_hints"]) || %{}
+
+    if map_size(hints) == 0 do
       ""
+    else
+      lines =
+        Enum.flat_map(hints, fn
+          {"cuisine", v} -> ["- Cuisine type: #{v}"]
+          {"description", v} -> ["- OSM description: #{v}"]
+          {"operator", v} -> ["- Operator/owner: #{v}"]
+          {"brand", v} -> ["- Brand/chain: #{v} (likely NOT a local gem)"]
+          {"wheelchair", v} -> ["- Wheelchair accessibility: #{v}"]
+          {"takeaway", v} -> ["- Takeaway available: #{v}"]
+          {"delivery", v} -> ["- Delivery available: #{v}"]
+          {"outdoor_seating", v} -> ["- Outdoor seating: #{v}"]
+          {"internet_access", v} -> ["- Internet access: #{v}"]
+          {"cash_only", true} -> ["- Payment: CASH ONLY (add this to warnings!)"]
+          {"diet_options", diets} -> ["- Diet options: #{Enum.join(diets, ", ")}"]
+          {"social_media", social} ->
+            social
+            |> Enum.map(fn {platform, url} -> "- Social media (#{platform}): #{url}" end)
+          _ -> []
+        end)
+
+      if lines == [] do
+        ""
+      else
+        """
+
+        ## ADDITIONAL BUSINESS DETAILS (from OpenStreetMap)
+        #{Enum.join(lines, "\n")}
+        """
+      end
     end
   end
 
