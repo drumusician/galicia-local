@@ -29,6 +29,11 @@ config :swoosh, local: false
 config :galicia_local, enrich_scheduler_cron: "*/5 * * * *"
 config :galicia_local, translate_scheduler_cron: "*/15 * * * *"
 
+# CLI enrichment (uses claude --print via Max plan, no API cost)
+# Jobs check ENABLE_CLI_ENRICHMENT env var at runtime before doing work
+config :galicia_local, enrich_cli_scheduler_cron: "*/5 * * * *"
+config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
+
 # Do not print debug messages in production
 config :logger, level: :info
 

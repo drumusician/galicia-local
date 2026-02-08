@@ -4,6 +4,8 @@ defmodule GaliciaLocal.Directory.Business.Changes.TranslateAllLocales do
 
   Loads the business's region to determine `supported_locales`, then queues
   a `TranslateWorker` job for each non-English locale that's missing a translation.
+
+  Only active when `ENABLE_CLI_ENRICHMENT=true`.
   """
   use Ash.Resource.Change
 
@@ -11,23 +13,27 @@ defmodule GaliciaLocal.Directory.Business.Changes.TranslateAllLocales do
 
   @impl true
   def change(changeset, _opts, _context) do
-    Ash.Changeset.after_action(changeset, fn _changeset, business ->
-      case queue_translations(business) do
-        {:ok, count} ->
-          if count > 0 do
-            Logger.info("Queued #{count} translation jobs for business #{business.id}")
-          end
+    if System.get_env("ENABLE_CLI_ENRICHMENT") in ["true", "1"] do
+      Ash.Changeset.after_action(changeset, fn _changeset, business ->
+        case queue_translations(business) do
+          {:ok, count} ->
+            if count > 0 do
+              Logger.info("Queued #{count} translation jobs for business #{business.id}")
+            end
 
-          {:ok, business}
+            {:ok, business}
 
-        {:error, reason} ->
-          Logger.error(
-            "Failed to queue translations for business #{business.id}: #{inspect(reason)}"
-          )
+          {:error, reason} ->
+            Logger.error(
+              "Failed to queue translations for business #{business.id}: #{inspect(reason)}"
+            )
 
-          {:ok, business}
-      end
-    end)
+            {:ok, business}
+        end
+      end)
+    else
+      changeset
+    end
   end
 
   defp queue_translations(business) do

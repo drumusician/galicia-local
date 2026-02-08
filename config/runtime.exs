@@ -26,13 +26,6 @@ config :galicia_local, GaliciaLocalWeb.Endpoint,
 # API keys for research pipeline
 config :galicia_local, :tavily_api_key, System.get_env("TAVILY_API_KEY")
 
-# CLI enrichment (uses claude --print via Max plan, no API cost)
-# When enabled, CLI enrichment runs on a schedule and API enrichment is disabled
-if System.get_env("ENABLE_CLI_ENRICHMENT") in ["true", "1"] do
-  config :galicia_local, enrich_cli_scheduler_cron: "*/5 * * * *"
-  config :galicia_local, enrich_scheduler_cron: false
-  config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
-end
 
 if config_env() == :prod do
   database_url =
