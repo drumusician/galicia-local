@@ -69,16 +69,17 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
             </div>
 
             <div class="flex items-center gap-3">
-              <select
-                phx-change="select_region"
-                name="region_id"
-                class="select select-bordered select-sm"
-              >
-                <option value="all" selected={is_nil(@selected_region_id)}>{gettext("All Regions")}</option>
-                <%= for region <- @regions do %>
-                  <option value={region.id} selected={region.id == @selected_region_id}>{region.name}</option>
-                <% end %>
-              </select>
+              <form phx-change="select_region">
+                <select
+                  name="region_id"
+                  class="select select-bordered select-sm"
+                >
+                  <option value="all" selected={is_nil(@selected_region_id)}>{gettext("All Regions")}</option>
+                  <%= for region <- @regions do %>
+                    <option value={region.id} selected={region.id == @selected_region_id}>{region.name}</option>
+                  <% end %>
+                </select>
+              </form>
               <span class="badge badge-ghost badge-sm">{gettext("Auto-refresh 10s")}</span>
             </div>
           </div>
