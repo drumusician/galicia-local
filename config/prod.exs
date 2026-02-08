@@ -27,7 +27,8 @@ config :swoosh, local: false
 # Enable enrichment and translation schedulers in production only
 # In dev, we use the content export/import pipeline with Claude Code instead
 config :galicia_local, enrich_scheduler_cron: "*/5 * * * *"
-config :galicia_local, translate_scheduler_cron: "*/15 * * * *"
+# Old Spanish-only translator disabled — replaced by translate_all_locales
+config :galicia_local, translate_scheduler_cron: false
 
 # CLI enrichment (uses claude --print via Max plan, no API cost)
 # Jobs check ENABLE_CLI_ENRICHMENT env var at runtime before doing work
