@@ -23,6 +23,8 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
      |> assign(:page_title, "Content Pipeline")
      |> assign(:regions, regions)
      |> assign(:selected_region_id, region_id)
+     |> assign(:action_result, nil)
+     |> assign(:action_loading, false)
      |> load_status(region_id)}
   end
 
@@ -32,6 +34,25 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
     {:noreply, load_status(socket, socket.assigns.selected_region_id)}
   end
 
+  def handle_info({:scrape_missing_images, region_id}, socket) do
+    alias GaliciaLocal.Scraper.Workers.ImageScrapeWorker
+
+    case ImageScrapeWorker.queue_missing(region_id) do
+      {:ok, %{queued: queued}} ->
+        {:noreply,
+         socket
+         |> assign(:action_loading, false)
+         |> assign(:action_result, {:ok, "Queued #{queued} image scrape jobs"})
+         |> load_status(socket.assigns.selected_region_id)}
+
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> assign(:action_loading, false)
+         |> assign(:action_result, {:error, "Failed: #{inspect(reason)}"})}
+    end
+  end
+
   @impl true
   def handle_event("select_region", %{"region_id" => "all"}, socket) do
     {:noreply, socket |> assign(:selected_region_id, nil) |> load_status(nil)}
@@ -39,6 +60,12 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
 
   def handle_event("select_region", %{"region_id" => id}, socket) do
     {:noreply, socket |> assign(:selected_region_id, id) |> load_status(id)}
+  end
+
+  def handle_event("scrape_missing_images", _params, socket) do
+    socket = assign(socket, action_loading: true, action_result: nil)
+    send(self(), {:scrape_missing_images, socket.assigns.selected_region_id})
+    {:noreply, socket}
   end
 
   defp load_status(socket, region_id) do
@@ -168,6 +195,55 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
                 <% end %>
               </div>
             </div>
+          </div>
+        </div>
+
+        <%!-- Quick Actions --%>
+        <div class="card bg-base-100 shadow-xl mb-8">
+          <div class="card-body">
+            <h2 class="card-title">
+              <span class="hero-bolt w-5 h-5 text-warning"></span>
+              {gettext("Quick Actions")}
+            </h2>
+
+            <%= if @action_result do %>
+              <%= case @action_result do %>
+                <% {:ok, msg} -> %>
+                  <div class="alert alert-success alert-sm py-2 text-sm mt-2">
+                    <span class="hero-check-circle w-4 h-4"></span>
+                    {msg}
+                  </div>
+                <% {:error, msg} -> %>
+                  <div class="alert alert-error alert-sm py-2 text-sm mt-2">
+                    <span class="hero-exclamation-circle w-4 h-4"></span>
+                    {msg}
+                  </div>
+              <% end %>
+            <% end %>
+
+            <div class="flex flex-wrap gap-3 mt-4">
+              <button
+                type="button"
+                phx-click="scrape_missing_images"
+                class="btn btn-outline btn-sm"
+                disabled={@action_loading}
+              >
+                <%= if @action_loading do %>
+                  <span class="loading loading-spinner loading-xs"></span>
+                <% else %>
+                  <span class="hero-photo w-4 h-4"></span>
+                <% end %>
+                {gettext("Scrape Missing Images")}
+              </button>
+            </div>
+            <p class="text-xs text-base-content/40 mt-2">
+              {gettext("Scrapes images from business websites for businesses without photos.")}
+              <%= if @selected_region_id do %>
+                {gettext("Filtered to selected region.")}
+              <% else %>
+                {gettext("All regions.")}
+              <% end %>
+            </p>
           </div>
         </div>
 
