@@ -124,7 +124,7 @@ defmodule GaliciaLocal.Directory.City do
 
   aggregates do
     count :business_count, :businesses do
-      filter expr(status in [:enriched, :verified])
+      filter expr(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
     end
   end
 end

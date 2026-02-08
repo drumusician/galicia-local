@@ -29,7 +29,10 @@ defmodule GaliciaLocalWeb.RegionHomeLive do
       Business.recent!(tenant_opts)
       |> Ash.load!([:city, :category], tenant_opts)
 
-    total_businesses = Ash.count!(Business, tenant_opts)
+    total_businesses =
+      Business
+      |> Ash.Query.filter(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
+      |> Ash.count!(tenant_opts)
 
     local_gems_count =
       Business

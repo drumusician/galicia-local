@@ -42,6 +42,7 @@ defmodule GaliciaLocalWeb.CategoriesLive do
       from b in "businesses",
         where: b.region_id == type(^region.id, Ecto.UUID),
         where: b.status in ["enriched", "verified"],
+        where: not is_nil(b.description) and not is_nil(b.summary),
         group_by: b.category_id,
         select: {type(b.category_id, :binary_id), count(b.id)}
     )

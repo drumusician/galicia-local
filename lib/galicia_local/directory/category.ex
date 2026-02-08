@@ -119,6 +119,8 @@ defmodule GaliciaLocal.Directory.Category do
   end
 
   aggregates do
-    count :business_count, :businesses
+    count :business_count, :businesses do
+      filter expr(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
+    end
   end
 end
