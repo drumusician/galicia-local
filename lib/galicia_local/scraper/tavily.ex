@@ -20,7 +20,7 @@ defmodule GaliciaLocal.Scraper.Tavily do
   The returned format matches the existing URL selection UI in the regions wizard.
   """
   def search_directory_sites(city_name, country_code) do
-    api_key = System.get_env("TAVILY_API_KEY")
+    api_key = get_api_key()
 
     if is_nil(api_key) or api_key == "" do
       {:error, :missing_api_key}
@@ -73,6 +73,11 @@ defmodule GaliciaLocal.Scraper.Tavily do
           {:error, reason}
       end
     end
+  end
+
+  defp get_api_key do
+    Application.get_env(:galicia_local, :tavily_api_key) ||
+      System.get_env("TAVILY_API_KEY")
   end
 
   defp skip_result?(result) do

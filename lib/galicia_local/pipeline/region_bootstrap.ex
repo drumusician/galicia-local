@@ -119,21 +119,34 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
   @doc """
   Suggest discovery URLs for all cities using Tavily search (replaces Claude URL suggestion).
   Returns `{:ok, [%{city_id, city_name, urls: [%{url, name, description, selected}]}]}`.
+
+  Uses Task.async_stream with max_concurrency: 3 for parallel lookups.
   """
   def suggest_discovery_urls_tavily(region_id) do
     region = Region.get_by_id!(region_id) |> Ash.load!(:cities)
 
     results =
-      Enum.map(region.cities, fn city ->
-        case Tavily.search_directory_sites(city.name, region.country_code) do
-          {:ok, urls} ->
-            %{city_id: city.id, city_name: city.name, urls: urls}
+      region.cities
+      |> Task.async_stream(
+        fn city ->
+          case Tavily.search_directory_sites(city.name, region.country_code) do
+            {:ok, urls} ->
+              %{city_id: city.id, city_name: city.name, urls: urls}
 
-          {:error, reason} ->
-            Logger.warning("Tavily search failed for #{city.name}: #{inspect(reason)}")
-            %{city_id: city.id, city_name: city.name, urls: []}
-        end
+            {:error, reason} ->
+              Logger.warning("Tavily search failed for #{city.name}: #{inspect(reason)}")
+              %{city_id: city.id, city_name: city.name, urls: []}
+          end
+        end,
+        max_concurrency: 3,
+        timeout: 60_000,
+        on_timeout: :kill_task
+      )
+      |> Enum.map(fn
+        {:ok, result} -> result
+        {:exit, _} -> nil
       end)
+      |> Enum.reject(&is_nil/1)
       |> Enum.filter(fn r -> r.urls != [] end)
 
     {:ok, results}
