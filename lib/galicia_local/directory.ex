@@ -12,5 +12,6 @@ defmodule GaliciaLocal.Directory do
     resource GaliciaLocal.Directory.BusinessTranslation
     resource GaliciaLocal.Directory.ScrapeJob
     resource GaliciaLocal.Directory.BusinessClaim
+    resource GaliciaLocal.Directory.DiscoveryCrawl
   end
 end

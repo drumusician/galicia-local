@@ -289,6 +289,21 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
             </div>
           </.link>
 
+          <!-- Discovery Crawls -->
+          <.link navigate={~p"/admin/discovery"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <div class="card-body">
+              <div class="flex items-center gap-4">
+                <div class="bg-secondary/10 rounded-xl p-3">
+                  <span class="hero-magnifying-glass-circle w-8 h-8 text-secondary"></span>
+                </div>
+                <div>
+                  <h3 class="card-title">{gettext("Discovery Crawls")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Monitor web crawls and extraction")}</p>
+                </div>
+              </div>
+            </div>
+          </.link>
+
           <!-- Regions -->
           <.link navigate={~p"/admin/regions"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
             <div class="card-body">

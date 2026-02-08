@@ -71,6 +71,15 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
       Jason.encode!(metadata, pretty: true)
     )
 
+    # Create DB record for tracking
+    GaliciaLocal.Directory.DiscoveryCrawl.create(%{
+      crawl_id: crawl_id,
+      seed_urls: seed_urls,
+      max_pages: max_pages,
+      city_id: context.city_id,
+      region_id: context.region_id
+    })
+
     Logger.info("Starting DiscoverySpider [#{crawl_id}]: #{length(seed_urls)} seed URLs, max #{max_pages} pages")
 
     [start_urls: seed_urls]

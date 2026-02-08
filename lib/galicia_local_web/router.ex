@@ -104,6 +104,7 @@ defmodule GaliciaLocalWeb.Router do
       live "/admin/users", Admin.UsersLive, :index
       live "/admin/pipeline", Admin.PipelineLive, :index
       live "/admin/regions", Admin.RegionsLive, :index
+      live "/admin/discovery", Admin.DiscoveryLive, :index
     end
 
     # Region switching (for admin)

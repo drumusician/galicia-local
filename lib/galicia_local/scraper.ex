@@ -233,6 +233,7 @@ defmodule GaliciaLocal.Scraper do
     case Crawly.Engine.start_spider(DiscoverySpider, spider_opts) do
       :ok ->
         Logger.info("Discovery crawl started: #{crawl_id}")
+        GaliciaLocal.Scraper.CrawlMonitor.watch(crawl_id)
         {:ok, crawl_id}
 
       {:error, :spider_already_started} ->

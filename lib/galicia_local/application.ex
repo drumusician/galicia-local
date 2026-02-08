@@ -17,9 +17,9 @@ defmodule GaliciaLocal.Application do
          Application.fetch_env!(:galicia_local, Oban)
        )},
       GaliciaLocal.Scraper.ApiCache,
+      GaliciaLocal.Scraper.CrawlMonitor,
+      GaliciaLocal.Scraper.CrawlResume,
       {Phoenix.PubSub, name: GaliciaLocal.PubSub},
-      # Start a worker by calling: GaliciaLocal.Worker.start_link(arg)
-      # {GaliciaLocal.Worker, arg},
       # Start to serve requests, typically the last entry
       GaliciaLocalWeb.Endpoint,
       {AshAuthentication.Supervisor, [otp_app: :galicia_local]}

@@ -17,7 +17,7 @@ defmodule GaliciaLocal.Workers.DiscoveryProcessWorker do
   require Logger
 
   alias GaliciaLocal.AI.ClaudeCLI
-  alias GaliciaLocal.Directory.Business
+  alias GaliciaLocal.Directory.{Business, DiscoveryCrawl}
 
   @batch_size 5
 
@@ -27,6 +27,7 @@ defmodule GaliciaLocal.Workers.DiscoveryProcessWorker do
 
     unless File.dir?(crawl_dir) do
       Logger.warning("DiscoveryProcess: crawl directory not found: #{crawl_dir}")
+      update_crawl_status(crawl_id, :failed, "crawl directory not found")
       {:error, :crawl_dir_not_found}
     else
       process_crawl(crawl_id, crawl_dir)
@@ -34,11 +35,13 @@ defmodule GaliciaLocal.Workers.DiscoveryProcessWorker do
   end
 
   defp process_crawl(crawl_id, crawl_dir) do
+    update_crawl_status(crawl_id, :processing)
     metadata = read_metadata(crawl_dir)
     pages = read_pages(crawl_dir)
 
     if pages == [] do
       Logger.info("DiscoveryProcess [#{crawl_id}]: no pages found, nothing to process")
+      update_crawl_status(crawl_id, :completed, {0, 0, 0})
       :ok
     else
       Logger.info("DiscoveryProcess [#{crawl_id}]: processing #{length(pages)} pages")
@@ -66,6 +69,7 @@ defmodule GaliciaLocal.Workers.DiscoveryProcessWorker do
         "DiscoveryProcess [#{crawl_id}]: done — #{total_created} created, #{total_skipped} skipped, #{total_failed} failed"
       )
 
+      update_crawl_status(crawl_id, :completed, {total_created, total_skipped, total_failed})
       :ok
     end
   end
@@ -329,6 +333,29 @@ defmodule GaliciaLocal.Workers.DiscoveryProcessWorker do
       binary_part(text, start, last - start + len)
     else
       _ -> nil
+    end
+  end
+
+  # --- DB status tracking ---
+
+  defp update_crawl_status(crawl_id, :processing) do
+    case DiscoveryCrawl.get_by_crawl_id(crawl_id) do
+      {:ok, crawl} -> DiscoveryCrawl.mark_processing(crawl)
+      _ -> :ok
+    end
+  end
+
+  defp update_crawl_status(crawl_id, :completed, {created, skipped, failed}) do
+    case DiscoveryCrawl.get_by_crawl_id(crawl_id) do
+      {:ok, crawl} -> DiscoveryCrawl.mark_completed(crawl, created, skipped, failed)
+      _ -> :ok
+    end
+  end
+
+  defp update_crawl_status(crawl_id, :failed, error) do
+    case DiscoveryCrawl.get_by_crawl_id(crawl_id) do
+      {:ok, crawl} -> DiscoveryCrawl.mark_failed(crawl, error)
+      _ -> :ok
     end
   end
 end
