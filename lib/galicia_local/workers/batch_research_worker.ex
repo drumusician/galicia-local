@@ -60,7 +60,7 @@ defmodule GaliciaLocal.Workers.BatchResearchWorker do
     Logger.info("BatchResearch: Finding pending OSM businesses with websites (offset: #{offset}, batch: #{batch_size})")
 
     # Find pending OSM businesses that have websites
-    region_filter = if region_id, do: "AND region_id = $3", else: ""
+    region_filter = if region_id, do: "AND region_id = $3::uuid", else: ""
 
     params =
       if region_id,
@@ -68,7 +68,7 @@ defmodule GaliciaLocal.Workers.BatchResearchWorker do
         else: [batch_size, offset]
 
     query = """
-    SELECT id, name
+    SELECT id::text, name
     FROM businesses
     WHERE source = 'openstreetmap'
       AND status = 'pending'
@@ -130,7 +130,7 @@ defmodule GaliciaLocal.Workers.BatchResearchWorker do
   """
   def pending_count(opts \\ []) do
     region_id = Keyword.get(opts, :region_id)
-    region_filter = if region_id, do: "AND region_id = $1", else: ""
+    region_filter = if region_id, do: "AND b.region_id = $1::uuid", else: ""
     params = if region_id, do: [region_id], else: []
 
     query = """
