@@ -70,6 +70,14 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
              ) do
           {:ok, crawl_id} ->
             Logger.info("Started discovery crawl #{crawl_id} for city #{city_id}")
+
+            # Queue processing worker with 10-minute delay to let crawl finish
+            %{crawl_id: crawl_id}
+            |> GaliciaLocal.Workers.DiscoveryProcessWorker.new(
+              scheduled_at: DateTime.add(DateTime.utc_now(), 10, :minute)
+            )
+            |> Oban.insert()
+
             {:ok, crawl_id}
 
           {:error, reason} ->
