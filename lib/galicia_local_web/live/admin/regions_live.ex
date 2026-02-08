@@ -260,6 +260,21 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
     {:noreply, assign(socket, :wizard_step, nil)}
   end
 
+  # --- Discover (for existing regions) ---
+
+  def handle_event("discover", %{"id" => id}, socket) do
+    region = Region.get_by_id!(id)
+
+    {:noreply,
+     socket
+     |> assign(:wizard_step, :discover)
+     |> assign(:wizard_data, region)
+     |> assign(:discovery_urls, [])
+     |> assign(:discovery_result, nil)
+     |> assign(:inline_error, nil)
+     |> assign(:loading, false)}
+  end
+
   # --- Edit existing region (modal) ---
 
   def handle_event("edit", %{"id" => id}, socket) do
@@ -455,10 +470,18 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
                       </div>
                     </div>
                   </div>
-                  <button type="button" phx-click="edit" phx-value-id={region.id} class="btn btn-ghost btn-sm">
-                    <span class="hero-pencil-square w-4 h-4"></span>
-                    {gettext("Edit")}
-                  </button>
+                  <div class="flex items-center gap-1">
+                    <%= if region.city_count > 0 do %>
+                      <button type="button" phx-click="discover" phx-value-id={region.id} class="btn btn-ghost btn-sm">
+                        <span class="hero-globe-alt w-4 h-4"></span>
+                        {gettext("Discover")}
+                      </button>
+                    <% end %>
+                    <button type="button" phx-click="edit" phx-value-id={region.id} class="btn btn-ghost btn-sm">
+                      <span class="hero-pencil-square w-4 h-4"></span>
+                      {gettext("Edit")}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
