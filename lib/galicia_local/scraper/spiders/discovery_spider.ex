@@ -35,14 +35,22 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
     crawl_id = Keyword.get(opts, :crawl_id, generate_crawl_id())
     max_pages = Keyword.get(opts, :max_pages, @default_max_pages)
 
-    # Parse base URL from first seed
+    # Parse base URL from first seed, collect all hosts for multi-domain crawling
     uri = URI.parse(List.first(seed_urls))
     base_url = "#{uri.scheme}://#{uri.host}"
+
+    allowed_hosts =
+      seed_urls
+      |> Enum.map(&URI.parse/1)
+      |> Enum.map(& &1.host)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
 
     context = %{
       crawl_id: crawl_id,
       base_url: base_url,
       host: uri.host,
+      allowed_hosts: allowed_hosts,
       max_pages: max_pages,
       pages_crawled: 0,
       city_id: Keyword.get(opts, :city_id),
@@ -107,8 +115,8 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
         updated_context = %{context | pages_crawled: context.pages_crawled + 1}
         :persistent_term.put({__MODULE__, :context}, updated_context)
 
-        # Find internal links to follow
-        requests = find_internal_links(document, context.base_url, context.host)
+        # Find internal links to follow (on any allowed host)
+        requests = find_internal_links(document, context.base_url, context.allowed_hosts)
 
         Logger.info(
           "[#{context.crawl_id}] Page #{updated_context.pages_crawled}: #{response.request_url} " <>
@@ -195,13 +203,13 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
     |> String.trim()
   end
 
-  defp find_internal_links(document, base_url, host) do
+  defp find_internal_links(document, base_url, allowed_hosts) do
     document
     |> Floki.find("a")
     |> Floki.attribute("href")
     |> Enum.map(&normalize_url(&1, base_url))
     |> Enum.reject(&is_nil/1)
-    |> Enum.filter(&same_host?(&1, host))
+    |> Enum.filter(&allowed_host?(&1, allowed_hosts))
     |> Enum.reject(&skip_url?/1)
     |> Enum.uniq()
     |> Enum.take(30)
@@ -224,9 +232,9 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
     end
   end
 
-  defp same_host?(url, host) do
+  defp allowed_host?(url, allowed_hosts) do
     case URI.parse(url) do
-      %URI{host: ^host} -> true
+      %URI{host: host} when is_binary(host) -> host in allowed_hosts
       _ -> false
     end
   end
@@ -244,6 +252,7 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
       crawl_id: "unknown",
       base_url: "https://example.com",
       host: "example.com",
+      allowed_hosts: ["example.com"],
       max_pages: @default_max_pages,
       pages_crawled: 0
     })
@@ -274,7 +283,7 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
       # The guard `when current <= limit and is_integer(limit)` won't match.
       closespider_timeout: :disabled,
       middlewares: [
-        Crawly.Middlewares.DomainFilter,
+        # No DomainFilter — we allow multiple seed domains and filter in find_internal_links
         Crawly.Middlewares.UniqueRequest,
         {Crawly.Middlewares.UserAgent,
          user_agents: [
