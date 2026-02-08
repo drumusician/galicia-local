@@ -25,17 +25,22 @@ defmodule GaliciaLocal.AI.ClaudeCLI do
   end
 
   defp do_request(prompt, timeout) do
-    args = ["--print", prompt]
-
     Logger.info("ClaudeCLI: starting request (timeout: #{timeout}ms)")
     start_time = System.monotonic_time(:millisecond)
 
+    # Use System.shell with </dev/null to close stdin immediately.
+    # Claude CLI hangs when stdin is an open pipe (as with System.cmd).
+    # ANTHROPIC_API_KEY is removed to force Max plan auth instead of API.
+    escaped = String.replace(prompt, "'", "'\\''")
+    command = "claude --print '#{escaped}' </dev/null 2>&1"
+
+    task =
+      Task.async(fn ->
+        System.shell(command, env: [{"ANTHROPIC_API_KEY", nil}])
+      end)
+
     try do
-      case System.cmd("claude", args,
-             stderr_to_stdout: true,
-             env: [{"ANTHROPIC_API_KEY", ""}],
-             timeout: timeout
-           ) do
+      case Task.await(task, timeout) do
         {output, 0} ->
           duration = System.monotonic_time(:millisecond) - start_time
           trimmed = String.trim(output)
@@ -55,6 +60,11 @@ defmodule GaliciaLocal.AI.ClaudeCLI do
       e ->
         Logger.error("ClaudeCLI: exception: #{inspect(e)}")
         {:error, {:exception, e}}
+    catch
+      :exit, {:timeout, _} ->
+        Task.shutdown(task, :brutal_kill)
+        Logger.error("ClaudeCLI: timed out after #{timeout}ms")
+        {:error, :timeout}
     end
   end
 

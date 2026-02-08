@@ -6,14 +6,13 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
   - Region attributes (country_code, slug, timezone, locales, tagline)
   - Settings (phrases, cultural_tips, enrichment_context)
   - City suggestions (name, province, lat/lon, population)
-
-  Then orchestrates Google Places discovery across all cities × categories.
+  - Discovery URL suggestions for web crawling
   """
 
   require Logger
 
   alias GaliciaLocal.AI.ClaudeCLI
-  alias GaliciaLocal.Directory.{Region, Category}
+  alias GaliciaLocal.Directory.Region
 
   @doc """
   Generate region attributes and settings from a region name using Claude.
@@ -42,51 +41,46 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
   end
 
   @doc """
-  Queue Google Places discovery for all cities in a region.
-  Returns `{:ok, %{cities: n, categories: n, jobs_queued: n}}`.
+  Suggest discovery URLs for all cities in a region using Claude.
+  Returns `{:ok, [%{city_name: name, urls: [%{url, name, description}]}]}` or `{:error, reason}`.
   """
-  def discover_region(region_id) do
+  def suggest_discovery_urls(region_id) do
     region = Region.get_by_id!(region_id) |> Ash.load!(:cities)
-    categories = Category.list!()
 
-    results =
-      for city <- region.cities, category <- categories do
-        case GaliciaLocal.Scraper.search_google_places(city, category) do
-          {:ok, jobs} -> length(jobs)
-          {:error, reason} ->
-            Logger.warning("Discovery failed for #{city.name}/#{category.name}: #{inspect(reason)}")
-            0
-        end
-      end
+    prompt = discovery_urls_prompt(region.name, region.country_code, Enum.map(region.cities, & &1.name))
 
-    {:ok, %{
-      cities: length(region.cities),
-      categories: length(categories),
-      jobs_queued: Enum.sum(results)
-    }}
+    case call_claude(prompt) do
+      {:ok, response} -> parse_discovery_urls_response(response, region.cities)
+      {:error, _} = error -> error
+    end
   end
 
   @doc """
-  Estimate the cost of discovering a region via Google Places.
+  Start discovery crawls for the given URLs grouped by city.
+  Expects a list of `%{city_id: id, urls: [url_string]}`.
+  Returns `{:ok, %{crawls_started: n, cities: n}}`.
   """
-  def estimate_discovery_cost(city_count, category_count) do
-    # Average ~3 sub-queries per category search
-    avg_sub_queries = 3
-    searches = city_count * category_count * avg_sub_queries
-    # $0.032 per search + $0.035 per detail (avg 5 results per search)
-    cost_per_search = 0.032
-    cost_per_detail = 0.035
-    avg_results = 5
+  def start_discovery_crawls(url_groups, region_id) do
+    crawls =
+      Enum.map(url_groups, fn %{city_id: city_id, urls: urls} ->
+        case GaliciaLocal.Scraper.crawl_directory(urls,
+               city_id: city_id,
+               region_id: region_id,
+               max_pages: 200
+             ) do
+          {:ok, crawl_id} ->
+            Logger.info("Started discovery crawl #{crawl_id} for city #{city_id}")
+            {:ok, crawl_id}
 
-    search_cost = searches * cost_per_search
-    detail_cost = searches * avg_results * cost_per_detail
-    total = search_cost + detail_cost
+          {:error, reason} ->
+            Logger.warning("Failed to start crawl for city #{city_id}: #{inspect(reason)}")
+            {:error, reason}
+        end
+      end)
 
-    %{
-      searches: searches,
-      estimated_businesses: searches * avg_results,
-      estimated_cost_usd: Float.round(total, 2)
-    }
+    started = Enum.count(crawls, &match?({:ok, _}, &1))
+
+    {:ok, %{crawls_started: started, cities: length(url_groups)}}
   end
 
   # --- Prompts ---
@@ -176,6 +170,42 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
     """
   end
 
+  defp discovery_urls_prompt(region_name, country_code, city_names) do
+    cities_list = Enum.join(city_names, ", ")
+
+    """
+    You are helping build StartLocal.app, an expat-focused local business directory for "#{region_name}" (#{country_code}).
+
+    For EACH of the following cities, suggest 3-6 URLs of local business directory websites
+    that we can crawl to discover businesses (restaurants, shops, services, professionals, etc.):
+
+    Cities: #{cities_list}
+
+    Return ONLY a JSON object (no markdown, no explanation) with this structure:
+
+    {
+      "cities": [
+        {
+          "city": "City Name",
+          "urls": [
+            {"url": "https://example.com/businesses/cityname", "name": "Site Name", "description": "What it lists"}
+          ]
+        }
+      ]
+    }
+
+    Guidelines:
+    - Include country-specific yellow pages / business directories (e.g., Páginas Amarelas for PT, Gouden Gids for NL)
+    - Include local chamber of commerce or municipal business listings
+    - Include popular review sites with local business pages (TripAdvisor city page, Yelp equivalent)
+    - URLs should point to pages that LIST businesses (search results, category pages), not homepages
+    - Make URLs as specific to the city as possible (include city name in URL path/query)
+    - Prefer URLs that will have many business listings when crawled
+    - Do NOT include Google Maps URLs (we handle that separately)
+    - Only include real, working websites you're confident exist
+    """
+  end
+
   # --- Claude Communication ---
 
   defp call_claude(prompt) do
@@ -225,6 +255,41 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
 
       {:ok, _} ->
         {:error, :expected_array}
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp parse_discovery_urls_response(response, cities) do
+    response
+    |> extract_json()
+    |> case do
+      {:ok, %{"cities" => city_urls}} when is_list(city_urls) ->
+        # Match Claude's city names back to our city records
+        results =
+          Enum.map(city_urls, fn %{"city" => city_name, "urls" => urls} ->
+            city = Enum.find(cities, fn c -> String.downcase(c.name) == String.downcase(city_name) end)
+
+            %{
+              city_id: city && city.id,
+              city_name: city_name,
+              urls: Enum.map(urls || [], fn u ->
+                %{
+                  "url" => u["url"],
+                  "name" => u["name"] || "Unknown",
+                  "description" => u["description"] || "",
+                  "selected" => true
+                }
+              end)
+            }
+          end)
+          |> Enum.filter(fn r -> r.city_id != nil and r.urls != [] end)
+
+        {:ok, results}
+
+      {:ok, _} ->
+        {:error, :unexpected_structure}
 
       {:error, _} = error ->
         error

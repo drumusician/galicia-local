@@ -5,7 +5,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
   """
   use GaliciaLocalWeb, :live_view
 
-  alias GaliciaLocal.Directory.{Region, City, Category}
+  alias GaliciaLocal.Directory.{Region, City}
   alias GaliciaLocal.Pipeline.RegionBootstrap
 
   @impl true
@@ -25,6 +25,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
      |> assign(:inline_error, nil)
      |> assign(:loading, false)
      |> assign(:settings_json, "{}")
+     |> assign(:discovery_urls, [])
      |> assign(:discovery_result, nil)}
   end
 
@@ -40,6 +41,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
      |> assign(:wizard_cities, [])
      |> assign(:inline_error, nil)
      |> assign(:loading, false)
+     |> assign(:discovery_urls, [])
      |> assign(:discovery_result, nil)}
   end
 
@@ -199,18 +201,59 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
 
   # --- Wizard: Step 4 - Discover ---
 
-  def handle_event("start_discovery", _params, socket) do
+  def handle_event("suggest_urls", _params, socket) do
     region = socket.assigns.wizard_data
     socket = assign(socket, loading: true, inline_error: nil)
-    send(self(), {:start_discovery, region.id})
+    send(self(), {:suggest_discovery_urls, region.id})
     {:noreply, socket}
+  end
+
+  def handle_event("toggle_url", %{"city" => city_idx_str, "url" => url_idx_str}, socket) do
+    city_idx = String.to_integer(city_idx_str)
+    url_idx = String.to_integer(url_idx_str)
+
+    discovery_urls =
+      List.update_at(socket.assigns.discovery_urls, city_idx, fn city_group ->
+        urls =
+          List.update_at(city_group.urls, url_idx, fn url ->
+            Map.put(url, "selected", !Map.get(url, "selected", true))
+          end)
+
+        Map.put(city_group, :urls, urls)
+      end)
+
+    {:noreply, assign(socket, :discovery_urls, discovery_urls)}
+  end
+
+  def handle_event("start_crawling", _params, socket) do
+    region = socket.assigns.wizard_data
+
+    url_groups =
+      socket.assigns.discovery_urls
+      |> Enum.map(fn group ->
+        selected_urls =
+          group.urls
+          |> Enum.filter(&Map.get(&1, "selected", true))
+          |> Enum.map(& &1["url"])
+
+        %{city_id: group.city_id, urls: selected_urls}
+      end)
+      |> Enum.filter(fn g -> g.urls != [] end)
+
+    if url_groups == [] do
+      {:noreply, assign(socket, :inline_error, "Select at least one URL to crawl")}
+    else
+      socket = assign(socket, loading: true, inline_error: nil)
+      send(self(), {:start_crawling, url_groups, region.id})
+      {:noreply, socket}
+    end
   end
 
   def handle_event("skip_discovery", _params, socket) do
     {:noreply,
      socket
      |> assign(:wizard_step, nil)
-     |> put_flash(:info, "Region ready! You can start discovery later from the pipeline page.")}
+     |> put_flash(:info, "Region ready! You can start discovery later.")}
   end
 
   def handle_event("finish", _params, socket) do
@@ -321,8 +364,24 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
     end
   end
 
-  def handle_info({:start_discovery, region_id}, socket) do
-    case RegionBootstrap.discover_region(region_id) do
+  def handle_info({:suggest_discovery_urls, region_id}, socket) do
+    case RegionBootstrap.suggest_discovery_urls(region_id) do
+      {:ok, url_groups} ->
+        {:noreply,
+         socket
+         |> assign(:discovery_urls, url_groups)
+         |> assign(:loading, false)}
+
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> assign(:loading, false)
+         |> assign(:inline_error, "URL suggestions failed: #{inspect(reason)}")}
+    end
+  end
+
+  def handle_info({:start_crawling, url_groups, region_id}, socket) do
+    case RegionBootstrap.start_discovery_crawls(url_groups, region_id) do
       {:ok, result} ->
         {:noreply,
          socket
@@ -333,7 +392,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
         {:noreply,
          socket
          |> assign(:loading, false)
-         |> assign(:inline_error, "Discovery failed: #{inspect(reason)}")}
+         |> assign(:inline_error, "Crawling failed: #{inspect(reason)}")}
     end
   end
 
@@ -417,6 +476,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
           settings_json={@settings_json}
           inline_error={@inline_error}
           loading={@loading}
+          discovery_urls={@discovery_urls}
           discovery_result={@discovery_result}
         />
       <% end %>
@@ -464,7 +524,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
           <% :suggest_cities -> %>
             <.wizard_step_cities wizard_cities={@wizard_cities} loading={@loading} wizard_data={@wizard_data} />
           <% :discover -> %>
-            <.wizard_step_discover wizard_data={@wizard_data} loading={@loading} discovery_result={@discovery_result} />
+            <.wizard_step_discover wizard_data={@wizard_data} loading={@loading} discovery_urls={@discovery_urls} discovery_result={@discovery_result} />
         <% end %>
       </div>
       <div class="modal-backdrop" phx-click="cancel"></div>
@@ -620,11 +680,6 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
   end
 
   defp wizard_step_cities(assigns) do
-    category_count = length(Category.list!())
-    city_count = Enum.count(assigns.wizard_cities, &Map.get(&1, "selected", true))
-    estimate = RegionBootstrap.estimate_discovery_cost(city_count, category_count)
-    assigns = assign(assigns, estimate: estimate, category_count: category_count)
-
     ~H"""
     <div class="space-y-4">
       <div>
@@ -679,15 +734,6 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
           </table>
         </div>
 
-        <div class="bg-base-200 rounded-lg p-3 text-sm">
-          <p class="font-medium">Discovery estimate for selected cities:</p>
-          <p class="text-base-content/60">
-            {Enum.count(@wizard_cities, &Map.get(&1, "selected", true))} cities x {@category_count} categories
-            = ~{@estimate.searches} Google Places searches
-            (~{@estimate.estimated_businesses} businesses, ~${@estimate.estimated_cost_usd} API cost)
-          </p>
-        </div>
-
         <div class="modal-action">
           <button type="button" phx-click="skip_cities" class="btn btn-ghost btn-sm">Skip</button>
           <button type="button" phx-click="create_cities" class="btn btn-primary btn-sm" disabled={@loading}>
@@ -702,24 +748,18 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
 
   defp wizard_step_discover(assigns) do
     ~H"""
-    <div class="space-y-6">
-      <div class="text-center py-4">
-        <h3 class="text-xl font-bold mb-2">Start Business Discovery</h3>
-        <p class="text-base-content/60">
-          Search Google Places for businesses across all cities and categories.
-        </p>
-      </div>
-
+    <div class="space-y-4">
       <%= if @discovery_result do %>
+        <%!-- Phase C: Crawling started --%>
         <div class="bg-success/10 rounded-lg p-6 text-center">
           <span class="hero-check-circle w-12 h-12 text-success mx-auto mb-3"></span>
-          <p class="font-bold text-lg">Discovery Started!</p>
+          <p class="font-bold text-lg">Crawling Started!</p>
           <p class="text-base-content/60 mt-2">
-            Queued {@discovery_result.jobs_queued} search jobs
-            across {@discovery_result.cities} cities and {@discovery_result.categories} categories.
+            Started {@discovery_result.crawls_started} crawls across {@discovery_result.cities} cities.
           </p>
           <p class="text-sm text-base-content/40 mt-2">
-            The pipeline will automatically research, enrich, and translate all discovered businesses.
+            Pages will be saved for processing. The pipeline will handle
+            extraction, enrichment, and translation automatically.
           </p>
         </div>
 
@@ -730,19 +770,92 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
             View Pipeline
           </.link>
         </div>
+
       <% else %>
-        <div class="modal-action">
-          <button type="button" phx-click="skip_discovery" class="btn btn-ghost btn-sm">Skip for now</button>
-          <button type="button" phx-click="start_discovery" class="btn btn-primary" disabled={@loading}>
-            <%= if @loading do %>
-              <span class="loading loading-spinner loading-xs"></span>
-              Starting discovery...
-            <% else %>
-              <span class="hero-magnifying-glass w-5 h-5"></span>
-              Start Discovery
-            <% end %>
-          </button>
+        <div>
+          <h3 class="font-bold text-lg">Discover Businesses</h3>
+          <p class="text-sm text-base-content/60">
+            Claude will suggest local business directory URLs to crawl for each city.
+          </p>
         </div>
+
+        <%= if @discovery_urls == [] do %>
+          <%!-- Phase A: Suggest URLs --%>
+          <div class="text-center py-4">
+            <p class="text-base-content/60 mb-4">
+              Click below to have Claude suggest directory websites for your cities.
+            </p>
+          </div>
+
+          <div class="modal-action">
+            <button type="button" phx-click="skip_discovery" class="btn btn-ghost btn-sm">Skip for now</button>
+            <button type="button" phx-click="suggest_urls" class="btn btn-primary" disabled={@loading}>
+              <%= if @loading do %>
+                <span class="loading loading-spinner loading-xs"></span>
+                Suggesting URLs...
+              <% else %>
+                <span class="hero-sparkles w-5 h-5"></span>
+                Suggest Discovery URLs
+              <% end %>
+            </button>
+          </div>
+
+        <% else %>
+          <%!-- Phase B: Review URLs & start crawling --%>
+          <div class="overflow-y-auto max-h-[55vh] space-y-3">
+            <%= for {city_group, city_idx} <- Enum.with_index(@discovery_urls) do %>
+              <div class="collapse collapse-open bg-base-200 rounded-lg">
+                <div class="collapse-title text-sm font-bold py-2 min-h-0">
+                  {city_group.city_name}
+                  <span class="badge badge-ghost badge-xs ml-2">
+                    {Enum.count(city_group.urls, &Map.get(&1, "selected", true))}/{length(city_group.urls)} selected
+                  </span>
+                </div>
+                <div class="collapse-content px-3 pb-2">
+                  <div class="space-y-1">
+                    <%= for {url_entry, url_idx} <- Enum.with_index(city_group.urls) do %>
+                      <label class={"flex items-start gap-2 p-2 rounded cursor-pointer hover:bg-base-300 #{unless Map.get(url_entry, "selected", true), do: "opacity-40"}"}>
+                        <input
+                          type="checkbox"
+                          class="checkbox checkbox-xs mt-0.5"
+                          checked={Map.get(url_entry, "selected", true)}
+                          phx-click="toggle_url"
+                          phx-value-city={city_idx}
+                          phx-value-url={url_idx}
+                        />
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium truncate">{url_entry["name"]}</p>
+                          <p class="text-xs text-base-content/50 truncate">{url_entry["url"]}</p>
+                          <p class="text-xs text-base-content/40">{url_entry["description"]}</p>
+                        </div>
+                      </label>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="bg-base-200 rounded-lg p-3 text-sm">
+            <p class="text-base-content/60">
+              <span class="font-medium">Free:</span>
+              Crawly will crawl the selected URLs to discover businesses. No API costs.
+            </p>
+          </div>
+
+          <div class="modal-action">
+            <button type="button" phx-click="skip_discovery" class="btn btn-ghost btn-sm">Skip</button>
+            <button type="button" phx-click="start_crawling" class="btn btn-primary btn-sm" disabled={@loading}>
+              <%= if @loading do %>
+                <span class="loading loading-spinner loading-xs"></span>
+                Starting crawls...
+              <% else %>
+                <span class="hero-globe-alt w-4 h-4"></span>
+                Start Crawling
+              <% end %>
+            </button>
+          </div>
+        <% end %>
       <% end %>
     </div>
     """
