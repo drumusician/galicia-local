@@ -1,7 +1,9 @@
 defmodule GaliciaLocal.Workers.TranslateWorker do
   @moduledoc """
-  Oban worker that translates a single entity to a target locale using DeepL.
-  Handles businesses, categories, and cities.
+  Oban worker that translates a single entity to a target locale.
+
+  Uses Claude CLI when ENABLE_CLI_ENRICHMENT is set (free via Max plan),
+  falls back to DeepL API otherwise.
   """
 
   use Oban.Worker,
@@ -12,6 +14,7 @@ defmodule GaliciaLocal.Workers.TranslateWorker do
   require Logger
 
   alias GaliciaLocal.AI.DeepL
+  alias GaliciaLocal.AI.ClaudeCLI
   alias GaliciaLocal.Directory.{Business, BusinessTranslation, Category, CategoryTranslation, City, CityTranslation}
 
   @impl Oban.Worker
@@ -100,7 +103,7 @@ defmodule GaliciaLocal.Workers.TranslateWorker do
     case City.get_by_id(id) do
       {:ok, city} ->
         if non_empty?(city.description) do
-          case DeepL.translate(city.description, locale, source_lang: "en") do
+          case translate_text(city.description, locale) do
             {:ok, translated} ->
               CityTranslation.upsert(%{
                 city_id: city.id,
@@ -134,16 +137,121 @@ defmodule GaliciaLocal.Workers.TranslateWorker do
     fields
   end
 
+  # --- Translation dispatch ---
+
+  defp use_claude_cli? do
+    System.get_env("ENABLE_CLI_ENRICHMENT") in ["true", "1"] and ClaudeCLI.cli_available?()
+  end
+
+  defp translate_text(text, locale) do
+    if use_claude_cli?() do
+      translate_text_with_claude(text, locale)
+    else
+      DeepL.translate(text, locale, source_lang: "en")
+    end
+  end
+
   defp translate_fields(fields, locale) do
-    # Separate string fields and array fields
+    if use_claude_cli?() do
+      translate_fields_with_claude(fields, locale)
+    else
+      translate_fields_with_deepl(fields, locale)
+    end
+  end
+
+  # --- Claude CLI translation ---
+
+  defp translate_text_with_claude(text, locale) do
+    prompt = build_claude_prompt(%{text: text}, locale)
+
+    case ClaudeCLI.complete(prompt) do
+      {:ok, response} ->
+        case extract_claude_json(response) do
+          {:ok, %{"text" => translated}} -> {:ok, translated}
+          {:ok, _} -> {:error, :unexpected_claude_response}
+          error -> error
+        end
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp translate_fields_with_claude(fields, locale) do
+    prompt = build_claude_prompt(fields, locale)
+
+    case ClaudeCLI.complete(prompt) do
+      {:ok, response} ->
+        case extract_claude_json(response) do
+          {:ok, translated} when is_map(translated) ->
+            result =
+              Enum.reduce(fields, %{}, fn {key, _value}, acc ->
+                key_str = to_string(key)
+
+                case Map.get(translated, key_str) do
+                  nil -> acc
+                  val -> Map.put(acc, key, val)
+                end
+              end)
+
+            {:ok, result}
+
+          {:ok, _} ->
+            {:error, :unexpected_claude_response}
+
+          error ->
+            error
+        end
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp build_claude_prompt(fields, locale) do
+    locale_name = locale_display_name(locale)
+
+    json_input = Jason.encode!(fields, pretty: false)
+
+    """
+    Translate the following JSON values from English to #{locale_name} (#{locale}).
+    Keep the JSON keys exactly the same, only translate the string values.
+    Arrays should have the same number of elements, each translated.
+    Return ONLY valid JSON, no markdown, no explanation.
+
+    #{json_input}
+    """
+  end
+
+  defp locale_display_name("es"), do: "Spanish"
+  defp locale_display_name("nl"), do: "Dutch"
+  defp locale_display_name("de"), do: "German"
+  defp locale_display_name("fr"), do: "French"
+  defp locale_display_name("pt"), do: "Portuguese"
+  defp locale_display_name(locale), do: locale
+
+  defp extract_claude_json(text) do
+    json_text =
+      case Regex.run(~r/```(?:json)?\s*\n?([\s\S]*?)\n?```/, text) do
+        [_, json] -> String.trim(json)
+        _ -> String.trim(text)
+      end
+
+    case Jason.decode(json_text) do
+      {:ok, data} -> {:ok, data}
+      {:error, _} -> {:error, {:json_parse_error, String.slice(json_text, 0, 200)}}
+    end
+  end
+
+  # --- DeepL translation (fallback) ---
+
+  defp translate_fields_with_deepl(fields, locale) do
     {string_fields, array_fields} =
       Enum.split_with(fields, fn {_k, v} -> is_binary(v) end)
 
-    # Translate all strings in a single batch call
     string_keys = Enum.map(string_fields, fn {k, _v} -> k end)
     string_values = Enum.map(string_fields, fn {_k, v} -> v end)
 
-    # Flatten array fields into a single batch too
     array_meta =
       Enum.map(array_fields, fn {k, list} -> {k, length(list)} end)
 
@@ -158,12 +266,10 @@ defmodule GaliciaLocal.Workers.TranslateWorker do
         {:ok, translated_all} ->
           {translated_strings, translated_arrays_flat} = Enum.split(translated_all, length(string_values))
 
-          # Rebuild string results
           string_result =
             Enum.zip(string_keys, translated_strings)
             |> Map.new()
 
-          # Rebuild array results
           {array_result, _rest} =
             Enum.reduce(array_meta, {%{}, translated_arrays_flat}, fn {key, count}, {acc, remaining} ->
               {items, rest} = Enum.split(remaining, count)
