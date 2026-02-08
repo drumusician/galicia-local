@@ -87,24 +87,18 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 
 WORKDIR "/app"
-RUN chown nobody /app
 
 # Claude CLI auth is stored in HOME/.claude — mount a Fly volume at /data/claude
-# so credentials persist across deploys
+# so credentials persist across deploys.
+# We run as root (standard for Fly machines, which are already isolated containers)
+# to avoid volume permission issues — Fly volume mounts are root-owned.
 ENV HOME="/data/claude"
-RUN mkdir -p /data/claude && chown nobody:root /data/claude
+RUN mkdir -p /data/claude
 
 # set runner ENV
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/galicia_local ./
-
-USER nobody
-
-# If using an environment that doesn't automatically reap zombie processes, it is
-# advised to add an init process such as tini via `apt-get install`
-# above and adding an entrypoint. See https://github.com/krallin/tini for details
-# ENTRYPOINT ["/tini", "--"]
+COPY --from=builder /app/_build/${MIX_ENV}/rel/galicia_local ./
 
 CMD ["/app/bin/server"]
