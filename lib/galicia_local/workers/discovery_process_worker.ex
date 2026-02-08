@@ -270,8 +270,8 @@ defmodule GaliciaLocal.Workers.DiscoveryProcessWorker do
   defp get_all_cities(region_id) do
     %{rows: rows} =
       GaliciaLocal.Repo.query!(
-        "SELECT slug, name, id::text, region_id::text FROM cities WHERE region_id = $1::uuid ORDER BY name",
-        [region_id]
+        "SELECT slug, name, id::text, region_id::text FROM cities WHERE region_id = $1 ORDER BY name",
+        [Ecto.UUID.dump!(region_id)]
       )
 
     Enum.map(rows, fn [slug, name, id, rid] ->
