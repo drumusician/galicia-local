@@ -238,8 +238,8 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
   # ~1500 input tokens ($3/M) + ~1500 output tokens ($15/M) ≈ $0.027 per call
   @claude_enrichment_cost 0.027
   @claude_translation_cost 0.027
-  # Tavily: 2 searches per business researched
-  @tavily_cost_per_search 0.001
+  # Web search: now uses DuckDuckGo (free), keeping tracking for legacy display
+  @web_search_cost_per_search 0.0
 
   defp load_monthly_costs(region) do
     month_start =
@@ -288,13 +288,13 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
 
     google_cost = search_calls * @google_search_cost + detail_calls * @google_details_cost
     claude_cost = enriched * @claude_enrichment_cost + translated * @claude_translation_cost
-    tavily_cost = researched * 2 * @tavily_cost_per_search
-    total = google_cost + claude_cost + tavily_cost
+    web_search_cost = researched * 2 * @web_search_cost_per_search
+    total = google_cost + claude_cost + web_search_cost
 
     %{
       google: %{search_calls: search_calls, detail_calls: detail_calls, cost: google_cost},
       claude: %{enriched: enriched, translated: translated, cost: claude_cost},
-      tavily: %{researched: researched, cost: tavily_cost},
+      web_search: %{researched: researched, cost: web_search_cost},
       total: total
     }
   end
@@ -618,11 +618,11 @@ defmodule GaliciaLocalWeb.Admin.ScraperLive do
                     <td class="text-right font-mono">${:erlang.float_to_binary(@monthly_costs.claude.cost, decimals: 2)}</td>
                   </tr>
                   <tr>
-                    <td class="font-medium">Tavily Search</td>
+                    <td class="font-medium">Web Search (DuckDuckGo)</td>
                     <td class="text-sm text-base-content/70">
-                      ~{@monthly_costs.tavily.researched * 2} web searches
+                      ~{@monthly_costs.web_search.researched * 2} searches (free)
                     </td>
-                    <td class="text-right font-mono">${:erlang.float_to_binary(@monthly_costs.tavily.cost, decimals: 2)}</td>
+                    <td class="text-right font-mono">$0.00</td>
                   </tr>
                 </tbody>
                 <tfoot>

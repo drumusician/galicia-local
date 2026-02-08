@@ -424,7 +424,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
         {:noreply,
          socket
          |> assign(:loading, false)
-         |> assign(:inline_error, "Tavily search failed: #{inspect(reason)}")}
+         |> assign(:inline_error, "Directory site search failed: #{inspect(reason)}")}
     end
   end
 
@@ -900,7 +900,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
                   <span class="hero-globe-alt w-8 h-8 text-info"></span>
                   <h4 class="font-bold">Directory Sites</h4>
                   <p class="text-xs text-base-content/60">
-                    Search for real directory sites to crawl. Uses Tavily search API.
+                    Search for real directory sites to crawl. Uses Tavily search.
                   </p>
                   <button type="button" phx-click="suggest_urls_tavily" class="btn btn-info btn-sm mt-2" disabled={@loading}>
                     <%= if @loading do %>

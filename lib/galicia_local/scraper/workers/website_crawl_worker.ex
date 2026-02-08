@@ -29,6 +29,45 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
   @max_pages 20
   @english_patterns ["/en/", "/en-", "/english/", "?lang=en", "&lang=en", "/en.html"]
 
+  # Pages we want to crawl first (high-value content)
+  @priority_patterns [
+    {"about", 10},
+    {"sobre", 10},
+    {"over-ons", 10},
+    {"quem-somos", 10},
+    {"menu", 9},
+    {"carta", 9},
+    {"ementa", 9},
+    {"menukaart", 9},
+    {"services", 8},
+    {"servicios", 8},
+    {"servicos", 8},
+    {"diensten", 8},
+    {"contact", 7},
+    {"contacto", 7},
+    {"kontakt", 7},
+    {"team", 6},
+    {"equipo", 6},
+    {"equipa", 6},
+    {"history", 5},
+    {"historia", 5},
+    {"geschiedenis", 5},
+    {"gallery", 4},
+    {"galeria", 4},
+    {"photos", 4},
+    {"fotos", 4},
+    {"prices", 3},
+    {"precios", 3},
+    {"precos", 3},
+    {"prijzen", 3},
+    {"hours", 3},
+    {"horario", 3},
+    {"openingstijden", 3},
+    {"reviews", 2},
+    {"testimonials", 2},
+    {"opiniones", 2}
+  ]
+
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"business_id" => business_id}}) do
     Logger.info("Starting website crawl for business: #{business_id}")
@@ -76,16 +115,40 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
     url = normalize_url(business.website)
     Logger.info("Crawling website: #{url}")
 
-    # Crawl the website starting from the main URL
     case crawl_pages(url) do
       {:ok, pages} ->
         has_english = detect_english_version(pages)
+
+        # Aggregate structured data from all pages
+        all_structured =
+          pages
+          |> Enum.flat_map(fn p -> p.structured_data || [] end)
+          |> Enum.uniq()
+
+        # Aggregate social proof from all pages
+        all_testimonials =
+          pages
+          |> Enum.flat_map(fn p -> (p.social_proof && p.social_proof.testimonials) || [] end)
+          |> Enum.uniq()
+          |> Enum.take(10)
+
+        all_awards =
+          pages
+          |> Enum.flat_map(fn p -> (p.social_proof && p.social_proof.awards) || [] end)
+          |> Enum.uniq()
+          |> Enum.take(10)
 
         results = %{
           pages_crawled: length(pages),
           has_english_version: has_english,
           total_content_length: Enum.reduce(pages, 0, &(&1.content_length + &2)),
           metadata: extract_metadata(pages),
+          structured_data: if(all_structured == [], do: nil, else: all_structured),
+          social_proof:
+            if(all_testimonials == [] and all_awards == [],
+              do: nil,
+              else: %{testimonials: all_testimonials, awards: all_awards}
+            ),
           pages: pages
         }
 
@@ -105,7 +168,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
         # Track seen URLs to avoid duplicates
         seen = MapSet.new([normalize_url_for_dedup(start_url), normalize_url_for_dedup(main_page.url)])
 
-        # Find internal links (excluding already seen and error pages)
+        # Find internal links, prioritizing high-value pages
         internal_links =
           main_page.links
           |> Enum.filter(&same_host?(&1, uri.host))
@@ -113,6 +176,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
           |> Enum.map(&normalize_url_for_dedup/1)
           |> Enum.uniq()
           |> Enum.reject(&MapSet.member?(seen, &1))
+          |> Enum.sort_by(&page_priority/1, :desc)
           |> Enum.take(@max_pages - 1)
 
         # Crawl additional pages
@@ -162,18 +226,21 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
   defp parse_page(url, html) do
     case Floki.parse_document(html) do
       {:ok, document} ->
+        content = extract_content(document)
+
         page = %{
           url: url,
           title: extract_title(document),
           description: extract_description(document),
           language: extract_language(document),
-          content: extract_content(document),
-          content_length: 0,
+          content: content,
+          content_length: String.length(content),
           headings: extract_headings(document),
-          links: extract_links(document, url)
+          links: extract_links(document, url),
+          structured_data: extract_structured_data(document),
+          social_proof: extract_social_proof(document)
         }
 
-        page = %{page | content_length: String.length(page.content)}
         {:ok, page}
 
       {:error, reason} ->
@@ -236,6 +303,149 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
     |> Enum.reject(&is_nil/1)
     |> Enum.reject(&skip_url?/1)
     |> Enum.uniq()
+  end
+
+  # Extract schema.org JSON-LD structured data
+  defp extract_structured_data(document) do
+    document
+    |> Floki.find("script[type='application/ld+json']")
+    |> Enum.map(&script_text/1)
+    |> Enum.flat_map(fn json_text ->
+      case Jason.decode(json_text) do
+        {:ok, data} when is_list(data) -> data
+        {:ok, %{"@graph" => graph}} when is_list(graph) -> graph
+        {:ok, data} when is_map(data) -> [data]
+        _ -> []
+      end
+    end)
+    |> Enum.filter(&relevant_schema_type?/1)
+    |> Enum.map(&extract_schema_fields/1)
+    |> case do
+      [] -> nil
+      items -> items
+    end
+  end
+
+  # Floki.text/1 returns "" for script tags; extract from children directly
+  defp script_text({_tag, _attrs, children}) do
+    children
+    |> Enum.filter(&is_binary/1)
+    |> Enum.join()
+  end
+
+  defp script_text(_), do: ""
+
+  @relevant_types ~w(
+    LocalBusiness Restaurant Bar CafeOrCoffeeShop Bakery
+    FoodEstablishment Store AutoRepair BeautySalon
+    HealthAndBeautyBusiness LegalService FinancialService
+    MedicalBusiness Dentist Physician Pharmacy
+    LodgingBusiness Hotel ProfessionalService
+    SportsActivityLocation FitnessCenter
+    Organization Place TouristAttraction
+  )
+
+  defp relevant_schema_type?(%{"@type" => type}) when is_binary(type) do
+    type in @relevant_types
+  end
+
+  defp relevant_schema_type?(%{"@type" => types}) when is_list(types) do
+    Enum.any?(types, &(&1 in @relevant_types))
+  end
+
+  defp relevant_schema_type?(_), do: false
+
+  defp extract_schema_fields(data) do
+    data
+    |> Map.take([
+      "@type",
+      "name",
+      "description",
+      "priceRange",
+      "servesCuisine",
+      "openingHours",
+      "openingHoursSpecification",
+      "telephone",
+      "email",
+      "address",
+      "geo",
+      "aggregateRating",
+      "review",
+      "menu",
+      "acceptsReservations",
+      "paymentAccepted",
+      "amenityFeature",
+      "hasMap"
+    ])
+    |> Enum.reject(fn {_k, v} -> is_nil(v) end)
+    |> Map.new()
+  end
+
+  # Extract social proof: testimonials, awards, certifications
+  defp extract_social_proof(document) do
+    testimonials = extract_testimonials(document)
+    awards = extract_awards(document)
+
+    if testimonials == [] and awards == [] do
+      nil
+    else
+      %{testimonials: testimonials, awards: awards}
+    end
+  end
+
+  defp extract_testimonials(document) do
+    # Look for common testimonial patterns
+    selectors = [
+      "[class*='testimonial']",
+      "[class*='review']",
+      "[class*='opinion']",
+      "[class*='resena']",
+      "blockquote"
+    ]
+
+    selectors
+    |> Enum.flat_map(fn selector ->
+      document
+      |> Floki.find(selector)
+      |> Enum.map(&Floki.text/1)
+      |> Enum.map(&String.trim/1)
+      |> Enum.reject(&(String.length(&1) < 20))
+      |> Enum.map(&String.slice(&1, 0, 500))
+    end)
+    |> Enum.uniq()
+    |> Enum.take(5)
+  end
+
+  defp extract_awards(document) do
+    award_patterns = ~r/(?i)(award|prize|certif|michelin|star|recognition|accolade|premio|certificad|galardón|reconocimiento|prijs|onderscheiding)/
+
+    # Check headings and image alts for award mentions
+    headings =
+      document
+      |> Floki.find("h1, h2, h3, h4, h5, h6")
+      |> Enum.map(&Floki.text/1)
+      |> Enum.filter(&Regex.match?(award_patterns, &1))
+      |> Enum.map(&String.trim/1)
+
+    img_alts =
+      document
+      |> Floki.find("img")
+      |> Floki.attribute("alt")
+      |> Enum.filter(&(is_binary(&1) and Regex.match?(award_patterns, &1)))
+
+    (headings ++ img_alts)
+    |> Enum.uniq()
+    |> Enum.take(10)
+  end
+
+  # Score links by priority - high-value pages first
+  defp page_priority(url) do
+    url_lower = String.downcase(url)
+
+    @priority_patterns
+    |> Enum.find_value(0, fn {pattern, score} ->
+      if String.contains?(url_lower, pattern), do: score
+    end)
   end
 
   defp normalize_link(nil, _base), do: nil
@@ -321,6 +531,8 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
       has_english_version: results.has_english_version,
       total_content_length: results.total_content_length,
       metadata: results.metadata,
+      structured_data: results.structured_data,
+      social_proof: results.social_proof,
       pages:
         Enum.map(results.pages, fn page ->
           %{

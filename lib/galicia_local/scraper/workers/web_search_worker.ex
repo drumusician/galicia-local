@@ -23,7 +23,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebSearchWorker do
   require Logger
 
   alias GaliciaLocal.Directory.Business
-  alias GaliciaLocal.Research.Tavily
+  alias GaliciaLocal.Research.DuckDuckGo
 
   @research_dir "priv/research"
 
@@ -62,7 +62,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebSearchWorker do
     queries = build_search_queries(business)
     Logger.info("Performing #{length(queries)} search queries for #{business.name}")
 
-    Tavily.search_multiple(queries, max_results: 5)
+    DuckDuckGo.search_multiple(queries, max_results: 5)
   end
 
   defp build_search_queries(business) do

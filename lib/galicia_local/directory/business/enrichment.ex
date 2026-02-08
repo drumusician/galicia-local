@@ -344,14 +344,86 @@ defmodule GaliciaLocal.Directory.Business.Enrichment do
           do: "YES - website has English version available!",
           else: "No English version detected"
 
+      structured_section = format_structured_data(data["structured_data"])
+      social_section = format_social_proof(data["social_proof"])
+
       """
 
       ## WEBSITE CONTENT (#{length(pages)} pages crawled)
       **English version available**: #{english_note}
       **Key sections/headings**: #{headings}
-
+      #{structured_section}#{social_section}
       ### Website Text:
       #{all_content}
+      """
+    end
+  end
+
+  defp format_structured_data(nil), do: ""
+  defp format_structured_data([]), do: ""
+
+  defp format_structured_data(items) do
+    formatted =
+      items
+      |> Enum.map(fn item ->
+        fields =
+          item
+          |> Enum.reject(fn {_k, v} -> is_nil(v) end)
+          |> Enum.map(fn {k, v} -> "  #{k}: #{format_schema_value(v)}" end)
+          |> Enum.join("\n")
+
+        fields
+      end)
+      |> Enum.join("\n---\n")
+
+    """
+
+    ### Structured Data (schema.org):
+    #{formatted}
+    """
+  end
+
+  defp format_schema_value(v) when is_binary(v), do: v
+  defp format_schema_value(v) when is_number(v), do: to_string(v)
+  defp format_schema_value(v) when is_list(v), do: Enum.map_join(v, ", ", &format_schema_value/1)
+  defp format_schema_value(v) when is_map(v), do: Jason.encode!(v)
+  defp format_schema_value(v), do: inspect(v)
+
+  defp format_social_proof(nil), do: ""
+
+  defp format_social_proof(proof) do
+    testimonials = proof["testimonials"] || []
+    awards = proof["awards"] || []
+
+    if testimonials == [] and awards == [] do
+      ""
+    else
+      parts = []
+
+      parts =
+        if awards != [] do
+          parts ++ ["**Awards/Certifications**: #{Enum.join(awards, "; ")}"]
+        else
+          parts
+        end
+
+      parts =
+        if testimonials != [] do
+          formatted =
+            testimonials
+            |> Enum.take(3)
+            |> Enum.map(&("  > #{String.slice(&1, 0, 200)}"))
+            |> Enum.join("\n")
+
+          parts ++ ["**Customer Testimonials**:\n#{formatted}"]
+        else
+          parts
+        end
+
+      """
+
+      ### Social Proof:
+      #{Enum.join(parts, "\n")}
       """
     end
   end
