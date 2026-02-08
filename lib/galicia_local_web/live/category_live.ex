@@ -15,6 +15,7 @@ defmodule GaliciaLocalWeb.CategoryLive do
     region_slug = if region, do: region.slug, else: "galicia"
     region_name = if region, do: Gettext.gettext(GaliciaLocalWeb.Gettext, region.name), else: gettext("Galicia")
     tenant_opts = if region, do: [tenant: region.id], else: []
+    is_admin = is_map(socket.assigns[:current_user]) and socket.assigns.current_user.is_admin == true
 
     case Category.get_by_slug(slug) do
       {:ok, category} ->
@@ -24,6 +25,9 @@ defmodule GaliciaLocalWeb.CategoryLive do
         businesses =
           Business.by_category!(category.id, tenant_opts)
           |> Ash.load!([:city])
+
+        businesses =
+          if is_admin, do: businesses, else: Enum.reject(businesses, &(&1.source == :openstreetmap))
 
         cities =
           City.list!(tenant_opts)

@@ -18,9 +18,9 @@ defmodule GaliciaLocalWeb.RegionHomeLive do
 
     featured_cities =
       City.featured!(tenant_opts)
-      |> Ash.load!([:business_count, :translations], tenant_opts)
+      |> Ash.load!([:business_count, :public_business_count, :translations], tenant_opts)
       |> then(fn cities ->
-        if is_admin, do: cities, else: Enum.filter(cities, fn c -> (c.business_count || 0) > 0 end)
+        if is_admin, do: cities, else: Enum.filter(cities, fn c -> (c.public_business_count || 0) > 0 end)
       end)
 
     categories_by_priority =
@@ -32,15 +32,16 @@ defmodule GaliciaLocalWeb.RegionHomeLive do
     recent_businesses =
       Business.recent!(tenant_opts)
       |> Ash.load!([:city, :category], tenant_opts)
+      |> Enum.reject(&(&1.source == :openstreetmap))
 
     total_businesses =
       Business
-      |> Ash.Query.filter(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
+      |> Ash.Query.filter(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary) and source != :openstreetmap)
       |> Ash.count!(tenant_opts)
 
     local_gems_count =
       Business
-      |> Ash.Query.filter(local_gem_score > 0.7 and status in [:enriched, :verified])
+      |> Ash.Query.filter(local_gem_score > 0.7 and status in [:enriched, :verified] and source != :openstreetmap)
       |> then(fn query ->
         if region, do: Ash.Query.set_tenant(query, region.id), else: query
       end)
@@ -51,8 +52,8 @@ defmodule GaliciaLocalWeb.RegionHomeLive do
         Ash.count!(City, tenant_opts)
       else
         City.list!(tenant_opts)
-        |> Ash.load!(:business_count, tenant_opts)
-        |> Enum.count(fn c -> (c.business_count || 0) > 0 end)
+        |> Ash.load!(:public_business_count, tenant_opts)
+        |> Enum.count(fn c -> (c.public_business_count || 0) > 0 end)
       end
 
     settings = (region && region.settings) || %{}
@@ -247,7 +248,7 @@ defmodule GaliciaLocalWeb.RegionHomeLive do
                   <div class="card-body">
                     <p class="text-sm text-base-content/70 line-clamp-2">{localized(city, :description, @locale)}</p>
                     <div class="card-actions justify-between items-center mt-2">
-                      <div class="badge badge-ghost">{ngettext("%{count} listing", "%{count} listings", city.business_count || 0)}</div>
+                      <div class="badge badge-ghost">{ngettext("%{count} listing", "%{count} listings", city.public_business_count || 0)}</div>
                       <span class="text-primary text-sm font-medium group-hover:underline">{gettext("Explore")}</span>
                     </div>
                   </div>

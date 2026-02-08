@@ -20,9 +20,10 @@ defmodule GaliciaLocalWeb.CityLive do
 
     case City.get_by_slug(slug, tenant_opts) do
       {:ok, city} ->
-        city = Ash.load!(city, [:business_count, :translations])
+        city = Ash.load!(city, [:business_count, :public_business_count, :translations])
+        visible_count = if is_admin, do: city.business_count || 0, else: city.public_business_count || 0
 
-        if not is_admin and (city.business_count || 0) == 0 do
+        if not is_admin and visible_count == 0 do
           {:ok,
            socket
            |> put_flash(:info, gettext("This city doesn't have any listings yet."))
@@ -33,6 +34,9 @@ defmodule GaliciaLocalWeb.CityLive do
         businesses =
           Business.by_city!(city.id, tenant_opts)
           |> Ash.load!([:category])
+
+        businesses =
+          if is_admin, do: businesses, else: Enum.reject(businesses, &(&1.source == :openstreetmap))
 
         categories =
           Category.list!()
@@ -48,6 +52,7 @@ defmodule GaliciaLocalWeb.CityLive do
          |> assign(:meta_description, city.description || gettext("Explore local businesses in %{city}, %{region}. Find restaurants, services, and more to help you integrate into local life.", city: city.name, region: region_name))
          |> assign(:city, city)
          |> assign(:businesses, businesses)
+         |> assign(:visible_count, length(businesses))
          |> assign(:categories, categories)
          |> assign(:businesses_by_category, businesses_by_category)
          |> assign(:selected_category, nil)
@@ -152,7 +157,7 @@ defmodule GaliciaLocalWeb.CityLive do
               </ul>
             </nav>
             <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">{@city.name}</h1>
-            <p class="text-white/80 text-lg">{@city.province} · {ngettext("1 listing", "%{count} listings", @city.business_count)}</p>
+            <p class="text-white/80 text-lg">{@city.province} · {ngettext("1 listing", "%{count} listings", @visible_count)}</p>
           </div>
         </div>
       </section>

@@ -99,7 +99,7 @@ defmodule GaliciaLocalWeb.SearchLive do
   defp search_businesses(query, city, category, english_only, local_gems, region) do
     tenant_opts = if region, do: [tenant: region.id], else: []
 
-    cond do
+    results = cond do
       String.trim(query) != "" ->
         Business.search!(query, tenant_opts)
         |> filter_by_city(city)
@@ -138,6 +138,8 @@ defmodule GaliciaLocalWeb.SearchLive do
         |> Ash.Query.load([:city, :category])
         |> Ash.read!(tenant_opts)
     end
+
+    Enum.reject(results, &(&1.source == :openstreetmap))
   end
 
   defp filter_by_city(results, nil), do: results

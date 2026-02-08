@@ -30,9 +30,9 @@ config :galicia_local, enrich_scheduler_cron: "*/5 * * * *"
 # Old Spanish-only translator disabled — replaced by translate_all_locales
 config :galicia_local, translate_scheduler_cron: false
 
-# CLI enrichment (uses claude --print via Max plan, no API cost)
-# Jobs check ENABLE_CLI_ENRICHMENT env var at runtime before doing work
-config :galicia_local, enrich_cli_scheduler_cron: "*/5 * * * *"
+# CLI enrichment disabled — was creating thousands of low-quality jobs for OSM businesses
+# Will be consolidated into the main enrich_scheduler_cron trigger in Phase 2
+config :galicia_local, enrich_cli_scheduler_cron: false
 config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
 
 # Store discovery crawl data on persistent volume (survives deploys)

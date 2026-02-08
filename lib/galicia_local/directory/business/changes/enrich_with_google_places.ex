@@ -52,6 +52,7 @@ defmodule GaliciaLocal.Directory.Business.Changes.EnrichWithGooglePlaces do
 
     %{
       raw_data: merged_raw,
+      source: :google_maps,
       photo_urls: details[:photos] || business.photo_urls || [],
       opening_hours: details[:opening_hours] || business.opening_hours,
       rating: details[:rating] || business.rating,

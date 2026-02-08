@@ -53,22 +53,26 @@ defmodule GaliciaLocalWeb.NetherlandsHomeLive do
     recent_businesses =
       Business.recent!(tenant_opts)
       |> Ash.load!([:city, :category], tenant_opts)
+      |> Enum.reject(&(&1.source == :openstreetmap))
 
     # Get some stats
     total_businesses =
       Business
-      |> Ash.Query.filter(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
+      |> Ash.Query.filter(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary) and source != :openstreetmap)
       |> Ash.count!(tenant_opts)
 
     local_gems_count =
       Business
-      |> Ash.Query.filter(local_gem_score > 0.7 and status in [:enriched, :verified])
+      |> Ash.Query.filter(local_gem_score > 0.7 and status in [:enriched, :verified] and source != :openstreetmap)
       |> then(fn query ->
         if region, do: Ash.Query.set_tenant(query, region.id), else: query
       end)
       |> Ash.count!()
 
-    cities_count = Ash.count!(City, tenant_opts)
+    cities_count =
+      City.list!(tenant_opts)
+      |> Ash.load!(:public_business_count, tenant_opts)
+      |> Enum.count(fn c -> (c.public_business_count || 0) > 0 end)
 
     # Pick a random phrase and tips to display
     random_phrase = Enum.random(dutch_phrases())

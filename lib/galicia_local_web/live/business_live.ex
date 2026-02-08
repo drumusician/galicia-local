@@ -7,6 +7,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
   alias GaliciaLocal.Directory.Business
   alias GaliciaLocal.Community.{Review, Favorite}
   alias GaliciaLocal.Analytics.Tracker
+  alias GaliciaLocal.Scraper.GooglePlaces
 
   require Ash.Query
 
@@ -14,9 +15,17 @@ defmodule GaliciaLocalWeb.BusinessLive do
   def mount(%{"id" => id}, _session, socket) do
     region = socket.assigns[:current_region]
     region_slug = if region, do: region.slug, else: "galicia"
+    is_admin = is_map(socket.assigns[:current_user]) and socket.assigns.current_user.is_admin == true
 
     case Business.get_by_id(id) do
       {:ok, business} when business.status in [:enriched, :verified] and not is_nil(business.description) ->
+        # Gate OSM businesses from non-admins
+        if not is_admin and business.source == :openstreetmap do
+          {:ok,
+           socket
+           |> put_flash(:error, gettext("Business not found"))
+           |> push_navigate(to: ~p"/")}
+        else
         business = Ash.load!(business, [:city, :translations, category: :translations])
         if connected?(socket) and region, do: Tracker.track_async("business", business.id, region.id)
         current_user = socket.assigns[:current_user]
@@ -54,7 +63,12 @@ defmodule GaliciaLocalWeb.BusinessLive do
          |> assign(:review_rating, 5)
          |> assign(:lightbox_index, nil)
          |> assign(:is_favorited, is_favorited)
+         |> assign(:is_admin, is_admin)
+         |> assign(:google_places_loading, false)
+         |> assign(:google_places_results, nil)
+         |> assign(:google_places_enriching, false)
          |> assign(:region_slug, region_slug)}
+        end
 
       {:ok, _business} ->
         # Business exists but isn't publicly visible (incomplete or not enriched)
@@ -193,6 +207,81 @@ defmodule GaliciaLocalWeb.BusinessLive do
     end
   end
 
+  def handle_event("search_google_places", _params, socket) do
+    socket = assign(socket, google_places_loading: true, google_places_results: nil)
+    send(self(), :do_search_google_places)
+    {:noreply, socket}
+  end
+
+  def handle_event("select_google_place", %{"place-id" => place_id}, socket) do
+    socket = assign(socket, google_places_enriching: true)
+    send(self(), {:do_enrich_google_places, place_id})
+    {:noreply, socket}
+  end
+
+  def handle_event("dismiss_google_places", _params, socket) do
+    {:noreply, assign(socket, google_places_results: nil)}
+  end
+
+  @impl true
+  def handle_info(:do_search_google_places, socket) do
+    business = socket.assigns.business
+    city_name = if business.city, do: business.city.name, else: ""
+    query = "#{business.name} #{city_name}"
+
+    location_opts =
+      if business.latitude && business.longitude do
+        [location: {business.latitude, business.longitude}, radius: 5000]
+      else
+        []
+      end
+
+    case GooglePlaces.search(query, location_opts) do
+      {:ok, results} ->
+        {:noreply,
+         socket
+         |> assign(:google_places_results, Enum.take(results, 5))
+         |> assign(:google_places_loading, false)}
+
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> assign(:google_places_loading, false)
+         |> assign(:google_places_results, nil)
+         |> put_flash(:error, "Google Places search failed: #{inspect(reason)}")}
+    end
+  end
+
+  @impl true
+  def handle_info({:do_enrich_google_places, place_id}, socket) do
+    business = socket.assigns.business
+
+    case Business.enrich_with_google_places(business, place_id) do
+      {:ok, updated} ->
+        # Queue re-enrichment so LLM generates new description from Google reviews
+        updated =
+          case Ash.update(updated, %{status: :researched}, action: :queue_re_enrichment) do
+            {:ok, re_queued} -> re_queued
+            {:error, _} -> updated
+          end
+
+        updated = Ash.load!(updated, [:city, :translations, category: :translations])
+
+        {:noreply,
+         socket
+         |> assign(:business, updated)
+         |> assign(:google_places_enriching, false)
+         |> assign(:google_places_results, nil)
+         |> put_flash(:info, gettext("Google Places data merged. Re-enrichment queued."))}
+
+      {:error, error} ->
+        {:noreply,
+         socket
+         |> assign(:google_places_enriching, false)
+         |> put_flash(:error, "Enrichment failed: #{inspect(error)}")}
+    end
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -207,6 +296,71 @@ defmodule GaliciaLocalWeb.BusinessLive do
             <li class="text-base-content/60">{@business.name}</li>
           </ul>
         </nav>
+
+        <!-- Admin Toolbar -->
+        <%= if @is_admin do %>
+          <div class="alert bg-warning/10 border border-warning/30 mb-6">
+            <div class="flex flex-wrap items-center gap-3 w-full">
+              <span class="badge badge-warning badge-sm">{gettext("Admin")}</span>
+              <span class="badge badge-ghost badge-sm">
+                {gettext("Source:")} {to_string(@business.source)}
+              </span>
+              <span class="badge badge-ghost badge-sm">
+                {gettext("Status:")} {to_string(@business.status)}
+              </span>
+              <div class="flex-1"></div>
+              <.link navigate={~p"/admin/businesses/#{@business.id}/edit"} class="btn btn-ghost btn-xs gap-1">
+                <span class="hero-pencil-square w-4 h-4"></span>
+                {gettext("Edit")}
+              </.link>
+              <%= if @google_places_loading do %>
+                <button class="btn btn-sm btn-disabled gap-1">
+                  <span class="loading loading-spinner loading-xs"></span>
+                  {gettext("Searching...")}
+                </button>
+              <% else %>
+                <button phx-click="search_google_places" class="btn btn-primary btn-sm gap-1">
+                  <span class="hero-magnifying-glass w-4 h-4"></span>
+                  {gettext("Search Google Places")}
+                </button>
+              <% end %>
+            </div>
+            <%= if @google_places_enriching do %>
+              <div class="mt-3 flex items-center gap-2 text-sm">
+                <span class="loading loading-spinner loading-xs"></span>
+                {gettext("Enriching with Google Places data...")}
+              </div>
+            <% end %>
+            <%= if @google_places_results do %>
+              <div class="mt-3 w-full">
+                <div class="text-sm font-medium mb-2">{gettext("Select a match:")}</div>
+                <div class="space-y-2">
+                  <%= for result <- @google_places_results do %>
+                    <div class="flex items-center justify-between bg-base-100 rounded-lg p-3 border border-base-300">
+                      <div>
+                        <p class="font-medium">{result.name}</p>
+                        <p class="text-xs text-base-content/60">{result.address}</p>
+                        <%= if result[:rating] do %>
+                          <span class="text-xs text-warning">★ {result.rating}</span>
+                        <% end %>
+                      </div>
+                      <button
+                        phx-click="select_google_place"
+                        phx-value-place-id={result.place_id}
+                        class="btn btn-success btn-xs"
+                      >
+                        {gettext("Select")}
+                      </button>
+                    </div>
+                  <% end %>
+                  <button phx-click="dismiss_google_places" class="btn btn-ghost btn-xs mt-1">
+                    {gettext("Dismiss")}
+                  </button>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
 
         <!-- Main Card -->
         <div class="card bg-base-100 shadow-xl">

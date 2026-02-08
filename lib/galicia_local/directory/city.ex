@@ -126,5 +126,9 @@ defmodule GaliciaLocal.Directory.City do
     count :business_count, :businesses do
       filter expr(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
     end
+
+    count :public_business_count, :businesses do
+      filter expr(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary) and source != :openstreetmap)
+    end
   end
 end

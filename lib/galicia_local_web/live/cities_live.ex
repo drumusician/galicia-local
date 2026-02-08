@@ -17,14 +17,14 @@ defmodule GaliciaLocalWeb.CitiesLive do
 
     cities =
       City.list!(tenant_opts)
-      |> Ash.load!([:business_count, :translations], tenant_opts)
+      |> Ash.load!([:business_count, :public_business_count, :translations], tenant_opts)
       |> Enum.sort_by(& &1.population, :desc)
 
     cities =
       if is_admin do
         cities
       else
-        Enum.filter(cities, fn city -> (city.business_count || 0) > 0 end)
+        Enum.filter(cities, fn city -> (city.public_business_count || 0) > 0 end)
       end
 
     {:ok,
@@ -63,7 +63,7 @@ defmodule GaliciaLocalWeb.CitiesLive do
               province: city.province,
               lat: city.latitude && Decimal.to_float(city.latitude),
               lng: city.longitude && Decimal.to_float(city.longitude),
-              business_count: city.business_count || 0
+              business_count: (if @is_admin, do: city.business_count, else: city.public_business_count) || 0
             }
           end))}
         >
@@ -102,7 +102,7 @@ defmodule GaliciaLocalWeb.CitiesLive do
                   </p>
                   <div class="flex justify-between items-center mt-4">
                     <div class="flex gap-2">
-                      <span class="badge badge-outline">{ngettext("1 listing", "%{count} listings", city.business_count || 0)}</span>
+                      <span class="badge badge-outline">{ngettext("1 listing", "%{count} listings", if(@is_admin, do: city.business_count, else: city.public_business_count) || 0)}</span>
                       <%= if city.population do %>
                         <span class="badge badge-ghost">{gettext("%{population} pop.", population: format_population(city.population))}</span>
                       <% end %>
