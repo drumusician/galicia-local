@@ -16,7 +16,7 @@ defmodule GaliciaLocalWeb.BusinessLive do
     region_slug = if region, do: region.slug, else: "galicia"
 
     case Business.get_by_id(id) do
-      {:ok, business} ->
+      {:ok, business} when business.status in [:enriched, :verified] and not is_nil(business.description) ->
         business = Ash.load!(business, [:city, :translations, category: :translations])
         if connected?(socket) and region, do: Tracker.track_async("business", business.id, region.id)
         current_user = socket.assigns[:current_user]
@@ -55,6 +55,13 @@ defmodule GaliciaLocalWeb.BusinessLive do
          |> assign(:lightbox_index, nil)
          |> assign(:is_favorited, is_favorited)
          |> assign(:region_slug, region_slug)}
+
+      {:ok, _business} ->
+        # Business exists but isn't publicly visible (incomplete or not enriched)
+        {:ok,
+         socket
+         |> put_flash(:error, gettext("Business not found"))
+         |> push_navigate(to: ~p"/")}
 
       {:error, _} ->
         {:ok,

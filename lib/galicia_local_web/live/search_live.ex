@@ -118,7 +118,7 @@ defmodule GaliciaLocalWeb.SearchLive do
       local_gems ->
         Business
         |> Ash.Query.for_read(:read)
-        |> Ash.Query.filter(status in [:enriched, :verified])
+        |> Ash.Query.filter(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
         |> Ash.Query.filter(local_gem_score > 0.7)
         |> filter_by_city_query(city)
         |> filter_by_category_query(category)
@@ -130,7 +130,7 @@ defmodule GaliciaLocalWeb.SearchLive do
       true ->
         Business
         |> Ash.Query.for_read(:read)
-        |> Ash.Query.filter(status in [:enriched, :verified])
+        |> Ash.Query.filter(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
         |> filter_by_city_query(city)
         |> filter_by_category_query(category)
         |> Ash.Query.sort(rating: :desc_nils_last, name: :asc)

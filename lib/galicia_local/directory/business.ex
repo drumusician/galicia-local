@@ -197,13 +197,13 @@ defmodule GaliciaLocal.Directory.Business do
 
     read :by_city do
       argument :city_id, :uuid, allow_nil?: false
-      filter expr(city_id == ^arg(:city_id) and status in [:enriched, :verified])
+      filter expr(city_id == ^arg(:city_id) and status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
       prepare build(sort: [rating: :desc_nils_last, name: :asc])
     end
 
     read :by_category do
       argument :category_id, :uuid, allow_nil?: false
-      filter expr(category_id == ^arg(:category_id) and status in [:enriched, :verified])
+      filter expr(category_id == ^arg(:category_id) and status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
       prepare build(sort: [rating: :desc_nils_last, name: :asc])
     end
 
@@ -212,6 +212,7 @@ defmodule GaliciaLocal.Directory.Business do
 
       filter expr(
         status in [:enriched, :verified] and
+        not is_nil(description) and not is_nil(summary) and
         (contains(name, ^arg(:query)) or
          contains(description, ^arg(:query)) or
          contains(address, ^arg(:query)))
@@ -221,12 +222,12 @@ defmodule GaliciaLocal.Directory.Business do
     end
 
     read :english_speaking do
-      filter expr(speaks_english == true and status in [:enriched, :verified])
+      filter expr(speaks_english == true and status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
       prepare build(sort: [speaks_english_confidence: :desc_nils_last, rating: :desc_nils_last])
     end
 
     read :recent do
-      filter expr(status in [:enriched, :verified])
+      filter expr(status in [:enriched, :verified] and not is_nil(description) and not is_nil(summary))
       prepare build(sort: [inserted_at: :desc], limit: 6)
     end
 
