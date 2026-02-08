@@ -7,6 +7,7 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
 
   alias GaliciaLocal.Pipeline.PipelineStatus
   alias GaliciaLocal.Directory.Region
+  alias GaliciaLocal.Workers.BatchResearchWorker
 
   @refresh_interval :timer.seconds(10)
 
@@ -68,6 +69,26 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
     {:noreply, socket}
   end
 
+  def handle_event("start_batch_research", _params, socket) do
+    opts =
+      if rid = socket.assigns.selected_region_id do
+        [region_id: rid]
+      else
+        []
+      end
+
+    case BatchResearchWorker.queue(opts) do
+      {:ok, _job} ->
+        {:noreply,
+         socket
+         |> assign(:action_result, {:ok, "Batch research pipeline started"})
+         |> load_status(socket.assigns.selected_region_id)}
+
+      {:error, reason} ->
+        {:noreply, assign(socket, :action_result, {:error, "Failed: #{inspect(reason)}"})}
+    end
+  end
+
   defp load_status(socket, region_id) do
     status = PipelineStatus.summary(region_id)
 
@@ -76,6 +97,7 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
     |> assign(:throughput, status.throughput)
     |> assign(:translation_coverage, status.translation_coverage)
     |> assign(:queue_depths, status.queue_depths)
+    |> assign(:research, status.research)
   end
 
   @impl true
@@ -139,6 +161,96 @@ defmodule GaliciaLocalWeb.Admin.PipelineLive do
             <div class="stat-title">{gettext("Total Businesses")}</div>
             <div class="stat-value text-accent">{@funnel.total}</div>
             <div class="stat-desc">{gettext("across all statuses")}</div>
+          </div>
+        </div>
+
+        <%!-- Research Pipeline --%>
+        <div class="card bg-base-100 shadow-xl mb-8">
+          <div class="card-body">
+            <div class="flex items-center justify-between">
+              <h2 class="card-title">
+                <span class="hero-magnifying-glass w-5 h-5 text-info"></span>
+                {gettext("Research Pipeline (OSM)")}
+              </h2>
+              <%= if @research.batch_active do %>
+                <span class="badge badge-info gap-1">
+                  <span class="loading loading-spinner loading-xs"></span>
+                  {gettext("Batch running")}
+                </span>
+              <% end %>
+            </div>
+
+            <%!-- OSM Business Progress --%>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+              <div class="bg-base-200 rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-warning">{@research.eligible}</div>
+                <div class="text-xs text-base-content/60">{gettext("Eligible")}</div>
+              </div>
+              <div class="bg-base-200 rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-info">{@research.researching}</div>
+                <div class="text-xs text-base-content/60">{gettext("Researching")}</div>
+              </div>
+              <div class="bg-base-200 rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-secondary">{@research.researched}</div>
+                <div class="text-xs text-base-content/60">{gettext("Awaiting LLM")}</div>
+              </div>
+              <div class="bg-base-200 rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-success">{@research.enriched}</div>
+                <div class="text-xs text-base-content/60">{gettext("Enriched")}</div>
+              </div>
+            </div>
+
+            <%!-- Job Stats (24h) --%>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <h3 class="text-sm font-semibold text-base-content/70 mb-2">{gettext("Website Crawl Jobs (24h)")}</h3>
+                <div class="flex flex-wrap gap-2">
+                  <span class={"badge badge-sm #{if @research.crawl_jobs.executing > 0, do: "badge-info", else: "badge-ghost"}"}>
+                    {gettext("Running: %{n}", n: @research.crawl_jobs.executing)}
+                  </span>
+                  <span class={"badge badge-sm #{if @research.crawl_jobs.scheduled > 0, do: "badge-warning", else: "badge-ghost"}"}>
+                    {gettext("Scheduled: %{n}", n: @research.crawl_jobs.scheduled + @research.crawl_jobs.available)}
+                  </span>
+                  <span class="badge badge-sm badge-success">
+                    {gettext("Done: %{n}", n: @research.crawl_jobs.completed)}
+                  </span>
+                  <%= if @research.crawl_jobs.failed > 0 do %>
+                    <span class="badge badge-sm badge-error">
+                      {gettext("Failed: %{n}", n: @research.crawl_jobs.failed)}
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+              <div>
+                <h3 class="text-sm font-semibold text-base-content/70 mb-2">{gettext("Web Search Jobs (24h)")}</h3>
+                <div class="flex flex-wrap gap-2">
+                  <span class={"badge badge-sm #{if @research.search_jobs.executing > 0, do: "badge-info", else: "badge-ghost"}"}>
+                    {gettext("Running: %{n}", n: @research.search_jobs.executing)}
+                  </span>
+                  <span class={"badge badge-sm #{if @research.search_jobs.scheduled > 0, do: "badge-warning", else: "badge-ghost"}"}>
+                    {gettext("Scheduled: %{n}", n: @research.search_jobs.scheduled + @research.search_jobs.available)}
+                  </span>
+                  <span class="badge badge-sm badge-success">
+                    {gettext("Done: %{n}", n: @research.search_jobs.completed)}
+                  </span>
+                  <%= if @research.search_jobs.failed > 0 do %>
+                    <span class="badge badge-sm badge-error">
+                      {gettext("Failed: %{n}", n: @research.search_jobs.failed)}
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
+            <%!-- Start Button --%>
+            <%= if @research.eligible > 0 and not @research.batch_active do %>
+              <div class="mt-4">
+                <button type="button" phx-click="start_batch_research" class="btn btn-info btn-sm">
+                  <span class="hero-play w-4 h-4"></span>
+                  {gettext("Start Batch Research (%{n} eligible)", n: @research.eligible)}
+                </button>
+              </div>
+            <% end %>
           </div>
         </div>
 

@@ -14,7 +14,8 @@ defmodule GaliciaLocal.Pipeline.PipelineStatus do
       funnel: business_funnel(region_id),
       throughput: throughput(region_id),
       translation_coverage: translation_coverage(region_id),
-      queue_depths: queue_depths()
+      queue_depths: queue_depths(),
+      research: research_progress(region_id)
     }
   end
 
@@ -139,6 +140,116 @@ defmodule GaliciaLocal.Pipeline.PipelineStatus do
       end
 
     locale_stats
+  end
+
+  @doc """
+  Research pipeline progress: crawl and search job stats.
+  """
+  def research_progress(region_id) do
+    {region_clause, base_params} = region_filter(region_id)
+
+    # Pending OSM businesses with websites (eligible for research)
+    %{rows: [[eligible]]} =
+      Repo.query!(
+        """
+        SELECT COUNT(*)::integer FROM businesses
+        WHERE source = 'openstreetmap' AND status = 'pending'
+          AND website IS NOT NULL AND website != ''
+          #{region_clause}
+        """,
+        base_params
+      )
+
+    # Currently researching
+    %{rows: [[researching]]} =
+      Repo.query!(
+        """
+        SELECT COUNT(*)::integer FROM businesses
+        WHERE source = 'openstreetmap' AND status = 'researching'
+          #{region_clause}
+        """,
+        base_params
+      )
+
+    # Researched (waiting for enrichment)
+    %{rows: [[researched]]} =
+      Repo.query!(
+        """
+        SELECT COUNT(*)::integer FROM businesses
+        WHERE source = 'openstreetmap' AND status = 'researched'
+          #{region_clause}
+        """,
+        base_params
+      )
+
+    # Already enriched from OSM
+    %{rows: [[enriched]]} =
+      Repo.query!(
+        """
+        SELECT COUNT(*)::integer FROM businesses
+        WHERE source = 'openstreetmap' AND status = 'enriched'
+          #{region_clause}
+        """,
+        base_params
+      )
+
+    # Recent crawl job stats (last 24h)
+    %{rows: crawl_rows} =
+      Repo.query!("""
+      SELECT state, COUNT(*)::integer
+      FROM oban_jobs
+      WHERE worker = 'GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker'
+        AND inserted_at >= NOW() - interval '24 hours'
+      GROUP BY state
+      """)
+
+    crawl_stats = Map.new(crawl_rows, fn [state, count] -> {state, count} end)
+
+    # Recent search job stats (last 24h)
+    %{rows: search_rows} =
+      Repo.query!("""
+      SELECT state, COUNT(*)::integer
+      FROM oban_jobs
+      WHERE worker = 'GaliciaLocal.Scraper.Workers.WebSearchWorker'
+        AND inserted_at >= NOW() - interval '24 hours'
+      GROUP BY state
+      """)
+
+    search_stats = Map.new(search_rows, fn [state, count] -> {state, count} end)
+
+    # Check if batch worker is active
+    %{rows: batch_rows} =
+      Repo.query!("""
+      SELECT state, COUNT(*)::integer
+      FROM oban_jobs
+      WHERE worker = 'GaliciaLocal.Workers.BatchResearchWorker'
+        AND state IN ('available', 'executing', 'scheduled')
+      GROUP BY state
+      """)
+
+    batch_active = Enum.any?(batch_rows, fn [_state, count] -> count > 0 end)
+
+    %{
+      eligible: eligible,
+      researching: researching,
+      researched: researched,
+      enriched: enriched,
+      batch_active: batch_active,
+      crawl_jobs: %{
+        completed: crawl_stats["completed"] || 0,
+        executing: crawl_stats["executing"] || 0,
+        scheduled: crawl_stats["scheduled"] || 0,
+        available: crawl_stats["available"] || 0,
+        failed: (crawl_stats["discarded"] || 0) + (crawl_stats["retryable"] || 0)
+      },
+      search_jobs: %{
+        completed: search_stats["completed"] || 0,
+        executing: search_stats["executing"] || 0,
+        scheduled: search_stats["scheduled"] || 0,
+        available: search_stats["available"] || 0,
+        failed: (search_stats["discarded"] || 0) + (search_stats["retryable"] || 0)
+      }
+    }
   end
 
   @doc """
