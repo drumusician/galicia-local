@@ -861,7 +861,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
               {@osm_import_result.jobs_queued} import jobs queued for {@osm_import_result.cities} cities.
             </p>
             <p class="text-sm text-base-content/40 mt-2">
-              Jobs are staggered by 5 seconds to respect Overpass rate limits.
+              Jobs are staggered by 60 seconds to respect Overpass rate limits.
               Check the pipeline page for progress.
             </p>
           </div>

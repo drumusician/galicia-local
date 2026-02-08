@@ -6,7 +6,7 @@ defmodule GaliciaLocal.Workers.OverpassImportWorker do
 
   use Oban.Worker,
     queue: :discovery,
-    max_attempts: 2,
+    max_attempts: 5,
     unique: [period: 600, fields: [:args, :queue]]
 
   require Logger
@@ -14,8 +14,8 @@ defmodule GaliciaLocal.Workers.OverpassImportWorker do
   alias GaliciaLocal.Scraper.Overpass
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"city_id" => city_id, "region_id" => region_id}}) do
-    Logger.info("OverpassImport: starting for city #{city_id}")
+  def perform(%Oban.Job{args: %{"city_id" => city_id, "region_id" => region_id}, attempt: attempt}) do
+    Logger.info("OverpassImport: starting for city #{city_id} (attempt #{attempt})")
 
     case Overpass.import_businesses(city_id, region_id) do
       {:ok, %{created: created, skipped: skipped, failed: failed}} ->
@@ -29,5 +29,11 @@ defmodule GaliciaLocal.Workers.OverpassImportWorker do
         Logger.warning("OverpassImport: city #{city_id} failed: #{inspect(reason)}")
         {:error, reason}
     end
+  end
+
+  # Exponential backoff: 2min, 4min, 8min, 16min, 32min
+  @impl Oban.Worker
+  def backoff(%Oban.Job{attempt: attempt}) do
+    trunc(:math.pow(2, attempt) * 60)
   end
 end

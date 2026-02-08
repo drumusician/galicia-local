@@ -102,10 +102,10 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
     jobs =
       Enum.with_index(region.cities, 1)
       |> Enum.map(fn {city, idx} ->
-        # Stagger jobs by 5 seconds each to respect Overpass rate limits
+        # Stagger jobs by 60 seconds each to respect Overpass rate limits (~2 req/min)
         %{city_id: city.id, region_id: region_id}
         |> GaliciaLocal.Workers.OverpassImportWorker.new(
-          scheduled_at: DateTime.add(DateTime.utc_now(), idx * 5, :second)
+          scheduled_at: DateTime.add(DateTime.utc_now(), idx * 60, :second)
         )
         |> Oban.insert()
       end)
