@@ -13,6 +13,7 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
 
   alias GaliciaLocal.AI.ClaudeCLI
   alias GaliciaLocal.Directory.Region
+  alias GaliciaLocal.Scraper.Tavily
 
   @doc """
   Generate region attributes and settings from a region name using Claude.
@@ -89,6 +90,53 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
     started = Enum.count(crawls, &match?({:ok, _}, &1))
 
     {:ok, %{crawls_started: started, cities: length(url_groups)}}
+  end
+
+  @doc """
+  Start Overpass import for all cities in a region.
+  Queues one OverpassImportWorker per city. Returns `{:ok, %{jobs_queued: n}}`.
+  """
+  def start_overpass_import(region_id) do
+    region = Region.get_by_id!(region_id) |> Ash.load!(:cities)
+
+    jobs =
+      Enum.with_index(region.cities, 1)
+      |> Enum.map(fn {city, idx} ->
+        # Stagger jobs by 5 seconds each to respect Overpass rate limits
+        %{city_id: city.id, region_id: region_id}
+        |> GaliciaLocal.Workers.OverpassImportWorker.new(
+          scheduled_at: DateTime.add(DateTime.utc_now(), idx * 5, :second)
+        )
+        |> Oban.insert()
+      end)
+
+    queued = Enum.count(jobs, &match?({:ok, _}, &1))
+    Logger.info("OverpassImport: queued #{queued} jobs for region #{region.name}")
+
+    {:ok, %{jobs_queued: queued, cities: length(region.cities)}}
+  end
+
+  @doc """
+  Suggest discovery URLs for all cities using Tavily search (replaces Claude URL suggestion).
+  Returns `{:ok, [%{city_id, city_name, urls: [%{url, name, description, selected}]}]}`.
+  """
+  def suggest_discovery_urls_tavily(region_id) do
+    region = Region.get_by_id!(region_id) |> Ash.load!(:cities)
+
+    results =
+      Enum.map(region.cities, fn city ->
+        case Tavily.search_directory_sites(city.name, region.country_code) do
+          {:ok, urls} ->
+            %{city_id: city.id, city_name: city.name, urls: urls}
+
+          {:error, reason} ->
+            Logger.warning("Tavily search failed for #{city.name}: #{inspect(reason)}")
+            %{city_id: city.id, city_name: city.name, urls: []}
+        end
+      end)
+      |> Enum.filter(fn r -> r.urls != [] end)
+
+    {:ok, results}
   end
 
   # --- Prompts ---

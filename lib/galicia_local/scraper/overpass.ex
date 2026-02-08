@@ -2,19 +2,27 @@ defmodule GaliciaLocal.Scraper.Overpass do
   @moduledoc """
   OpenStreetMap Overpass API client for discovering businesses.
 
-  Free alternative to Google Places API. Uses the public Overpass API
-  to query OSM data by category within a geographic bounding box.
+  Two modes of operation:
+  1. **City-wide query** (`query_businesses/1`) — queries ALL business-relevant tags
+     for a city by name using Overpass area search. Returns raw OSM elements.
+  2. **Category search** (`search/2`) — queries a specific category within a bounding box.
+  3. **Import** (`import_businesses/2`) — queries + creates Business records in the DB.
 
   ## Examples
 
-      # Search for restaurants in Amsterdam area
-      Overpass.search("restaurants", {52.3, 4.8, 52.4, 5.0})
+      # Query all businesses in a city
+      Overpass.query_businesses("Pontevedra")
 
-      # Check if a category has OSM mappings
-      Overpass.has_tags?("restaurants")  #=> true
+      # Import businesses for a city into the DB
+      Overpass.import_businesses(city_id, region_id)
+
+      # Search for restaurants in Amsterdam area (bbox)
+      Overpass.search("restaurants", {52.3, 4.8, 52.4, 5.0})
   """
 
   require Logger
+
+  alias GaliciaLocal.Directory.Business
 
   @overpass_url "https://overpass-api.de/api/interpreter"
   @request_timeout 60_000
@@ -46,7 +54,48 @@ defmodule GaliciaLocal.Scraper.Overpass do
     "plumbers" => [{"craft", "plumber"}],
     "car-services" => [{"shop", "car_repair"}, {"shop", "car"}],
     "real-estate" => [{"office", "estate_agent"}],
-    "municipalities" => [{"amenity", "townhall"}, {"office", "government"}]
+    "municipalities" => [{"amenity", "townhall"}, {"office", "government"}],
+    "camping" => [{"tourism", "camp_site"}]
+  }
+
+  # Reverse mapping: OSM tag value → category slug (for city-wide import)
+  @osm_category_map %{
+    {"shop", "supermarket"} => "supermarkets",
+    {"shop", "bakery"} => "bakeries",
+    {"shop", "butcher"} => "butchers",
+    {"shop", "hairdresser"} => "hair-salons",
+    {"shop", "beauty"} => "hair-salons",
+    {"shop", "car_repair"} => "car-services",
+    {"shop", "car"} => "car-services",
+    {"shop", "wine"} => "wineries",
+    {"shop", "marketplace"} => "markets",
+    {"amenity", "cafe"} => "cafes",
+    {"amenity", "restaurant"} => "restaurants",
+    {"amenity", "dentist"} => "dentists",
+    {"amenity", "doctors"} => "doctors",
+    {"amenity", "hospital"} => "hospitals",
+    {"amenity", "veterinary"} => "veterinarians",
+    {"amenity", "library"} => "libraries",
+    {"amenity", "marketplace"} => "markets",
+    {"amenity", "language_school"} => "language-schools",
+    {"amenity", "music_school"} => "music-schools",
+    {"amenity", "school"} => "elementary-schools",
+    {"amenity", "townhall"} => "municipalities",
+    {"amenity", "bar"} => "cider-houses",
+    {"amenity", "pub"} => "cider-houses",
+    {"craft", "electrician"} => "electricians",
+    {"craft", "plumber"} => "plumbers",
+    {"craft", "winery"} => "wineries",
+    {"office", "estate_agent"} => "real-estate",
+    {"office", "lawyer"} => "lawyers",
+    {"office", "notary"} => "lawyers",
+    {"office", "accountant"} => "accountants",
+    {"office", "tax_advisor"} => "accountants",
+    {"office", "government"} => "municipalities",
+    {"office", "language_school"} => "language-schools",
+    {"healthcare", "doctor"} => "doctors",
+    {"healthcare", "dentist"} => "dentists",
+    {"tourism", "camp_site"} => "camping"
   }
 
   @day_map %{
@@ -60,6 +109,161 @@ defmodule GaliciaLocal.Scraper.Overpass do
   }
 
   @day_order ~w(Mo Tu We Th Fr Sa Su)
+
+  # --- City-wide query + import ---
+
+  @doc """
+  Query ALL businesses in a city by name using Overpass area search.
+  Returns `{:ok, [normalized_element]}` or `{:error, reason}`.
+
+  Uses `area["name"="{city}"]["admin_level"~"6|7|8"]` for flexible city matching,
+  then queries all business-relevant OSM tags within that area.
+  """
+  def query_businesses(city_name, _opts \\ []) do
+    query = build_city_query(city_name)
+    Logger.info("Overpass city query for #{city_name}: #{String.length(query)} chars")
+
+    case do_request(query) do
+      {:ok, elements} ->
+        normalized =
+          elements
+          |> Enum.filter(&has_name?/1)
+          |> Enum.map(&normalize_element/1)
+
+        Logger.info("Overpass found #{length(normalized)} businesses in #{city_name}")
+        {:ok, normalized}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  @doc """
+  Import businesses from OpenStreetMap for a city into the database.
+  Returns `{:ok, %{created: n, skipped: n, failed: n}}` or `{:error, reason}`.
+  """
+  def import_businesses(city_id, region_id) do
+    city = load_city(city_id)
+
+    if is_nil(city) do
+      {:error, :city_not_found}
+    else
+      case query_businesses(city.name) do
+        {:ok, elements} ->
+          category_ids = load_category_ids()
+          results = Enum.map(elements, &create_business(&1, city, region_id, category_ids))
+
+          created = Enum.count(results, &(&1 == :created))
+          skipped = Enum.count(results, &(&1 == :skipped))
+          failed = Enum.count(results, &(&1 == :failed))
+
+          Logger.info(
+            "Overpass import for #{city.name}: #{created} created, #{skipped} skipped, #{failed} failed"
+          )
+
+          {:ok, %{created: created, skipped: skipped, failed: failed}}
+
+        {:error, reason} ->
+          {:error, reason}
+      end
+    end
+  end
+
+  defp build_city_query(city_name) do
+    # Use multiple area lookups: admin boundaries (6-10) and place nodes.
+    # Small towns may only have place=town/village, not admin_level boundaries.
+    """
+    [out:json][timeout:60];
+    (
+      area["name"="#{city_name}"]["admin_level"~"^(6|7|8|9|10)$"];
+      area["name"="#{city_name}"]["place"~"^(city|town|village|municipality)$"];
+    )->.searchArea;
+    (
+      nwr["name"]["shop"](area.searchArea);
+      nwr["name"]["amenity"~"^(restaurant|cafe|bar|pub|doctors|dentist|hospital|veterinary|library|marketplace|language_school|music_school|school|townhall)$"](area.searchArea);
+      nwr["name"]["craft"](area.searchArea);
+      nwr["name"]["office"~"^(estate_agent|lawyer|notary|accountant|tax_advisor|government|language_school)$"](area.searchArea);
+      nwr["name"]["healthcare"](area.searchArea);
+      nwr["name"]["tourism"="camp_site"](area.searchArea);
+    );
+    out center tags;
+    """
+  end
+
+  defp load_city(city_id) do
+    case GaliciaLocal.Repo.query!(
+           "SELECT id::text, name, region_id::text FROM cities WHERE id = $1",
+           [Ecto.UUID.dump!(city_id)]
+         ) do
+      %{rows: [[id, name, rid]]} -> %{id: id, name: name, region_id: rid}
+      _ -> nil
+    end
+  end
+
+  defp load_category_ids do
+    %{rows: rows} =
+      GaliciaLocal.Repo.query!("SELECT slug, id::text FROM categories ORDER BY slug")
+
+    Map.new(rows, fn [slug, id] -> {slug, id} end)
+  end
+
+  defp create_business(element, city, region_id, category_ids) do
+    category_slug = detect_category(element.raw_tags)
+    category_id = category_ids[category_slug]
+
+    if is_nil(category_id) do
+      :skipped
+    else
+      slug = generate_slug(element.name)
+
+      attrs = %{
+        name: element.name,
+        slug: slug,
+        address: element.address,
+        phone: element.phone,
+        website: element.website,
+        email: element.email,
+        latitude: element.latitude && Decimal.new("#{element.latitude}"),
+        longitude: element.longitude && Decimal.new("#{element.longitude}"),
+        opening_hours: element.opening_hours,
+        google_maps_url: element.google_maps_url,
+        status: :pending,
+        source: :openstreetmap,
+        raw_data: %{
+          osm_id: element.osm_id,
+          osm_tags: element.raw_tags,
+          imported_at: DateTime.utc_now() |> DateTime.to_iso8601()
+        },
+        city_id: city.id,
+        category_id: category_id,
+        region_id: region_id
+      }
+
+      case Business.create(attrs) do
+        {:ok, _business} -> :created
+        {:error, %Ash.Error.Invalid{}} -> :skipped
+        {:error, _reason} -> :failed
+      end
+    end
+  end
+
+  defp detect_category(tags) do
+    # Try each known OSM tag pair against the reverse mapping
+    Enum.find_value(@osm_category_map, fn {{key, value}, slug} ->
+      if tags[key] == value, do: slug
+    end)
+  end
+
+  defp generate_slug(name) do
+    name
+    |> String.downcase()
+    |> String.replace(~r/[^a-z0-9\s-]/, "")
+    |> String.replace(~r/\s+/, "-")
+    |> String.trim("-")
+    |> String.slice(0, 100)
+  end
+
+  # --- Category-based bbox search ---
 
   @doc """
   Search for businesses of a given category within a bounding box.

@@ -26,7 +26,8 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
      |> assign(:loading, false)
      |> assign(:settings_json, "{}")
      |> assign(:discovery_urls, [])
-     |> assign(:discovery_result, nil)}
+     |> assign(:discovery_result, nil)
+     |> assign(:osm_import_result, nil)}
   end
 
   # --- Wizard: Step 1 - Enter name ---
@@ -42,7 +43,8 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
      |> assign(:inline_error, nil)
      |> assign(:loading, false)
      |> assign(:discovery_urls, [])
-     |> assign(:discovery_result, nil)}
+     |> assign(:discovery_result, nil)
+     |> assign(:osm_import_result, nil)}
   end
 
   def handle_event("update_wizard_name", %{"name" => name}, socket) do
@@ -208,6 +210,20 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
     {:noreply, socket}
   end
 
+  def handle_event("suggest_urls_tavily", _params, socket) do
+    region = socket.assigns.wizard_data
+    socket = assign(socket, loading: true, inline_error: nil)
+    send(self(), {:suggest_discovery_urls_tavily, region.id})
+    {:noreply, socket}
+  end
+
+  def handle_event("start_osm_import", _params, socket) do
+    region = socket.assigns.wizard_data
+    socket = assign(socket, loading: true, inline_error: nil)
+    send(self(), {:start_osm_import, region.id})
+    {:noreply, socket}
+  end
+
   def handle_event("toggle_url", %{"city" => city_idx_str, "url" => url_idx_str}, socket) do
     city_idx = String.to_integer(city_idx_str)
     url_idx = String.to_integer(url_idx_str)
@@ -271,6 +287,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
      |> assign(:wizard_data, region)
      |> assign(:discovery_urls, [])
      |> assign(:discovery_result, nil)
+     |> assign(:osm_import_result, nil)
      |> assign(:inline_error, nil)
      |> assign(:loading, false)}
   end
@@ -395,6 +412,38 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
     end
   end
 
+  def handle_info({:suggest_discovery_urls_tavily, region_id}, socket) do
+    case RegionBootstrap.suggest_discovery_urls_tavily(region_id) do
+      {:ok, url_groups} ->
+        {:noreply,
+         socket
+         |> assign(:discovery_urls, url_groups)
+         |> assign(:loading, false)}
+
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> assign(:loading, false)
+         |> assign(:inline_error, "Tavily search failed: #{inspect(reason)}")}
+    end
+  end
+
+  def handle_info({:start_osm_import, region_id}, socket) do
+    case RegionBootstrap.start_overpass_import(region_id) do
+      {:ok, result} ->
+        {:noreply,
+         socket
+         |> assign(:osm_import_result, result)
+         |> assign(:loading, false)}
+
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> assign(:loading, false)
+         |> assign(:inline_error, "OSM import failed: #{inspect(reason)}")}
+    end
+  end
+
   def handle_info({:start_crawling, url_groups, region_id}, socket) do
     case RegionBootstrap.start_discovery_crawls(url_groups, region_id) do
       {:ok, result} ->
@@ -501,6 +550,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
           loading={@loading}
           discovery_urls={@discovery_urls}
           discovery_result={@discovery_result}
+          osm_import_result={@osm_import_result}
         />
       <% end %>
 
@@ -547,7 +597,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
           <% :suggest_cities -> %>
             <.wizard_step_cities wizard_cities={@wizard_cities} loading={@loading} wizard_data={@wizard_data} />
           <% :discover -> %>
-            <.wizard_step_discover wizard_data={@wizard_data} loading={@loading} discovery_urls={@discovery_urls} discovery_result={@discovery_result} />
+            <.wizard_step_discover wizard_data={@wizard_data} loading={@loading} discovery_urls={@discovery_urls} discovery_result={@discovery_result} osm_import_result={@osm_import_result} />
         <% end %>
       </div>
       <div class="modal-backdrop" phx-click="cancel"></div>
@@ -798,29 +848,87 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
         <div>
           <h3 class="font-bold text-lg">Discover Businesses</h3>
           <p class="text-sm text-base-content/60">
-            Claude will suggest local business directory URLs to crawl for each city.
+            Import from OpenStreetMap or find directory sites to crawl.
           </p>
         </div>
 
-        <%= if @discovery_urls == [] do %>
-          <%!-- Phase A: Suggest URLs --%>
-          <div class="text-center py-4">
-            <p class="text-base-content/60 mb-4">
-              Click below to have Claude suggest directory websites for your cities.
+        <%= if @osm_import_result do %>
+          <%!-- OSM import queued --%>
+          <div class="bg-success/10 rounded-lg p-6 text-center">
+            <span class="hero-check-circle w-12 h-12 text-success mx-auto mb-3"></span>
+            <p class="font-bold text-lg">OpenStreetMap Import Queued!</p>
+            <p class="text-base-content/60 mt-2">
+              {@osm_import_result.jobs_queued} import jobs queued for {@osm_import_result.cities} cities.
+            </p>
+            <p class="text-sm text-base-content/40 mt-2">
+              Jobs are staggered by 5 seconds to respect Overpass rate limits.
+              Check the pipeline page for progress.
             </p>
           </div>
 
+          <div class="divider text-xs text-base-content/40">Additionally</div>
+
+          <p class="text-sm text-base-content/60 text-center">
+            You can also find directory sites to crawl for more businesses.
+          </p>
+        <% end %>
+
+        <%= if @discovery_urls == [] do %>
+          <%!-- Phase A: Choose discovery method --%>
+          <%= unless @osm_import_result do %>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div class="card bg-base-200 border border-base-300">
+                <div class="card-body items-center text-center py-6">
+                  <span class="hero-map w-8 h-8 text-success"></span>
+                  <h4 class="font-bold">OpenStreetMap</h4>
+                  <p class="text-xs text-base-content/60">
+                    Direct import from OSM. Free, structured data with addresses, phones, websites.
+                  </p>
+                  <button type="button" phx-click="start_osm_import" class="btn btn-success btn-sm mt-2" disabled={@loading}>
+                    <%= if @loading do %>
+                      <span class="loading loading-spinner loading-xs"></span>
+                    <% else %>
+                      <span class="hero-arrow-down-tray w-4 h-4"></span>
+                    <% end %>
+                    Import from OSM
+                  </button>
+                </div>
+              </div>
+
+              <div class="card bg-base-200 border border-base-300">
+                <div class="card-body items-center text-center py-6">
+                  <span class="hero-globe-alt w-8 h-8 text-info"></span>
+                  <h4 class="font-bold">Directory Sites</h4>
+                  <p class="text-xs text-base-content/60">
+                    Search for real directory sites to crawl. Uses Tavily search API.
+                  </p>
+                  <button type="button" phx-click="suggest_urls_tavily" class="btn btn-info btn-sm mt-2" disabled={@loading}>
+                    <%= if @loading do %>
+                      <span class="loading loading-spinner loading-xs"></span>
+                    <% else %>
+                      <span class="hero-magnifying-glass w-4 h-4"></span>
+                    <% end %>
+                    Find Directory Sites
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% else %>
+            <div class="flex justify-center">
+              <button type="button" phx-click="suggest_urls_tavily" class="btn btn-info btn-sm" disabled={@loading}>
+                <%= if @loading do %>
+                  <span class="loading loading-spinner loading-xs"></span>
+                  Searching...
+                <% else %>
+                  <span class="hero-magnifying-glass w-4 h-4"></span>
+                  Find Directory Sites
+                <% end %>
+              </button>
+            </div>
+          <% end %>
+
           <div class="modal-action">
             <button type="button" phx-click="skip_discovery" class="btn btn-ghost btn-sm">Skip for now</button>
-            <button type="button" phx-click="suggest_urls" class="btn btn-primary" disabled={@loading}>
-              <%= if @loading do %>
-                <span class="loading loading-spinner loading-xs"></span>
-                Suggesting URLs...
-              <% else %>
-                <span class="hero-sparkles w-5 h-5"></span>
-                Suggest Discovery URLs
-              <% end %>
-            </button>
           </div>
 
         <% else %>

@@ -111,25 +111,29 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
         # Extract page content
         page_data = extract_page_content(response.request_url, document)
 
-        # Update counter
-        updated_context = %{context | pages_crawled: context.pages_crawled + 1}
-        :persistent_term.put({__MODULE__, :context}, updated_context)
-
         # Find internal links to follow (on any allowed host)
         requests = find_internal_links(document, context.base_url, context.allowed_hosts)
 
-        Logger.info(
-          "[#{context.crawl_id}] Page #{updated_context.pages_crawled}: #{response.request_url} " <>
-            "(#{String.length(page_data.content)} chars, #{length(requests)} links)"
-        )
+        # Skip pages with no meaningful content (JS-rendered SPAs return empty HTML)
+        if page_data.content_length < 50 do
+          Logger.info("[#{context.crawl_id}] Skipping empty page: #{response.request_url}")
 
-        # Add crawl_id so the SaveToFile pipeline knows where to write
-        item = Map.put(page_data, :crawl_id, context.crawl_id)
+          %Crawly.ParsedItem{items: [], requests: requests}
+        else
+          # Update counter only for pages with content
+          updated_context = %{context | pages_crawled: context.pages_crawled + 1}
+          :persistent_term.put({__MODULE__, :context}, updated_context)
 
-        %Crawly.ParsedItem{
-          items: [item],
-          requests: requests
-        }
+          Logger.info(
+            "[#{context.crawl_id}] Page #{updated_context.pages_crawled}: #{response.request_url} " <>
+              "(#{page_data.content_length} chars, #{length(requests)} links)"
+          )
+
+          # Add crawl_id so the SaveToFile pipeline knows where to write
+          item = Map.put(page_data, :crawl_id, context.crawl_id)
+
+          %Crawly.ParsedItem{items: [item], requests: requests}
+        end
 
       {:error, reason} ->
         Logger.warning("[#{context.crawl_id}] Failed to parse #{response.request_url}: #{inspect(reason)}")
@@ -292,7 +296,7 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
         {Crawly.Middlewares.RequestOptions, [timeout: 30_000, recv_timeout: 30_000]}
       ],
       pipelines: [
-        Crawly.Pipelines.Validate,
+        {Crawly.Pipelines.Validate, fields: [:url, :content, :crawl_id]},
         GaliciaLocal.Scraper.Pipelines.SaveToFile
       ]
     ]
