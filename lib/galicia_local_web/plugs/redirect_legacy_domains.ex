@@ -69,7 +69,7 @@ defmodule GaliciaLocalWeb.Plugs.RedirectLegacyDomains do
 
       conn
       |> put_resp_header("location", new_url)
-      |> send_resp(302, "")
+      |> send_resp(301, "")
       |> halt()
     else
       conn
