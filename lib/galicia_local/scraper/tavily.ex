@@ -29,7 +29,6 @@ defmodule GaliciaLocal.Scraper.Tavily do
       Logger.info("Tavily search: #{query}")
 
       body = %{
-        api_key: api_key,
         query: query,
         search_depth: "basic",
         max_results: 8,
@@ -40,7 +39,10 @@ defmodule GaliciaLocal.Scraper.Tavily do
       case Req.post(@tavily_url,
              json: body,
              receive_timeout: @request_timeout,
-             headers: [{"content-type", "application/json"}]
+             headers: [
+               {"content-type", "application/json"},
+               {"authorization", "Bearer #{api_key}"}
+             ]
            ) do
         {:ok, %{status: 200, body: %{"results" => results}}} ->
           urls =
