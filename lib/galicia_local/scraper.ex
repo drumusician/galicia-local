@@ -248,6 +248,15 @@ defmodule GaliciaLocal.Scraper do
     :crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)
   end
 
+  @doc """
+  Returns the base directory for discovery crawl data.
+  Uses persistent volume in prod, tmp/ in dev.
+  """
+  def discovery_data_dir do
+    base = Application.get_env(:galicia_local, :discovery_data_dir, "tmp")
+    Path.join(base, "discovery_crawls")
+  end
+
   # =============================================================================
   # Google Places API Integration (Recommended)
   # =============================================================================

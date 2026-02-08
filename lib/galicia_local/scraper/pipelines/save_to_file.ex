@@ -12,7 +12,7 @@ defmodule GaliciaLocal.Scraper.Pipelines.SaveToFile do
   @impl Crawly.Pipeline
   def run(item, state) do
     crawl_id = item[:crawl_id] || "unknown"
-    dir = Path.join("tmp/discovery_crawls", crawl_id)
+    dir = Path.join(GaliciaLocal.Scraper.discovery_data_dir(), crawl_id)
     File.mkdir_p!(dir)
 
     # Get and increment page counter

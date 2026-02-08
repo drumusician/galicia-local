@@ -23,7 +23,7 @@ defmodule GaliciaLocal.Workers.DiscoveryProcessWorker do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"crawl_id" => crawl_id}}) do
-    crawl_dir = Path.join("tmp/discovery_crawls", crawl_id)
+    crawl_dir = Path.join(GaliciaLocal.Scraper.discovery_data_dir(), crawl_id)
 
     unless File.dir?(crawl_dir) do
       Logger.warning("DiscoveryProcess: crawl directory not found: #{crawl_dir}")

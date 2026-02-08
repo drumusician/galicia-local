@@ -35,6 +35,9 @@ config :galicia_local, translate_scheduler_cron: false
 config :galicia_local, enrich_cli_scheduler_cron: "*/5 * * * *"
 config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
 
+# Store discovery crawl data on persistent volume (survives deploys)
+config :galicia_local, discovery_data_dir: "/data/claude/discovery"
+
 # Do not print debug messages in production
 config :logger, level: :info
 

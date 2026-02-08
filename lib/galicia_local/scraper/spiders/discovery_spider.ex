@@ -53,7 +53,7 @@ defmodule GaliciaLocal.Scraper.Spiders.DiscoverySpider do
     :persistent_term.put({__MODULE__, :context}, context)
 
     # Write metadata file
-    meta_dir = Path.join("tmp/discovery_crawls", crawl_id)
+    meta_dir = Path.join(GaliciaLocal.Scraper.discovery_data_dir(), crawl_id)
     File.mkdir_p!(meta_dir)
 
     metadata = %{
