@@ -6,6 +6,7 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
   use GaliciaLocalWeb, :live_view
 
   alias GaliciaLocal.Directory.{Business, BusinessTranslation, City, Category}
+  alias GaliciaLocal.Directory.Business.Quality
 
   @days ~w(monday tuesday wednesday thursday friday saturday sunday)
   @supported_locales [
@@ -40,7 +41,12 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
          |> assign(:translations_map, translations_map)
          |> assign(:active_locale, "en")
          |> assign(:translating, nil)
-         |> assign(:saving, false)}
+         |> assign(:saving, false)
+         |> assign(:quality_score, Quality.score(business))
+         |> assign(:quality_checklist, Quality.checklist(business))
+         |> assign(:google_places_results, nil)
+         |> assign(:google_places_loading, false)
+         |> assign(:google_places_enriching, false)}
 
       {:error, _} ->
         {:ok,
@@ -91,6 +97,8 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
          socket
          |> assign(:business, updated)
          |> assign(:translations_map, build_translations_map(updated))
+         |> assign(:quality_score, Quality.score(updated))
+         |> assign(:quality_checklist, Quality.checklist(updated))
          |> assign(:saving, false)
          |> put_flash(:info, "Business updated successfully")}
 
@@ -181,6 +189,50 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
   end
 
   @impl true
+  def handle_event("search_google_places", _params, socket) do
+    socket = assign(socket, google_places_loading: true, google_places_results: nil)
+    send(self(), :do_search_google_places)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("select_google_place", %{"place-id" => place_id}, socket) do
+    socket = assign(socket, google_places_enriching: true)
+    send(self(), {:do_enrich_google_places, place_id})
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("dismiss_google_places", _params, socket) do
+    {:noreply, assign(socket, google_places_results: nil)}
+  end
+
+  @impl true
+  def handle_event("enrich_with_llm", _params, socket) do
+    socket = assign(socket, saving: true)
+    send(self(), :do_enrich_with_llm)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("queue_re_enrichment", _params, socket) do
+    business = socket.assigns.business
+
+    case Ash.update(business, %{status: :researched}, action: :queue_re_enrichment) do
+      {:ok, updated} ->
+        updated = Ash.load!(updated, [:city, :category, :translations])
+
+        {:noreply,
+         socket
+         |> assign(:business, updated)
+         |> put_flash(:info, "Queued for re-enrichment. Oban will pick it up.")}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Failed to queue re-enrichment")}
+    end
+  end
+
+  @impl true
   def handle_info({:do_translate, field}, socket) do
     business = socket.assigns.business
     target_locale = socket.assigns.active_locale
@@ -256,6 +308,86 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
            |> assign(:translating, nil)
            |> put_flash(:error, "Translation failed: #{reason}")}
       end
+    end
+  end
+
+  @impl true
+  def handle_info(:do_search_google_places, socket) do
+    business = socket.assigns.business
+    city_name = if business.city, do: business.city.name, else: ""
+    query = "#{business.name} #{city_name}"
+
+    location_opts =
+      if business.latitude && business.longitude do
+        [location: {business.latitude, business.longitude}, radius: 5000]
+      else
+        []
+      end
+
+    case GaliciaLocal.Scraper.GooglePlaces.search(query, location_opts) do
+      {:ok, results} ->
+        {:noreply,
+         socket
+         |> assign(:google_places_results, Enum.take(results, 5))
+         |> assign(:google_places_loading, false)}
+
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> assign(:google_places_loading, false)
+         |> assign(:google_places_results, nil)
+         |> put_flash(:error, "Google Places search failed: #{inspect(reason)}")}
+    end
+  end
+
+  @impl true
+  def handle_info({:do_enrich_google_places, place_id}, socket) do
+    business = socket.assigns.business
+
+    case Business.enrich_with_google_places(business, place_id) do
+      {:ok, updated} ->
+        updated = Ash.load!(updated, [:city, :category, :translations])
+
+        {:noreply,
+         socket
+         |> assign(:business, updated)
+         |> assign(:translations_map, build_translations_map(updated))
+         |> assign(:quality_score, Quality.score(updated))
+         |> assign(:quality_checklist, Quality.checklist(updated))
+         |> assign(:google_places_enriching, false)
+         |> assign(:google_places_results, nil)
+         |> put_flash(:info, "Google Places data merged successfully")}
+
+      {:error, error} ->
+        {:noreply,
+         socket
+         |> assign(:google_places_enriching, false)
+         |> put_flash(:error, "Enrichment failed: #{inspect(error)}")}
+    end
+  end
+
+  @impl true
+  def handle_info(:do_enrich_with_llm, socket) do
+    business = socket.assigns.business
+
+    case Business.enrich_with_llm(business) do
+      {:ok, updated} ->
+        updated = Ash.load!(updated, [:city, :category, :translations])
+
+        {:noreply,
+         socket
+         |> assign(:business, updated)
+         |> assign(:translations_map, build_translations_map(updated))
+         |> assign(:quality_score, Quality.score(updated))
+         |> assign(:quality_checklist, Quality.checklist(updated))
+         |> assign(:saving, false)
+         |> put_flash(:info, "AI enrichment complete")}
+
+      {:error, error} ->
+        {:noreply,
+         socket
+         |> assign(:saving, false)
+         |> put_flash(:error, "AI enrichment failed: #{inspect(error)}")}
     end
   end
 
@@ -513,6 +645,141 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
             </div>
           </div>
         </form>
+
+        <!-- Data Enrichment Card -->
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h2 class="card-title text-lg flex items-center gap-2">
+              <span class="hero-sparkles w-5 h-5 text-primary"></span>
+              Data Enrichment
+            </h2>
+
+            <div class="flex flex-col md:flex-row gap-6 mt-4">
+              <%!-- Quality Score --%>
+              <div class="flex flex-col items-center gap-2">
+                <div class={"radial-progress text-#{quality_color(@quality_score)}"} style={"--value:#{@quality_score}; --size:5rem; --thickness:0.4rem;"} role="progressbar">
+                  <span class="text-lg font-bold">{@quality_score}%</span>
+                </div>
+                <span class="text-xs text-base-content/60">Data Quality</span>
+              </div>
+
+              <%!-- Checklist --%>
+              <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2">
+                <%= for {label, present?} <- @quality_checklist do %>
+                  <div class="flex items-center gap-1.5">
+                    <%= if present? do %>
+                      <span class="hero-check-circle w-4 h-4 text-success"></span>
+                    <% else %>
+                      <span class="hero-x-circle w-4 h-4 text-base-content/30"></span>
+                    <% end %>
+                    <span class={"text-sm #{if present?, do: "text-base-content", else: "text-base-content/40"}"}>{label}</span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+            <%!-- Action Buttons --%>
+            <div class="flex flex-wrap gap-3 mt-4 pt-4 border-t border-base-300">
+              <button
+                type="button"
+                phx-click="search_google_places"
+                class="btn btn-outline btn-sm"
+                disabled={@google_places_loading || @google_places_enriching}
+              >
+                <%= if @google_places_loading do %>
+                  <span class="loading loading-spinner loading-xs"></span>
+                <% else %>
+                  <span class="hero-map-pin w-4 h-4"></span>
+                <% end %>
+                Fetch Google Places Data
+              </button>
+
+              <%= if @business.status in [:pending, :researched] do %>
+                <button
+                  type="button"
+                  phx-click="enrich_with_llm"
+                  class="btn btn-outline btn-sm btn-secondary"
+                  disabled={@saving}
+                >
+                  <%= if @saving do %>
+                    <span class="loading loading-spinner loading-xs"></span>
+                  <% else %>
+                    <span class="hero-cpu-chip w-4 h-4"></span>
+                  <% end %>
+                  Enrich with AI
+                </button>
+              <% end %>
+
+              <%= if @business.status in [:enriched, :verified] do %>
+                <button
+                  type="button"
+                  phx-click="queue_re_enrichment"
+                  class="btn btn-outline btn-sm btn-warning"
+                >
+                  <span class="hero-arrow-path w-4 h-4"></span>
+                  Queue Re-enrichment
+                </button>
+              <% end %>
+            </div>
+
+            <%!-- Google Places Search Results --%>
+            <%= if @google_places_results do %>
+              <div class="mt-4 border border-base-300 rounded-lg overflow-hidden">
+                <div class="flex items-center justify-between bg-base-200 px-4 py-2">
+                  <span class="text-sm font-medium">Google Places Results</span>
+                  <button type="button" phx-click="dismiss_google_places" class="btn btn-ghost btn-xs btn-circle">
+                    <span class="hero-x-mark w-4 h-4"></span>
+                  </button>
+                </div>
+                <%= if @google_places_results == [] do %>
+                  <div class="px-4 py-6 text-center text-base-content/50 text-sm">
+                    No results found. Try editing the business name or city.
+                  </div>
+                <% else %>
+                  <div class="divide-y divide-base-300">
+                    <%= for result <- @google_places_results do %>
+                      <div class="flex items-center justify-between px-4 py-3 hover:bg-base-200/50">
+                        <div class="flex-1 min-w-0">
+                          <div class="font-medium text-sm truncate">{result.name}</div>
+                          <div class="text-xs text-base-content/60 truncate">{result.address}</div>
+                          <div class="flex items-center gap-3 mt-1 text-xs text-base-content/50">
+                            <%= if result.rating do %>
+                              <span>
+                                <span class="text-warning">&#9733;</span> {result.rating}
+                                <%= if result.review_count do %>
+                                  <span class="text-base-content/40">({result.review_count})</span>
+                                <% end %>
+                              </span>
+                            <% end %>
+                            <%= if result.photos && result.photos != [] do %>
+                              <span>{length(result.photos)} photos</span>
+                            <% end %>
+                            <%= if result.opening_hours do %>
+                              <span class="text-success">Has hours</span>
+                            <% end %>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          phx-click="select_google_place"
+                          phx-value-place-id={result.place_id}
+                          class="btn btn-primary btn-xs ml-3"
+                          disabled={@google_places_enriching}
+                        >
+                          <%= if @google_places_enriching do %>
+                            <span class="loading loading-spinner loading-xs"></span>
+                          <% else %>
+                            Use This
+                          <% end %>
+                        </button>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
 
         <!-- Translations Card -->
         <div class="card bg-base-100 shadow-lg">
@@ -820,6 +1087,10 @@ defmodule GaliciaLocalWeb.Admin.EditBusinessLive do
     </div>
     """
   end
+
+  defp quality_color(score) when score >= 80, do: "success"
+  defp quality_color(score) when score >= 50, do: "warning"
+  defp quality_color(_score), do: "error"
 
   defp status_class(:pending), do: "badge-warning"
   defp status_class(:researching), do: "badge-info"

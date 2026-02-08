@@ -107,6 +107,7 @@ defmodule GaliciaLocal.Directory.Business do
     define :create
     define :enrich_with_llm
     define :enrich_with_cli
+    define :enrich_with_google_places, args: [:google_place_id]
     define :translate_to_spanish
     define :translate_all_locales
     define :queue_re_enrichment
@@ -162,6 +163,13 @@ defmodule GaliciaLocal.Directory.Business do
       require_atomic? false
       accept []
       change GaliciaLocal.Directory.Business.Changes.EnrichWithCLI
+    end
+
+    update :enrich_with_google_places do
+      require_atomic? false
+      accept []
+      argument :google_place_id, :string, allow_nil?: false
+      change GaliciaLocal.Directory.Business.Changes.EnrichWithGooglePlaces
     end
 
     update :translate_to_spanish do

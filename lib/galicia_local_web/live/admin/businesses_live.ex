@@ -69,6 +69,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
   defp maybe_filter_status(query, "verified"), do: Ash.Query.filter(query, status == :verified)
   defp maybe_filter_status(query, "rejected"), do: Ash.Query.filter(query, status == :rejected)
   defp maybe_filter_status(query, "low_fit"), do: Ash.Query.filter(query, not is_nil(category_fit_score) and category_fit_score < 0.5)
+  defp maybe_filter_status(query, "sparse"), do: Ash.Query.filter(query, status == :pending and is_nil(description) and (is_nil(photo_urls) or photo_urls == []))
   defp maybe_filter_status(query, _), do: query
 
   defp maybe_filter_city(query, nil), do: query
@@ -500,6 +501,12 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
               Rejected
             </button>
             <button
+              type="button" phx-click="filter" phx-value-status="sparse"
+              class={["btn btn-sm", if(@filter_status == "sparse", do: "btn-secondary", else: "btn-ghost")]}
+            >
+              Sparse
+            </button>
+            <button
               type="button" phx-click="filter" phx-value-status="low_fit"
               class={["btn btn-sm", if(@filter_status == "low_fit", do: "btn-accent", else: "btn-ghost")]}
             >
@@ -571,6 +578,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                     <th>Category</th>
                     <th>Status</th>
                     <th>Rating</th>
+                    <th>Data</th>
                     <th>Fit</th>
                     <th>Added</th>
                     <th></th>
@@ -593,6 +601,14 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
                         <% else %>
                           <span class="text-base-content/30">-</span>
                         <% end %>
+                      </td>
+                      <td>
+                        <div class="flex gap-0.5">
+                          <span class={"hero-photo w-3.5 h-3.5 #{if business.photo_urls && business.photo_urls != [], do: "text-success", else: "text-base-content/20"}"}></span>
+                          <span class={"hero-clock w-3.5 h-3.5 #{if business.opening_hours && business.opening_hours != %{}, do: "text-success", else: "text-base-content/20"}"}></span>
+                          <span class={"hero-star w-3.5 h-3.5 #{if business.rating, do: "text-success", else: "text-base-content/20"}"}></span>
+                          <span class={"hero-document-text w-3.5 h-3.5 #{if business.description, do: "text-success", else: "text-base-content/20"}"}></span>
+                        </div>
                       </td>
                       <td>
                         <%= cond do %>
@@ -669,7 +685,7 @@ defmodule GaliciaLocalWeb.Admin.BusinessesLive do
 
                   <%= if @page.results == [] do %>
                     <tr>
-                      <td colspan="8" class="text-center py-12 text-base-content/50">
+                      <td colspan="9" class="text-center py-12 text-base-content/50">
                         No businesses found matching your filters.
                       </td>
                     </tr>
