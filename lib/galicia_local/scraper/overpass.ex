@@ -150,6 +150,9 @@ defmodule GaliciaLocal.Scraper.Overpass do
     else
       case query_businesses(city.name) do
         {:ok, elements} ->
+          with_website = Enum.count(elements, fn e -> is_binary(e.website) and e.website != "" end)
+          Logger.info("Overpass #{city.name}: #{length(elements)} total, #{with_website} with website")
+
           category_ids = load_category_ids()
           results = Enum.map(elements, &create_business(&1, city, region_id, category_ids))
 
@@ -158,7 +161,7 @@ defmodule GaliciaLocal.Scraper.Overpass do
           failed = Enum.count(results, &(&1 == :failed))
 
           Logger.info(
-            "Overpass import for #{city.name}: #{created} created, #{skipped} skipped, #{failed} failed"
+            "Overpass import for #{city.name}: #{created} created, #{skipped} skipped (no website or no category), #{failed} failed"
           )
 
           {:ok, %{created: created, skipped: skipped, failed: failed}}
@@ -210,44 +213,50 @@ defmodule GaliciaLocal.Scraper.Overpass do
   defp create_business(element, city, region_id, category_ids) do
     category_slug = detect_category(element.raw_tags)
     category_id = category_ids[category_slug]
+    has_website? = is_binary(element.website) and element.website != ""
 
-    if is_nil(category_id) do
-      :skipped
-    else
-      slug = generate_slug(element.name)
+    cond do
+      is_nil(category_id) ->
+        :skipped
 
-      attrs = %{
-        name: element.name,
-        slug: slug,
-        address: element.address,
-        phone: element.phone,
-        website: element.website,
-        email: element.email,
-        latitude: element.latitude && Decimal.new("#{element.latitude}"),
-        longitude: element.longitude && Decimal.new("#{element.longitude}"),
-        opening_hours: element.opening_hours,
-        google_maps_url: element.google_maps_url,
-        status: :pending,
-        source: :openstreetmap,
-        raw_data:
-          %{
-            osm_id: element.osm_id,
-            osm_tags: element.raw_tags,
-            imported_at: DateTime.utc_now() |> DateTime.to_iso8601()
-          }
-          |> then(fn data ->
-            if element.extracted_hints, do: Map.put(data, "extracted_hints", element.extracted_hints), else: data
-          end),
-        city_id: city.id,
-        category_id: category_id,
-        region_id: region_id
-      }
+      not has_website? ->
+        :skipped
 
-      case Business.create(attrs) do
-        {:ok, _business} -> :created
-        {:error, %Ash.Error.Invalid{}} -> :skipped
-        {:error, _reason} -> :failed
-      end
+      true ->
+        slug = generate_slug(element.name)
+
+        attrs = %{
+          name: element.name,
+          slug: slug,
+          address: element.address,
+          phone: element.phone,
+          website: element.website,
+          email: element.email,
+          latitude: element.latitude && Decimal.new("#{element.latitude}"),
+          longitude: element.longitude && Decimal.new("#{element.longitude}"),
+          opening_hours: element.opening_hours,
+          google_maps_url: element.google_maps_url,
+          status: :pending,
+          source: :openstreetmap,
+          raw_data:
+            %{
+              osm_id: element.osm_id,
+              osm_tags: element.raw_tags,
+              imported_at: DateTime.utc_now() |> DateTime.to_iso8601()
+            }
+            |> then(fn data ->
+              if element.extracted_hints, do: Map.put(data, "extracted_hints", element.extracted_hints), else: data
+            end),
+          city_id: city.id,
+          category_id: category_id,
+          region_id: region_id
+        }
+
+        case Business.create(attrs) do
+          {:ok, _business} -> :created
+          {:error, %Ash.Error.Invalid{}} -> :skipped
+          {:error, _reason} -> :failed
+        end
     end
   end
 

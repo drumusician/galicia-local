@@ -118,8 +118,13 @@ defmodule GaliciaLocal.Scraper.Workers.OverpassWorker do
     }
 
     existing = find_by_osm_id(element.osm_id, city)
+    has_website? = is_binary(element.website) and element.website != ""
 
     case existing do
+      nil when not has_website? ->
+        Logger.debug("Skipping OSM business without website: #{element.name}")
+        {:skipped, element.name}
+
       nil ->
         case Business.create(attrs) do
           {:ok, business} ->
