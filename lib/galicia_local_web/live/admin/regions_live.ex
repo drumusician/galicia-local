@@ -1136,7 +1136,7 @@ defmodule GaliciaLocalWeb.Admin.RegionsLive do
         settings: settings
       }
 
-      case Ash.update(socket.assigns.editing, :update, params: attrs) do
+      case Ash.update(socket.assigns.editing, attrs, action: :update) do
         {:ok, region} ->
           clear_region_cache()
           {:ok, region}
