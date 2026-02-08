@@ -18,8 +18,8 @@ defmodule GaliciaLocalWeb.RegionSelectorLive do
         # Load business counts for each region's cities
         regions
         |> Enum.map(fn region ->
-          cities = Ash.load!(region.cities, :business_count, tenant: region.id)
-          total = Enum.sum(Enum.map(cities, fn c -> c.business_count || 0 end))
+          cities = Ash.load!(region.cities, :public_business_count, tenant: region.id)
+          total = Enum.sum(Enum.map(cities, fn c -> c.public_business_count || 0 end))
           Map.put(region, :total_business_count, total)
         end)
       end)
