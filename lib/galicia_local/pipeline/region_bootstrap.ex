@@ -297,16 +297,39 @@ defmodule GaliciaLocal.Pipeline.RegionBootstrap do
   end
 
   defp extract_json(text) do
-    # Try to find JSON in the response (Claude sometimes wraps in markdown code blocks)
-    json_text =
-      case Regex.run(~r/```(?:json)?\s*\n?([\s\S]*?)\n?```/, text) do
-        [_, json] -> String.trim(json)
-        _ -> String.trim(text)
-      end
+    # Try multiple strategies to find JSON in Claude's response:
+    # 1. Markdown code blocks
+    # 2. Raw text as-is
+    # 3. First { to last } (JSON object buried in text)
+    # 4. First [ to last ] (JSON array buried in text)
+    candidates =
+      [
+        case Regex.run(~r/```(?:json)?\s*\n?([\s\S]*?)\n?```/, text) do
+          [_, json] -> String.trim(json)
+          _ -> nil
+        end,
+        String.trim(text),
+        slice_outer(text, "{", "}"),
+        slice_outer(text, "[", "]")
+      ]
+      |> Enum.reject(&is_nil/1)
 
-    case Jason.decode(json_text) do
-      {:ok, data} -> {:ok, data}
-      {:error, _} -> {:error, {:json_parse_error, String.slice(json_text, 0, 200)}}
+    Enum.find_value(candidates, {:error, {:json_parse_error, String.slice(text, 0, 200)}}, fn
+      candidate ->
+        case Jason.decode(candidate) do
+          {:ok, data} -> {:ok, data}
+          {:error, _} -> nil
+        end
+    end)
+  end
+
+  defp slice_outer(text, open, close) do
+    with {start, _} <- :binary.match(text, open),
+         matches when matches != [] <- :binary.matches(text, close) do
+      {last, len} = List.last(matches)
+      binary_part(text, start, last - start + len)
+    else
+      _ -> nil
     end
   end
 end

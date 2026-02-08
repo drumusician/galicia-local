@@ -231,15 +231,34 @@ defmodule GaliciaLocal.Workers.TranslateWorker do
   defp locale_display_name(locale), do: locale
 
   defp extract_claude_json(text) do
-    json_text =
-      case Regex.run(~r/```(?:json)?\s*\n?([\s\S]*?)\n?```/, text) do
-        [_, json] -> String.trim(json)
-        _ -> String.trim(text)
-      end
+    candidates =
+      [
+        case Regex.run(~r/```(?:json)?\s*\n?([\s\S]*?)\n?```/, text) do
+          [_, json] -> String.trim(json)
+          _ -> nil
+        end,
+        String.trim(text),
+        slice_outer(text, "{", "}"),
+        slice_outer(text, "[", "]")
+      ]
+      |> Enum.reject(&is_nil/1)
 
-    case Jason.decode(json_text) do
-      {:ok, data} -> {:ok, data}
-      {:error, _} -> {:error, {:json_parse_error, String.slice(json_text, 0, 200)}}
+    Enum.find_value(candidates, {:error, {:json_parse_error, String.slice(text, 0, 200)}}, fn
+      candidate ->
+        case Jason.decode(candidate) do
+          {:ok, data} -> {:ok, data}
+          {:error, _} -> nil
+        end
+    end)
+  end
+
+  defp slice_outer(text, open, close) do
+    with {start, _} <- :binary.match(text, open),
+         matches when matches != [] <- :binary.matches(text, close) do
+      {last, len} = List.last(matches)
+      binary_part(text, start, last - start + len)
+    else
+      _ -> nil
     end
   end
 
