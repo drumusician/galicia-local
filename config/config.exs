@@ -24,7 +24,11 @@ config :galicia_local, Oban,
     discovery: 1
   ],
   repo: GaliciaLocal.Repo,
-  plugins: [{Oban.Plugins.Cron, []}]
+  plugins: [
+    {Oban.Plugins.Cron, []},
+    {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},
+    {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7}
+  ]
 
 # Crawly configuration
 config :crawly,
