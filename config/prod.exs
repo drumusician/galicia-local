@@ -24,10 +24,19 @@ config :swoosh, api_client: Swoosh.ApiClient.Req
 # Disable Swoosh Local Memory Storage
 config :swoosh, local: false
 
-# Enable enrichment and translation schedulers in production only
-# In dev, we use the content export/import pipeline with Claude Code instead
-config :galicia_local, enrich_scheduler_cron: "*/5 * * * *"
-config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
+# Enrichment and translation schedulers DISABLED in production.
+# These heavy jobs (Claude CLI, web scraping, research) are run locally
+# and synced to prod via the content export/import pipeline.
+# See CONTENT_WORKFLOW.md for the local workflow.
+# config :galicia_local, enrich_scheduler_cron: "*/5 * * * *"
+# config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
+
+# Disable all heavy Oban queues in production.
+# Only keep default for lightweight background tasks (e.g. emails).
+config :galicia_local, Oban,
+  queues: [
+    default: 5
+  ]
 
 # Store discovery crawl data on persistent volume (survives deploys)
 config :galicia_local, discovery_data_dir: "/data/claude/discovery"
