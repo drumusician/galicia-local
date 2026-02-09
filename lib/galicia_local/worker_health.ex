@@ -82,14 +82,30 @@ defmodule GaliciaLocal.WorkerHealth do
 
   @doc """
   Returns a child spec for starting the health check server under a supervisor.
+  Wraps Bandit start to handle port conflicts gracefully.
   """
   def child_spec(_opts) do
-    port = Application.get_env(:galicia_local, :worker_health_port, 4001)
-
     %{
       id: __MODULE__,
-      start: {Bandit, :start_link, [[plug: __MODULE__, port: port, scheme: :http]]},
-      type: :supervisor
+      start: {__MODULE__, :start_link, []},
+      type: :worker,
+      restart: :permanent
     }
+  end
+
+  def start_link do
+    port = Application.get_env(:galicia_local, :worker_health_port, 4001)
+
+    case Bandit.start_link(plug: __MODULE__, port: port, scheme: :http) do
+      {:ok, pid} ->
+        require Logger
+        Logger.info("WorkerHealth listening on port #{port}")
+        {:ok, pid}
+
+      {:error, reason} ->
+        require Logger
+        Logger.warning("WorkerHealth failed to start on port #{port}: #{inspect(reason)}, continuing without health endpoint")
+        :ignore
+    end
   end
 end
