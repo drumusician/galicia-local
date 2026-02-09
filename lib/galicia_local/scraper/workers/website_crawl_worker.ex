@@ -25,7 +25,9 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
   alias GaliciaLocal.Directory.Business
   alias GaliciaLocal.Scraper.Workers.WebSearchWorker
 
-  @research_dir "priv/research"
+  defp research_dir do
+    Application.get_env(:galicia_local, :research_data_dir, "priv/research")
+  end
   @max_pages 20
   @english_patterns ["/en/", "/en-", "/english/", "?lang=en", "&lang=en", "/en.html"]
 
@@ -514,7 +516,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
   end
 
   defp ensure_research_dir(business_id) do
-    dir = Path.join([@research_dir, business_id])
+    dir = Path.join([research_dir(), business_id])
 
     case File.mkdir_p(dir) do
       :ok -> :ok
@@ -523,7 +525,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
   end
 
   defp save_results(business_id, results) do
-    path = Path.join([@research_dir, business_id, "website.json"])
+    path = Path.join([research_dir(), business_id, "website.json"])
 
     data = %{
       crawled_at: DateTime.utc_now() |> DateTime.to_iso8601(),
@@ -567,7 +569,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebsiteCrawlWorker do
   Returns the path to the research directory for a business.
   """
   def research_path(business_id) do
-    Path.join([@research_dir, business_id])
+    Path.join([research_dir(), business_id])
   end
 
   @doc """

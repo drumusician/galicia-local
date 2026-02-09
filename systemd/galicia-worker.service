@@ -1,0 +1,22 @@
+[Unit]
+Description=GaliciaLocal Content Worker
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/opt/galicia-local
+EnvironmentFile=/opt/galicia-local/.env
+Environment=MIX_ENV=worker
+Environment=LANG=en_US.UTF-8
+ExecStart=/home/deploy/.asdf/shims/elixir --sname worker -S mix run --no-halt
+Restart=always
+RestartSec=10
+SyslogIdentifier=galicia-worker
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=3G
+
+[Install]
+WantedBy=multi-user.target

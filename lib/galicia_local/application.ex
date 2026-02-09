@@ -7,28 +7,38 @@ defmodule GaliciaLocal.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      GaliciaLocalWeb.Telemetry,
-      GaliciaLocal.Repo,
-      {DNSCluster, query: Application.get_env(:galicia_local, :dns_cluster_query) || :ignore},
-      {Oban,
-       AshOban.config(
-         Application.fetch_env!(:galicia_local, :ash_domains),
-         Application.fetch_env!(:galicia_local, Oban)
-       )},
-      GaliciaLocal.Scraper.ApiCache,
-      GaliciaLocal.Scraper.CrawlMonitor,
-      GaliciaLocal.Scraper.CrawlResume,
-      {Phoenix.PubSub, name: GaliciaLocal.PubSub},
-      # Start to serve requests, typically the last entry
-      GaliciaLocalWeb.Endpoint,
-      {AshAuthentication.Supervisor, [otp_app: :galicia_local]}
-    ]
+    children =
+      [
+        GaliciaLocalWeb.Telemetry,
+        GaliciaLocal.Repo,
+        {DNSCluster, query: Application.get_env(:galicia_local, :dns_cluster_query) || :ignore},
+        {Oban,
+         AshOban.config(
+           Application.fetch_env!(:galicia_local, :ash_domains),
+           Application.fetch_env!(:galicia_local, Oban)
+         )},
+        GaliciaLocal.Scraper.ApiCache,
+        GaliciaLocal.Scraper.CrawlMonitor,
+        GaliciaLocal.Scraper.CrawlResume,
+        {Phoenix.PubSub, name: GaliciaLocal.PubSub},
+        # Start to serve requests, typically the last entry
+        GaliciaLocalWeb.Endpoint,
+        {AshAuthentication.Supervisor, [otp_app: :galicia_local]}
+      ] ++ worker_children()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: GaliciaLocal.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  # In worker mode, start the health check endpoint
+  defp worker_children do
+    if Application.get_env(:galicia_local, :worker_health_port) do
+      [GaliciaLocal.WorkerHealth]
+    else
+      []
+    end
   end
 
   # Tell Phoenix to update the endpoint configuration

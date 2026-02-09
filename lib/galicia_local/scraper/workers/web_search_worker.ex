@@ -25,7 +25,9 @@ defmodule GaliciaLocal.Scraper.Workers.WebSearchWorker do
   alias GaliciaLocal.Directory.Business
   alias GaliciaLocal.Research.DuckDuckGo
 
-  @research_dir "priv/research"
+  defp research_dir do
+    Application.get_env(:galicia_local, :research_data_dir, "priv/research")
+  end
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"business_id" => business_id}}) do
@@ -93,7 +95,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebSearchWorker do
   end
 
   defp ensure_research_dir(business_id) do
-    dir = Path.join([@research_dir, business_id])
+    dir = Path.join([research_dir(), business_id])
 
     case File.mkdir_p(dir) do
       :ok -> :ok
@@ -102,7 +104,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebSearchWorker do
   end
 
   defp save_results(business_id, results) do
-    path = Path.join([@research_dir, business_id, "search.json"])
+    path = Path.join([research_dir(), business_id, "search.json"])
 
     data = %{
       searched_at: DateTime.utc_now() |> DateTime.to_iso8601(),
@@ -140,7 +142,7 @@ defmodule GaliciaLocal.Scraper.Workers.WebSearchWorker do
   Returns the path to the search results file.
   """
   def search_results_path(business_id) do
-    Path.join([@research_dir, business_id, "search.json"])
+    Path.join([research_dir(), business_id, "search.json"])
   end
 
   @doc """

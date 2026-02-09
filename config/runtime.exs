@@ -27,7 +27,7 @@ config :galicia_local, GaliciaLocalWeb.Endpoint,
 config :galicia_local, :tavily_api_key, System.get_env("TAVILY_API_KEY")
 
 
-if config_env() == :prod do
+if config_env() in [:prod, :worker] do
   database_url =
     System.get_env("DATABASE_URL") ||
       raise """
