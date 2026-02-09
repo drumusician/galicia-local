@@ -37,16 +37,22 @@ for i in $(seq "$START" "$END"); do
 
 Read $(pwd)/${INPUT}. For each business, analyze the data and generate enrichment content.
 
+RESEARCH STEPS — do these for EVERY business to improve quality:
+1. WebSearch: Search for the business name + city (e.g. 'O Barril restaurant Aveiro') to find reviews, articles, or additional info. This is critical for businesses without reviews.
+2. WebFetch: If the business has a website URL, fetch it to gather services, about page, opening hours, specialties, testimonials.
+3. If both fail, proceed with available data but be conservative with scores.
+Do NOT skip research — it dramatically improves enrichment quality.
+
 Philosophy: We celebrate authentic local businesses. Low newcomer_friendly_score is NOT negative.
 - Region 'galicia': Spanish/Galician, siesta, tapas culture
 - Region 'netherlands': Dutch, directness, appointment culture
 
 For each business generate JSON with: business_id, description (2-3 sentences), summary (max 100 chars), local_gem_score (0-1), newcomer_friendly_score (0-1), speaks_english (bool), speaks_english_confidence (0-1), languages_spoken ([]), languages_taught ([]), integration_tips ([]), cultural_notes ([]), service_specialties ([]), highlights ([]), warnings ([]), sentiment_summary, review_insights ({common_praise, common_concerns, notable_quotes, reviewer_demographics}), quality_score (0-1), category_fit_score (0-1), suggested_category_slug (null or slug if fit<0.5).
 
-If no reviews available, be conservative with scores.
+If no reviews found via search or website, be conservative with scores. Use all gathered info to fill gaps.
 
 Write to $(pwd)/${OUTPUT} as: {\"enrichments\": [...]}
-Process ALL businesses. Valid JSON only." --allowedTools Read,Write
+Process ALL businesses. Valid JSON only." --allowedTools Read,Write,WebFetch,WebSearch
 
   if [[ -f "$OUTPUT" ]]; then
     COUNT=$(python3 -c "import json; d=json.load(open('$OUTPUT')); print(len(d.get('enrichments',[])))" 2>/dev/null || echo "?")
