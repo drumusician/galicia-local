@@ -31,12 +31,12 @@ config :swoosh, local: false
 # config :galicia_local, enrich_scheduler_cron: "*/5 * * * *"
 # config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
 
-# Disable all heavy Oban queues in production.
-# Only keep default for lightweight background tasks (e.g. emails).
+# Disable ALL Oban processing in production web server.
+# Heavy jobs run on the dedicated worker instance (MIX_ENV=worker).
+# No queues, no plugins — Oban is completely passive here.
 config :galicia_local, Oban,
-  queues: [
-    default: 5
-  ]
+  queues: false,
+  plugins: false
 
 # Store discovery crawl data on persistent volume (survives deploys)
 config :galicia_local, discovery_data_dir: "/data/claude/discovery"
