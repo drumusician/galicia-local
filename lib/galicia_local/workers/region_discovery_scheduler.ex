@@ -6,6 +6,7 @@ defmodule GaliciaLocal.Workers.RegionDiscoveryScheduler do
   1. Finds active regions with cities that have few or no businesses
   2. Queues OverpassImportWorker for cities needing discovery
   3. Queues BatchResearchWorker for regions with pending businesses
+  4. Queues ImageScrapeWorker for enriched businesses without photos
 
   This makes the content pipeline fully autonomous — add a region/city in admin,
   and the worker picks it up automatically.
@@ -20,6 +21,7 @@ defmodule GaliciaLocal.Workers.RegionDiscoveryScheduler do
 
   alias GaliciaLocal.Workers.OverpassImportWorker
   alias GaliciaLocal.Workers.BatchResearchWorker
+  alias GaliciaLocal.Scraper.Workers.ImageScrapeWorker
 
   # Cities with fewer than this many total businesses get discovery queued
   @min_businesses_threshold 5
@@ -38,10 +40,14 @@ defmodule GaliciaLocal.Workers.RegionDiscoveryScheduler do
     # Also queue research for regions with pending businesses
     research_count = queue_research_for_pending(regions)
 
+    # Queue image scraping for enriched businesses without photos
+    image_count = queue_image_scraping(regions)
+
     Logger.info(
       "RegionDiscoveryScheduler: complete — " <>
       "#{discovery_count} discovery jobs queued, " <>
-      "#{research_count} research batches queued"
+      "#{research_count} research batches queued, " <>
+      "#{image_count} image scrape jobs queued"
     )
 
     :ok
@@ -115,6 +121,39 @@ defmodule GaliciaLocal.Workers.RegionDiscoveryScheduler do
         acc + 1
       else
         acc
+      end
+    end)
+  end
+
+  defp queue_image_scraping(regions) do
+    Enum.reduce(regions, 0, fn region, acc ->
+      query = """
+      SELECT id::text
+      FROM businesses
+      WHERE region_id = $1::uuid
+        AND status IN ('enriched', 'verified')
+        AND website IS NOT NULL
+        AND website != ''
+        AND (photo_urls IS NULL OR photo_urls = '[]')
+      LIMIT 100
+      """
+
+      %{rows: rows} = GaliciaLocal.Repo.query!(query, [Ecto.UUID.dump!(region.id)])
+
+      if rows == [] do
+        acc
+      else
+        Logger.info(
+          "RegionDiscoveryScheduler: #{region.name} — queuing image scraping for #{length(rows)} businesses without photos"
+        )
+
+        Enum.each(rows, fn [id] ->
+          %{business_id: id}
+          |> ImageScrapeWorker.new()
+          |> Oban.insert()
+        end)
+
+        acc + length(rows)
       end
     end)
   end
