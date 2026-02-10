@@ -20,8 +20,10 @@ if System.get_env("PHX_SERVER") do
   config :galicia_local, GaliciaLocalWeb.Endpoint, server: true
 end
 
-config :galicia_local, GaliciaLocalWeb.Endpoint,
-  http: [port: String.to_integer(System.get_env("PORT", "4000"))]
+if config_env() != :worker do
+  config :galicia_local, GaliciaLocalWeb.Endpoint,
+    http: [port: String.to_integer(System.get_env("PORT", "4000"))]
+end
 
 # API keys for research pipeline
 config :galicia_local, :tavily_api_key, System.get_env("TAVILY_API_KEY")

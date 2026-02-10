@@ -22,20 +22,28 @@ defmodule GaliciaLocal.Application do
          )}
       end
 
+    base_children = [
+      GaliciaLocalWeb.Telemetry,
+      GaliciaLocal.Repo,
+      {DNSCluster, query: Application.get_env(:galicia_local, :dns_cluster_query) || :ignore},
+      oban_child,
+      {Phoenix.PubSub, name: GaliciaLocal.PubSub}
+    ]
+
     children =
-      [
-        GaliciaLocalWeb.Telemetry,
-        GaliciaLocal.Repo,
-        {DNSCluster, query: Application.get_env(:galicia_local, :dns_cluster_query) || :ignore},
-        oban_child,
-        GaliciaLocal.Scraper.ApiCache,
-        GaliciaLocal.Scraper.CrawlMonitor,
-        GaliciaLocal.Scraper.CrawlResume,
-        {Phoenix.PubSub, name: GaliciaLocal.PubSub},
-        # Start to serve requests, typically the last entry
-        GaliciaLocalWeb.Endpoint,
-        {AshAuthentication.Supervisor, [otp_app: :galicia_local]}
-      ] ++ worker_children()
+      if Application.get_env(:galicia_local, :worker_health_port) do
+        # Worker mode: no Phoenix endpoint, no scraper processes
+        base_children ++ worker_children()
+      else
+        base_children ++
+          [
+            GaliciaLocal.Scraper.ApiCache,
+            GaliciaLocal.Scraper.CrawlMonitor,
+            GaliciaLocal.Scraper.CrawlResume,
+            GaliciaLocalWeb.Endpoint,
+            {AshAuthentication.Supervisor, [otp_app: :galicia_local]}
+          ]
+      end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
