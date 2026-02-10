@@ -19,8 +19,8 @@ defmodule GaliciaLocal.Mailer.EmailLayout do
               <!-- Header -->
               <tr>
                 <td style="background-color: #4f46e5; padding: 24px 32px; text-align: center;">
-                  <span style="font-size: 24px; margin-right: 8px;">&#x1F41A;</span>
-                  <span style="color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; vertical-align: middle;">GaliciaLocal</span>
+                  <span style="font-size: 24px; margin-right: 8px;">&#x1F4CD;</span>
+                  <span style="color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; vertical-align: middle;">StartLocal</span>
                 </td>
               </tr>
               <!-- Content -->
@@ -33,8 +33,8 @@ defmodule GaliciaLocal.Mailer.EmailLayout do
               <tr>
                 <td style="padding: 20px 32px; border-top: 1px solid #e4e4e7; text-align: center;">
                   <p style="margin: 0; font-size: 13px; color: #a1a1aa;">
-                    <a href="https://galicialocal.com" style="color: #4f46e5; text-decoration: none;">galicialocal.com</a>
-                    &nbsp;&middot;&nbsp; Helping newcomers integrate into Galician life
+                    <a href="https://startlocal.app" style="color: #4f46e5; text-decoration: none;">startlocal.app</a>
+                    &nbsp;&middot;&nbsp; Your local guide to life abroad
                   </p>
                 </td>
               </tr>

@@ -19,9 +19,9 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendMagicLinkEmail do
       end
 
     new()
-    |> from({"GaliciaLocal", "support@galicialocal.com"})
+    |> from({"StartLocal", "support@startlocal.app"})
     |> to(to_string(email))
-    |> subject("Your sign-in link for GaliciaLocal")
+    |> subject("Your sign-in link for StartLocal")
     |> html_body(body(token: token, email: email))
     |> Mailer.deliver!()
   end
@@ -30,7 +30,7 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendMagicLinkEmail do
     link_url = url(~p"/magic_link/#{params[:token]}")
 
     content =
-      EmailLayout.paragraph("Hello! Click the button below to sign in to GaliciaLocal.") <>
+      EmailLayout.paragraph("Hello! Click the button below to sign in to StartLocal.") <>
         EmailLayout.button(link_url, "Sign In") <>
         EmailLayout.paragraph("This link will expire in 10 minutes. If you didn't request this, you can safely ignore this email.") <>
         EmailLayout.fallback_link(link_url)

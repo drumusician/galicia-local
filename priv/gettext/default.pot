@@ -650,11 +650,6 @@ msgstr ""
 msgid "Galicia, Spain"
 msgstr ""
 
-#: lib/galicia_local_web/controllers/page_html/privacy.html.heex:10
-#, elixir-autogen, elixir-format
-msgid "GaliciaLocal (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website galicialocal.com."
-msgstr ""
-
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:74
 #, elixir-autogen, elixir-format
 msgid "GaliciaLocal is a passion project created by people who love this beautiful region of northwestern Spain and want to help others discover its charms. We work with locals on the ground to verify information and ensure our listings reflect what you'll actually find when you get there."
@@ -1436,11 +1431,6 @@ msgstr ""
 #: lib/galicia_local_web/controllers/page_html/privacy.html.heex:18
 #, elixir-autogen, elixir-format
 msgid "Voluntarily:"
-msgstr ""
-
-#: lib/galicia_local_web/controllers/page_html/contact.html.heex:35
-#, elixir-autogen, elixir-format
-msgid "Want to list your business on GaliciaLocal? Send us an email with your business details and we'll get back to you."
 msgstr ""
 
 #: lib/galicia_local_web/components/layouts.ex:94
@@ -2629,4 +2619,14 @@ msgstr ""
 #: lib/galicia_local_web/live/admin/pipeline_live.ex:155
 #, elixir-autogen, elixir-format
 msgid "unique businesses"
+msgstr ""
+
+#: lib/galicia_local_web/controllers/page_html/privacy.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "StartLocal (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website startlocal.app."
+msgstr ""
+
+#: lib/galicia_local_web/controllers/page_html/contact.html.heex:35
+#, elixir-autogen, elixir-format
+msgid "Want to list your business on StartLocal? Send us an email with your business details and we'll get back to you."
 msgstr ""

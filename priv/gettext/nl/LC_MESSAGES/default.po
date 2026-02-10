@@ -650,11 +650,6 @@ msgstr "Van immigratieadvocaten tot internationale scholen — categorieën die 
 msgid "Galicia, Spain"
 msgstr "Galicië, Spanje"
 
-#: lib/galicia_local_web/controllers/page_html/privacy.html.heex:10
-#, elixir-autogen, elixir-format
-msgid "GaliciaLocal (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website galicialocal.com."
-msgstr "GaliciaLocal (\"wij\", \"ons\", of \"onze\") zet zich in voor de bescherming van uw privacy. Dit Privacybeleid legt uit hoe wij uw informatie verzamelen, gebruiken en beschermen wanneer u onze website galicialocal.com bezoekt."
-
 #: lib/galicia_local_web/controllers/page_html/about.html.heex:74
 #, elixir-autogen, elixir-format
 msgid "GaliciaLocal is a passion project created by people who love this beautiful region of northwestern Spain and want to help others discover its charms. We work with locals on the ground to verify information and ensure our listings reflect what you'll actually find when you get there."
@@ -1437,11 +1432,6 @@ msgstr "Bezocht"
 #, elixir-autogen, elixir-format
 msgid "Voluntarily:"
 msgstr "Vrijwillig:"
-
-#: lib/galicia_local_web/controllers/page_html/contact.html.heex:35
-#, elixir-autogen, elixir-format
-msgid "Want to list your business on GaliciaLocal? Send us an email with your business details and we'll get back to you."
-msgstr "Wilt u uw bedrijf op GaliciaLocal vermelden? Stuur ons een e-mail met uw bedrijfsgegevens en we nemen contact met u op."
 
 #: lib/galicia_local_web/components/layouts.ex:94
 #, elixir-autogen, elixir-format
@@ -2631,82 +2621,12 @@ msgstr "regio's"
 msgid "unique businesses"
 msgstr "unieke bedrijven"
 
-## Dynamic content: Portugal region (phrases + tips)
+#: lib/galicia_local_web/controllers/page_html/privacy.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "StartLocal (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website startlocal.app."
+msgstr "StartLocal (\"wij\", \"ons\" of \"onze\") zet zich in voor de bescherming van uw privacy. Dit privacybeleid legt uit hoe wij uw gegevens verzamelen, gebruiken en beschermen wanneer u onze website startlocal.app bezoekt."
 
-msgid "General greeting, works in any situation"
-msgstr "Standaardbegroeting, werkt in elke situatie"
-
-msgid "Greeting used until around noon"
-msgstr "Begroeting tot rond het middaguur"
-
-msgid "Use obrigado if male, obrigada if female"
-msgstr "Gebruik obrigado als man, obrigada als vrouw"
-
-msgid "When making a request or ordering"
-msgstr "Bij een verzoek of bestelling"
-
-msgid "Excuse me"
-msgstr "Pardon"
-
-msgid "To get someone's attention or pass by"
-msgstr "Om iemands aandacht te trekken of langs te lopen"
-
-msgid "Goodbye / See you later"
-msgstr "Tot ziens / Tot later"
-
-msgid "When leaving, até logo is more casual"
-msgstr "Bij het weggaan, até logo is informeler"
-
-msgid "When toasting drinks"
-msgstr "Bij het proosten"
-
-msgid "Said before eating, very common"
-msgstr "Gezegd voor het eten, heel gebruikelijk"
-
-msgid "Do you speak English?"
-msgstr "Spreekt u Engels?"
-
-msgid "Polite way to ask before switching to English"
-msgstr "Beleefde manier om te vragen voor je overschakelt naar Engels"
-
-msgid "The bill, please"
-msgstr "De rekening, alstublieft"
-
-msgid "When asking for the check at a restaurant"
-msgstr "Bij het vragen om de rekening in een restaurant"
-
-msgid "Relaxed Pace"
-msgstr "Ontspannen tempo"
-
-msgid "Lunch is sacred, often 1-2 hours. Many shops close between 1pm and 3pm, especially outside Lisbon and Porto."
-msgstr "Lunch is heilig, vaak 1-2 uur. Veel winkels sluiten tussen 13 en 15 uur, vooral buiten Lissabon en Porto."
-
-msgid "Cash Still Matters"
-msgstr "Contant geld telt nog steeds"
-
-msgid "Smaller cafés, markets, and rural businesses may not accept cards. Carry some cash, especially outside major cities."
-msgstr "Kleinere cafés, markten en landelijke bedrijven accepteren mogelijk geen kaarten. Heb wat contant geld bij je, vooral buiten de grote steden."
-
-msgid "Coffee Culture"
-msgstr "Koffiecultuur"
-
-msgid "A 'café' means espresso. Portuguese coffee culture is central to daily life — stand at the counter for a cheaper price in traditional spots."
-msgstr "Een 'café' betekent espresso. Portugese koffiecultuur is centraal in het dagelijks leven — sta aan de bar voor een goedkopere prijs in traditionele gelegenheden."
-
-msgid "Personal Connections"
-msgstr "Persoonlijke connecties"
-
-msgid "Relationships matter in business. Greet shopkeepers, learn names, and become a regular — you'll unlock better service and local tips."
-msgstr "Relaties zijn belangrijk in het zakenleven. Groet winkeliers, leer namen en word een vaste klant — je krijgt betere service en lokale tips."
-
-msgid "Saints' Festivals"
-msgstr "Heiligenfeesten"
-
-msgid "June is packed with festas for Santos Populares. Expect street parties, grilled sardines, and neighbourhood celebrations nationwide."
-msgstr "Juni staat vol met feesten voor Santos Populares. Verwacht straatfeesten, gegrilde sardines en buurtfeesten door het hele land."
-
-msgid "Language Effort"
-msgstr "Talige inzet"
-
-msgid "Most Portuguese speak some English, but attempting Portuguese — even basics — is deeply appreciated and opens doors."
-msgstr "De meeste Portugezen spreken wat Engels, maar Portugees proberen — zelfs de basis — wordt zeer gewaardeerd en opent deuren."
+#: lib/galicia_local_web/controllers/page_html/contact.html.heex:35
+#, elixir-autogen, elixir-format
+msgid "Want to list your business on StartLocal? Send us an email with your business details and we'll get back to you."
+msgstr "Wilt u uw bedrijf op StartLocal vermelden? Stuur ons een e-mail met uw bedrijfsgegevens en we nemen contact met u op."

@@ -14,9 +14,9 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendNewUserConfirmationEmail do
   @impl true
   def send(user, token, _) do
     new()
-    |> from({"GaliciaLocal", "support@galicialocal.com"})
+    |> from({"StartLocal", "support@startlocal.app"})
     |> to(to_string(user.email))
-    |> subject("Confirm your email – Welcome to GaliciaLocal!")
+    |> subject("Confirm your email – Welcome to StartLocal!")
     |> html_body(body(token: token))
     |> Mailer.deliver!()
   end
@@ -25,7 +25,7 @@ defmodule GaliciaLocal.Accounts.User.Senders.SendNewUserConfirmationEmail do
     link_url = url(~p"/confirm_new_user/#{params[:token]}")
 
     content =
-      EmailLayout.paragraph("Welcome to GaliciaLocal! We're glad you're here.") <>
+      EmailLayout.paragraph("Welcome to StartLocal! We're glad you're here.") <>
         EmailLayout.paragraph("Please confirm your email address by clicking the button below to get started.") <>
         EmailLayout.button(link_url, "Confirm Email") <>
         EmailLayout.paragraph("If you didn't create an account, you can safely ignore this email.") <>
