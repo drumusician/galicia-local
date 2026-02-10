@@ -14,11 +14,12 @@ config :galicia_local, Oban,
     discovery: 2,
     scraper: 3,
     research: 3,
+    # Claude CLI queues — keep total concurrency low to stay within Max plan rate limits
     business_enrich_pending: 1,
     business_enrich_researched: 1,
     business_enrich_pending_no_website: 1,
     business_translate_all_locales: 1,
-    translations: 2
+    translations: 1
   ],
   plugins: [
     {Oban.Plugins.Cron,
