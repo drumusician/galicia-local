@@ -64,7 +64,7 @@ defmodule GaliciaLocal.Workers.BatchResearchWorker do
 
     params =
       if region_id,
-        do: [batch_size, offset, region_id],
+        do: [batch_size, offset, Ecto.UUID.dump!(region_id)],
         else: [batch_size, offset]
 
     query = """
@@ -131,7 +131,7 @@ defmodule GaliciaLocal.Workers.BatchResearchWorker do
   def pending_count(opts \\ []) do
     region_id = Keyword.get(opts, :region_id)
     region_filter = if region_id, do: "AND b.region_id = $1::uuid", else: ""
-    params = if region_id, do: [region_id], else: []
+    params = if region_id, do: [Ecto.UUID.dump!(region_id)], else: []
 
     query = """
     SELECT

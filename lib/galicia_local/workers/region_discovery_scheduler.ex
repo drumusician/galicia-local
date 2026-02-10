@@ -97,7 +97,7 @@ defmodule GaliciaLocal.Workers.RegionDiscoveryScheduler do
     ORDER BY COUNT(b.id) ASC, c.name
     """
 
-    %{rows: rows} = GaliciaLocal.Repo.query!(query, [region_id, @min_businesses_threshold])
+    %{rows: rows} = GaliciaLocal.Repo.query!(query, [Ecto.UUID.dump!(region_id), @min_businesses_threshold])
 
     Enum.map(rows, fn [id, name, count] -> {id, name, count} end)
   end
@@ -129,7 +129,7 @@ defmodule GaliciaLocal.Workers.RegionDiscoveryScheduler do
       AND website != ''
     """
 
-    %{rows: [[count]]} = GaliciaLocal.Repo.query!(query, [region_id])
+    %{rows: [[count]]} = GaliciaLocal.Repo.query!(query, [Ecto.UUID.dump!(region_id)])
     count
   end
 end
