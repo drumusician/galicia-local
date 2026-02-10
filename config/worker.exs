@@ -44,6 +44,9 @@ config :swoosh, api_client: Swoosh.ApiClient.Req
 # Disable Swoosh Local Memory Storage
 config :swoosh, local: false
 
+# Disable Crawly's built-in HTTP API (defaults to port 4001, conflicts with health check)
+config :crawly, start_http_api?: false
+
 # Worker health check port
 config :galicia_local, worker_health_port: 4001
 
