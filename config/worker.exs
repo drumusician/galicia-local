@@ -30,9 +30,9 @@ config :galicia_local, Oban,
     {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7}
   ]
 
-# Enrichment & translation schedulers enabled
-config :galicia_local, enrich_scheduler_cron: "*/5 * * * *"
-config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
+# Enrichment & translation schedulers DISABLED until Claude CLI is installed on VPS
+# config :galicia_local, enrich_scheduler_cron: "*/5 * * * *"
+# config :galicia_local, translate_all_scheduler_cron: "*/10 * * * *"
 
 # Research data on persistent disk
 config :galicia_local, research_data_dir: "/data/research"
