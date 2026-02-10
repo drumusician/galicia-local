@@ -1,40 +1,41 @@
 #!/bin/bash
 # Deploy script for the Content Worker
-# Run as deploy user: sudo -u deploy bash scripts/deploy_worker.sh
+# Run as root: bash /opt/galicia-local/scripts/deploy_worker.sh
 #
-# Pulls latest code, compiles, migrates, and restarts the worker service.
+# Stops the worker, pulls latest code, compiles, and restarts.
 
 set -euo pipefail
 
 APP_DIR="/opt/galicia-local"
-export MIX_ENV=worker
-export PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
-
-cd "$APP_DIR"
 
 echo "=== Deploying Content Worker ==="
 
-# Pull latest code
-echo "--- Pulling latest code ---"
-git pull origin master
+# Stop service first
+echo "--- Stopping worker service ---"
+sudo systemctl stop galicia-worker
 
-# Install dependencies
-echo "--- Installing dependencies ---"
-mix deps.get --only $MIX_ENV
+# Run the rest as deploy user
+sudo -u deploy bash -c "
+  export MIX_ENV=worker
+  export PATH=\"\$HOME/.asdf/bin:\$HOME/.asdf/shims:\$PATH\"
+  cd $APP_DIR
 
-# Compile
-echo "--- Compiling ---"
-mix compile
+  echo '--- Pulling latest code ---'
+  git pull origin master
 
-# Run migrations
-echo "--- Running migrations ---"
-mix ecto.migrate
+  echo '--- Installing dependencies ---'
+  mix deps.get
+
+  echo '--- Compiling (forced for compile_env changes) ---'
+  mix compile --force
+"
 
 # Restart service
-echo "--- Restarting worker service ---"
-sudo systemctl restart galicia-worker
+echo "--- Starting worker service ---"
+sudo systemctl start galicia-worker
 
 echo ""
 echo "=== Deploy complete! ==="
 echo "Check status: sudo systemctl status galicia-worker"
+echo "Check health: curl http://localhost:4001/health"
 echo "Check logs:   journalctl -u galicia-worker -f"
