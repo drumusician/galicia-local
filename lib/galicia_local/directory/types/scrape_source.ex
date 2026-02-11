@@ -10,6 +10,7 @@ defmodule GaliciaLocal.Directory.Types.ScrapeSource do
       tripadvisor: [description: "TripAdvisor reviews and listings", label: "TripAdvisor"],
       manual: [description: "Manually entered data", label: "Manual Entry"],
       web_scrape: [description: "General web scraping", label: "Web Scrape"],
-      discovery_spider: [description: "Discovery spider - directory crawl + Claude extraction", label: "Discovery Spider"]
+      discovery_spider: [description: "Discovery spider - directory crawl + Claude extraction", label: "Discovery Spider"],
+      user_submitted: [description: "User-submitted recommendation", label: "User Submitted"]
     ]
 end

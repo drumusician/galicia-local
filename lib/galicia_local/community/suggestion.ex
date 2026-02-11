@@ -16,6 +16,8 @@ defmodule GaliciaLocal.Community.Suggestion do
   code_interface do
     define :create
     define :list_pending
+    define :list_all
+    define :update_status
   end
 
   actions do
@@ -32,6 +34,10 @@ defmodule GaliciaLocal.Community.Suggestion do
 
     read :list_pending do
       filter expr(status == :pending)
+      prepare build(sort: [inserted_at: :desc])
+    end
+
+    read :list_all do
       prepare build(sort: [inserted_at: :desc])
     end
   end

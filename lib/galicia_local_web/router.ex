@@ -101,6 +101,7 @@ defmodule GaliciaLocalWeb.Router do
       live "/admin/analytics", Admin.AnalyticsLive, :index
       live "/admin/translations", Admin.TranslationsLive, :index
       live "/admin/claims", Admin.ClaimsLive, :index
+      live "/admin/suggestions", Admin.SuggestionsLive, :index
       live "/admin/users", Admin.UsersLive, :index
       live "/admin/pipeline", Admin.PipelineLive, :index
       live "/admin/regions", Admin.RegionsLive, :index

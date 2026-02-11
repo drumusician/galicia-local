@@ -334,6 +334,21 @@ defmodule GaliciaLocalWeb.Admin.DashboardLive do
             </div>
           </.link>
 
+          <!-- Suggestions -->
+          <.link navigate={~p"/admin/suggestions"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <div class="card-body">
+              <div class="flex items-center gap-4">
+                <div class="bg-info/10 rounded-xl p-3">
+                  <span class="hero-light-bulb w-8 h-8 text-info"></span>
+                </div>
+                <div>
+                  <h3 class="card-title">{gettext("Suggestions")}</h3>
+                  <p class="text-sm text-base-content/70">{gettext("Review user recommendations")}</p>
+                </div>
+              </div>
+            </div>
+          </.link>
+
           <!-- Users -->
           <.link navigate={~p"/admin/users"} class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
             <div class="card-body">
