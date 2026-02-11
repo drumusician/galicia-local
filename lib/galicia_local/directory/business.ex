@@ -27,6 +27,7 @@ defmodule GaliciaLocal.Directory.Business do
       # Enrich businesses that have completed research
       trigger :enrich_researched do
         scheduler_cron Application.compile_env(:galicia_local, :enrich_scheduler_cron, false)
+        scheduler_queue :default
         action :enrich_with_llm
         where expr(status == :researched)
         read_action :read
@@ -39,6 +40,7 @@ defmodule GaliciaLocal.Directory.Business do
       # (they skip the research phase)
       trigger :enrich_pending_no_website do
         scheduler_cron Application.compile_env(:galicia_local, :enrich_scheduler_cron, false)
+        scheduler_queue :default
         action :enrich_with_llm
         where expr(status == :pending and is_nil(website))
         read_action :read
@@ -50,6 +52,7 @@ defmodule GaliciaLocal.Directory.Business do
       # Translate enriched content to all region locales
       trigger :translate_all_locales do
         scheduler_cron Application.compile_env(:galicia_local, :translate_all_scheduler_cron, false)
+        scheduler_queue :default
         action :translate_all_locales
         where expr(
           status in [:enriched, :verified] and
