@@ -68,22 +68,25 @@ else
     echo "Logs: fly logs -a $APP_NAME"
 fi
 
-# Deploy worker VPS
-WORKER_HOST="deploy@89.167.60.204"
-echo ""
-echo -e "${GREEN}🔧 Deploying Content Worker...${NC}"
-
-if ssh -o ConnectTimeout=5 "$WORKER_HOST" "true" 2>/dev/null; then
-    ssh "$WORKER_HOST" 'export PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH" && cd /opt/galicia-local && git pull origin master && MIX_ENV=worker mix deps.get && MIX_ENV=worker mix compile --force'
-    ssh "$WORKER_HOST" 'sudo systemctl restart galicia-worker'
-    sleep 5
-    if ssh "$WORKER_HOST" 'curl -sf http://localhost:4001/health' > /dev/null; then
-        echo -e "${GREEN}✅ Worker is healthy${NC}"
-    else
-        echo -e "${YELLOW}⚠️  Worker health check failed - check: ssh $WORKER_HOST journalctl -u galicia-worker -f${NC}"
-    fi
-else
-    echo -e "${YELLOW}⚠️  Cannot reach worker VPS ($WORKER_HOST), skipping worker deploy${NC}"
-fi
+# Worker VPS deployment DISABLED (2026-02-20) — paused to reduce costs.
+# The worker VPS (89.167.60.204) should be fully stopped.
+# To re-enable, uncomment the block below and restore worker.exs Oban config.
+#
+# WORKER_HOST="deploy@89.167.60.204"
+# echo ""
+# echo -e "${GREEN}🔧 Deploying Content Worker...${NC}"
+#
+# if ssh -o ConnectTimeout=5 "$WORKER_HOST" "true" 2>/dev/null; then
+#     ssh "$WORKER_HOST" 'export PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH" && cd /opt/galicia-local && git pull origin master && MIX_ENV=worker mix deps.get && MIX_ENV=worker mix compile --force'
+#     ssh "$WORKER_HOST" 'sudo systemctl restart galicia-worker'
+#     sleep 5
+#     if ssh "$WORKER_HOST" 'curl -sf http://localhost:4001/health' > /dev/null; then
+#         echo -e "${GREEN}✅ Worker is healthy${NC}"
+#     else
+#         echo -e "${YELLOW}⚠️  Worker health check failed - check: ssh $WORKER_HOST journalctl -u galicia-worker -f${NC}"
+#     fi
+# else
+#     echo -e "${YELLOW}⚠️  Cannot reach worker VPS ($WORKER_HOST), skipping worker deploy${NC}"
+# fi
 
 echo -e "${GREEN}🎉 Deployment complete!${NC}"

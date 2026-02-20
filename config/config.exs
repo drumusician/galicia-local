@@ -155,7 +155,18 @@ config :appsignal, :config,
   name: "GaliciaLocal",
   push_api_key: System.get_env("APPSIGNAL_PUSH_API_KEY"),
   env: Mix.env(),
-  active: config_env() == :prod
+  active: config_env() == :prod,
+  ignore_actions: [
+    # Oban workers with high throughput — skip to reduce AppSignal volume
+    "GaliciaLocal.Directory.Business.TranslateAllWorker#perform",
+    "GaliciaLocal.Directory.Business.TranslateSpanishWorker#perform",
+    "GaliciaLocal.Workers.TranslateWorker#perform",
+    "GaliciaLocal.Directory.Business.EnrichPendingWorker#perform",
+    "GaliciaLocal.Directory.Business.EnrichResearchedWorker#perform",
+    "GaliciaLocal.Directory.Business.EnrichPendingScheduler#perform",
+    "GaliciaLocal.Directory.Business.EnrichResearchedScheduler#perform",
+    "GaliciaLocal.Directory.Business.TranslateAllScheduler#perform"
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

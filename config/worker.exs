@@ -3,38 +3,24 @@ import Config
 # Worker environment: headless content pipeline
 # No web server — only Oban workers for discovery, enrichment, and translation.
 # Connects to the same Supabase database as production.
+#
+# NOTE: Worker VPS is DISABLED (2026-02-20). All Oban processing and
+# automatic discovery/enrichment/translation is paused to reduce costs.
+# The worker VPS (89.167.60.204) should be stopped via:
+#   ssh deploy@89.167.60.204 'sudo systemctl stop galicia-worker'
 
 # No web server
 config :galicia_local, GaliciaLocalWeb.Endpoint, server: false
 
-# All heavy queues enabled with appropriate concurrency
+# Disable ALL Oban processing on worker — paused to reduce costs.
+# Was running discovery, enrichment, and translation jobs automatically.
 config :galicia_local, Oban,
-  queues: [
-    default: 5,
-    discovery: 2,
-    scraper: 3,
-    research: 3,
-    # Claude CLI queues — keep total concurrency low to stay within Max plan rate limits
-    business_enrich_pending: 1,
-    business_enrich_researched: 1,
-    business_enrich_pending_no_website: 1,
-    business_translate_all_locales: 1,
-    translations: 1
-  ],
-  plugins: [
-    {Oban.Plugins.Cron,
-     crontab: [
-       # Daily at 02:00 UTC — discover businesses for underpopulated cities
-       {"0 2 * * *", GaliciaLocal.Workers.RegionDiscoveryScheduler}
-     ]},
-    {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(30)},
-    {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7}
-  ]
+  queues: false,
+  plugins: false
 
-# Enrichment & translation schedulers
-# Run every 30 min to avoid flooding the database with jobs
-config :galicia_local, enrich_scheduler_cron: "*/30 * * * *"
-config :galicia_local, translate_all_scheduler_cron: "*/30 * * * *"
+# Enrichment & translation schedulers DISABLED
+# config :galicia_local, enrich_scheduler_cron: "*/30 * * * *"
+# config :galicia_local, translate_all_scheduler_cron: "*/30 * * * *"
 
 # Research data on persistent disk
 config :galicia_local, research_data_dir: "/data/research"
@@ -55,5 +41,5 @@ config :galicia_local, worker_health_port: 4001
 # Do not print debug messages
 config :logger, level: :info
 
-# AppSignal active for worker too
-config :appsignal, :config, active: true
+# AppSignal disabled — worker is not running
+config :appsignal, :config, active: false
