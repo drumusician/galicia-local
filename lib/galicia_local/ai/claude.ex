@@ -5,7 +5,7 @@ defmodule GaliciaLocal.AI.Claude do
   require Logger
 
   @api_url "https://api.anthropic.com/v1/messages"
-  @model "claude-sonnet-4-20250514"
+  @model "claude-sonnet-4-6"
   @max_tokens 1024
 
   @doc """
