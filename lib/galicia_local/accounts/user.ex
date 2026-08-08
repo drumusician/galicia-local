@@ -80,6 +80,27 @@ defmodule GaliciaLocal.Accounts.User do
       filter expr(id == ^arg(:id))
     end
 
+    destroy :destroy
+
+    read :stale_unconfirmed do
+      description """
+      Users who registered before `cutoff`, never confirmed their email, and
+      left nothing behind. Signup spam looks exactly like this; a real user who
+      got as far as favouriting or claiming anything is excluded by the
+      `exists` clauses, and so is anything with an FK pointing at it — which
+      also keeps the delete from tripping a foreign key constraint, since none
+      of those tables cascade.
+      """
+
+      argument :cutoff, :utc_datetime_usec, allow_nil?: false
+
+      filter expr(
+               is_nil(confirmed_at) and is_admin == false and inserted_at < ^arg(:cutoff) and
+                 not exists(favorites) and not exists(reviews) and not exists(suggestions) and
+                 not exists(claims) and not exists(owned_businesses)
+             )
+    end
+
     update :update_profile do
       accept [:display_name, :bio, :origin_country, :avatar_url, :city_id]
     end
@@ -184,6 +205,10 @@ defmodule GaliciaLocal.Accounts.User do
         allow_nil? false
         sensitive? true
       end
+
+      # Throwaway addresses are the bulk of automated signups, and each one
+      # costs a Postmark send that is guaranteed never to be read.
+      validate {GaliciaLocal.Accounts.User.Validations.NotDisposableEmail, argument: :email}
 
       # Sets the email from the argument
       change set_attribute(:email, arg(:email))
@@ -356,6 +381,13 @@ defmodule GaliciaLocal.Accounts.User do
     end
 
     has_many :favorites, GaliciaLocal.Community.Favorite
+    has_many :reviews, GaliciaLocal.Community.Review
+    has_many :suggestions, GaliciaLocal.Community.Suggestion
+    has_many :claims, GaliciaLocal.Directory.BusinessClaim
+
+    has_many :owned_businesses, GaliciaLocal.Directory.Business do
+      destination_attribute :owner_id
+    end
   end
 
   aggregates do

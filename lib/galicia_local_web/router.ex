@@ -16,6 +16,10 @@ defmodule GaliciaLocalWeb.Router do
     plug :put_secure_browser_headers
     plug :load_from_session
     plug GaliciaLocalWeb.Plugs.SetLocale
+    # No-ops unless the request is a POST to one of the auth endpoints that
+    # sends email. Lives here because `auth_routes` generates its routes inside
+    # this pipeline's scope and cannot be given a pipeline of its own.
+    plug GaliciaLocalWeb.Plugs.RateLimitAuth
   end
 
   pipeline :with_region do

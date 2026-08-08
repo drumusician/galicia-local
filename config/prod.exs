@@ -38,6 +38,12 @@ config :galicia_local, Oban,
   queues: false,
   plugins: false
 
+# Delete never-confirmed signups. Not an Oban job because Oban is passive here
+# (see above), so this runs as a supervised GenServer instead.
+config :galicia_local,
+  stale_signup_cleanup?: true,
+  unconfirmed_user_retention_days: 7
+
 # Store discovery crawl data on persistent volume (survives deploys)
 config :galicia_local, discovery_data_dir: "/data/claude/discovery"
 

@@ -40,15 +40,26 @@ defmodule GaliciaLocal.Application do
             GaliciaLocal.Scraper.ApiCache,
             GaliciaLocal.Scraper.CrawlMonitor,
             GaliciaLocal.Scraper.CrawlResume,
+            GaliciaLocalWeb.RateLimit,
             GaliciaLocalWeb.Endpoint,
             {AshAuthentication.Supervisor, [otp_app: :galicia_local]}
-          ]
+          ] ++ stale_signup_cleanup_children()
       end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: GaliciaLocal.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  # Deletes never-confirmed signups. Runs on the web instance only — the worker
+  # VPS is currently stopped, and one sweeper is enough.
+  defp stale_signup_cleanup_children do
+    if Application.get_env(:galicia_local, :stale_signup_cleanup?, false) do
+      [GaliciaLocal.Accounts.StaleSignupCleanup]
+    else
+      []
+    end
   end
 
   # In worker mode, start the health check endpoint
