@@ -39,9 +39,10 @@ config :crawly,
   middlewares: [
     Crawly.Middlewares.DomainFilter,
     Crawly.Middlewares.UniqueRequest,
-    {Crawly.Middlewares.UserAgent, user_agents: [
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    ]},
+    {Crawly.Middlewares.UserAgent,
+     user_agents: [
+       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+     ]},
     {Crawly.Middlewares.RequestOptions, [timeout: 30_000, recv_timeout: 30_000]}
   ],
   pipelines: [
@@ -97,7 +98,12 @@ config :galicia_local,
   ecto_repos: [GaliciaLocal.Repo],
   generators: [timestamp_type: :utc_datetime],
   base_url: "https://startlocal.app",
-  ash_domains: [GaliciaLocal.Accounts, GaliciaLocal.Directory, GaliciaLocal.Community, GaliciaLocal.Analytics],
+  ash_domains: [
+    GaliciaLocal.Accounts,
+    GaliciaLocal.Directory,
+    GaliciaLocal.Community,
+    GaliciaLocal.Analytics
+  ],
   ash_authentication: [return_error_on_invalid_magic_link_token?: true]
 
 # Configure the endpoint
@@ -165,7 +171,33 @@ config :appsignal, :config,
     "GaliciaLocal.Directory.Business.EnrichResearchedWorker#perform",
     "GaliciaLocal.Directory.Business.EnrichPendingScheduler#perform",
     "GaliciaLocal.Directory.Business.EnrichResearchedScheduler#perform",
-    "GaliciaLocal.Directory.Business.TranslateAllScheduler#perform"
+    "GaliciaLocal.Directory.Business.TranslateAllScheduler#perform",
+
+    # Public read-only pages. These are ~95% of all throughput and are almost
+    # entirely crawler traffic, so they dominate the AppSignal request bill
+    # without telling us anything we act on. Ignored actions report no
+    # performance *and* no error data, but an exception raised inside one of
+    # these still surfaces as the separate
+    # `Render "500.html" template from GaliciaLocalWeb.ErrorHTML` action,
+    # so outages remain visible. Remove entries here to get detail back.
+    "GET /:region",
+    "GET /:region/businesses/:id",
+    "GET /:region/categories/:slug",
+    "GET /:region/categories",
+    "GET /:region/cities/:slug",
+    "GET /:region/cities",
+    "GET /:region/search",
+    "GET /:region/members/:id",
+    "GET /",
+
+    # Unauthenticated auth pages, hammered by the same bots that drive the
+    # signup spam. The POST /auth actions are deliberately kept so real
+    # sign-in/registration failures stay visible.
+    "GET /sign-in",
+    "GET /register",
+    "GET /reset",
+    "GET /password-reset/:token",
+    "GET /confirm_new_user/:token"
   ]
 
 # Import environment specific config. This must remain at the bottom
